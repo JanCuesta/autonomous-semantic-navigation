@@ -181,6 +181,7 @@ DIAG-01 & Report clear mission success, cancellation, timeout, or failure. & Mis
 \end{itemize}
 \exitcheck{A clean terminal can reproduce the build and communicate with the simulator using documented commands.}
 
+\newpage
 \stagebanner{02 / ARCHITECTURE AND PROJECT FOUNDATION}{Interfaces before integration}
 
 \workstep{5.}{Define system architecture and interface control}
@@ -193,7 +194,6 @@ DIAG-01 & Report clear mission success, cancellation, timeout, or failure. & Mis
 \end{itemize}
 \exitcheck{The ROS graph, TF ownership, command path, and simulation/hardware replacements are unambiguous before implementation.}
 
-\newpage
 \workstep{6.}{Create the repository, packages, and continuous quality controls}
 \begin{itemize}
   \item[\cb] Create the workspace under \texttt{~/projects}; initialize Git with README, license decision, issue list, change log, and tagged baselines.
@@ -205,6 +205,7 @@ DIAG-01 & Report clear mission success, cancellation, timeout, or failure. & Mis
 \end{itemize}
 \exitcheck{The project rebuilds from source, package responsibilities are clear, and automated checks run from the beginning.}
 
+\newpage
 \stagebanner{03 / SIMULATION AND COMPONENT INTEGRATION}{Build the minimum valid system}
 
 \workstep{7.}{Build and version the lightweight Isaac Sim acceptance world}
@@ -227,7 +228,6 @@ DIAG-01 & Report clear mission success, cancellation, timeout, or failure. & Mis
 \end{itemize}
 \exitcheck{Motion matches commands and stale, absent, or terminated command sources produce the documented stop response.}
 
-\newpage
 \workstep{9.}{Integrate sensors, simulation time, and transforms}
 \begin{itemize}
   \item[\cb] Publish 2D LiDAR, wheel/joint measurements, odometry, simulation clock, and sensor transforms; add IMU data only if required for the V2 interface or planned comparison.
@@ -247,6 +247,7 @@ DIAG-01 & Report clear mission success, cancellation, timeout, or failure. & Mis
 \end{itemize}
 \exitcheck{Navigation does not depend on perfect global simulator pose, and odometry performance is measured and documented.}
 
+\newpage
 \stagebanner{04 / MAPPING, LOCALIZATION, AND AUTONOMY}{Integrate only after components pass}
 
 \workstep{11.}{Create and save the occupancy map}
@@ -259,7 +260,6 @@ DIAG-01 & Report clear mission success, cancellation, timeout, or failure. & Mis
 \end{itemize}
 \exitcheck{A usable map has been produced from simulated robot sensors and survives a clean restart.}
 
-\newpage
 \workstep{12.}{Localize on the saved map after restart}
 \begin{itemize}
   \item[\cb] Start saved-map navigation mode, load the map, and use AMCL for localization.
@@ -397,42 +397,6 @@ Sustained operation & PERF-02 & Thirty-minute session without unexplained crash,
 \end{enumerate}
 
 \textbf{Important:} V1 simulation evidence does not validate physical braking, wheel slip, motor polarity, sensor calibration, networking, human interaction, or emergency-stop effectiveness.
-
-\newpage
-\section{Two-week execution sprint}
-
-Each day is a work block, not an automatic completion date. Continue from the first failed exit check; do not bypass dependencies to protect the calendar.
-
-\begin{tabularx}{\textwidth}{>{\bfseries}p{10mm}p{70mm}X}
-\toprule
-Day & Main work & Observable result \\
-\midrule
-1 & ConOps, scope, requirements, risks & Baselined scope, requirement IDs, risk register \\
-2 & Hardware assumptions, architecture, TF/interfaces & Interface-control and mismatch list \\
-3 & Environment, repository, packages, tests & Reproducible build and quality command \\
-4 & Acceptance world and performance baseline & Saved, reloadable, measured scene \\
-5 & ROS motion and command expiry & Correct movement and predictable stopping \\
-6 & LiDAR, clock, TF, odometry & Coherent sensor data in RViz \\
-7 & Odometry validation and mapping & Error results and first saved map \\
-8 & Clean restart and AMCL & Localization on the saved map \\
-9 & Basic Nav2 configuration & First autonomous goal \\
-10 & Doorway/corridor tuning & Several repeatable routes \\
-11 & C++ mission manager and tests & Automated, cancellable waypoint mission \\
-12 & Fault injection, metrics, fusion decision & Predictable failures and recorded comparisons \\
-13 & Frozen acceptance campaign and fixes & Traceable pass/fail results \\
-14 & Regression, release, V2 gate review & Tagged V1 release or explicit remaining-work list \\
-\bottomrule
-\end{tabularx}
-
-\textbf{Dependency gates}
-\begin{itemize}
-  \item Coherent interfaces, frames, sensors, time, and odometry before mapping.
-  \item Saved-map localization before navigation tuning.
-  \item Reliable single-goal navigation before mission-manager expansion.
-  \item Frozen requirements and configuration before the acceptance campaign.
-\end{itemize}
-
-\textbf{If the sprint overruns:} preserve stopping behavior, fault handling, acceptance tests, evidence, and reproducibility. Defer visual polish, decorative assets, optional sensor fusion, and nonessential features.
 
 \newpage
 \section{Final release checklist}
