@@ -1,0 +1,100 @@
+requirement_id,group,type,shall_statement,status,verification_method,verification_rigor
+OPS-001,Operations,Functional,"The system shall inhibit motion until the required processes, simulation clock, LiDAR, odometry, TF, localization, command path, logging, and stop controls satisfy the Ready checks.",Baseline candidate,Test,Medium
+OPS-002,Operations,Performance,The controlled launcher shall reach Ready within 120 seconds of invocation.,Provisional target,Test,Medium
+OPS-003,Operations,Functional,The system shall permit manual velocity control only in Mapping mode and shall prohibit manual steering during navigation acceptance trials.,Baseline candidate,Test,High
+OPS-004,Operations,Safety,The system shall maintain only one authorized velocity-command source in each operating mode.,Baseline candidate,Test and inspection,High
+OPS-005,Operations,Functional,"After a normal goal cancellation, the system shall stop, report Canceled, return to Ready, and not resume the canceled goal automatically.",Baseline candidate,Test,Medium
+OPS-006,Operations,Functional,"Orderly shutdown shall cancel active motion, verify the stopped condition, preserve required evidence, avoid modifying the approved map, and terminate controlled processes in the documented order.",Baseline candidate,Test,Medium
+MAP-001,Mapping,Functional,The mapping function shall construct the occupancy map from simulated LiDAR and wheel-derived odometry without using simulator ground truth as a mapping or navigation input.,Baseline candidate,Test and inspection,Medium
+MAP-002,Mapping,Performance,Mapping commands shall not exceed 0.20 m/s linear speed or 0.60 rad/s angular speed.,Baseline candidate,Test,Medium
+MAP-003,Mapping,Functional,"The approved static occupancy map shall represent both rooms, both doorways, the corridor, turn pocket, permanent obstacles, and localization features without unexplained discontinuities or duplicated geometry.",Baseline candidate,Inspection and analysis,Medium
+MAP-004,Mapping,Performance,The initial occupancy-map resolution shall be 0.05 m/cell.,Provisional target,Inspection,Low
+MAP-005,Mapping,Evidence,"The saved map and metadata shall identify the world, robot, SLAM configuration, and repository revision used to create them.",Baseline candidate,Inspection,Low
+MAP-006,Mapping,Functional,The approved map shall load successfully after a clean restart.,Baseline candidate,Test,Medium
+MAP-007,Mapping,Configuration,Navigation operation shall not overwrite or silently modify the approved map.,Baseline candidate,Test and inspection,Medium
+MAP-008,Mapping,Performance,"After rigid 2D alignment, mapped doorway, corridor, and turn-pocket clear dimensions shall differ from programmed dimensions by no more than 0.10 m.",Provisional target,Analysis,Medium
+MAP-009,Mapping,Performance,"After rigid 2D alignment, at least 95 percent of sampled permanent boundaries shall lie within 0.15 m of their programmed boundaries, and no included sample shall exceed 0.20 m error.",Provisional target,Analysis,Medium
+MAP-010,Mapping,Safety,The approved map shall contain neither a false occupied region that blocks a frozen nominal route nor a false free opening through a wall that the planner can treat as traversable.,Baseline candidate,Analysis and demonstration,High
+LOC-001,Localization,Functional,Navigation startup shall load the approved map and accept an approximate initial pose for AMCL.,Baseline candidate,Test,Medium
+LOC-002,Localization,Performance,"The system shall achieve localization readiness from each of S1, S2, and S3 within 30 seconds after receiving a valid initial pose.",Provisional target,Test,Medium
+LOC-003,Localization,Functional,Nominal localization readiness shall not require manual or autonomous initialization motion.,Baseline candidate,Test,Medium
+LOC-004,Localization,Performance,"Localization shall not report Ready unless map-to-odom is available, required sensor and TF data are fresh, pose age is no greater than 0.50 seconds, and estimated horizontal and yaw standard deviations remain no greater than 0.20 m and 10 degrees for three continuous seconds.",Provisional target,Test and analysis,High
+LOC-005,Localization,Safety,"The mission manager shall reject goals while localization is absent, stale, or outside its readiness limits.",Baseline candidate,Test,High
+LOC-006,Localization,Safety,Loss or implausibility of localization during navigation shall stop mission motion and require restored readiness before further movement.,Baseline candidate,Fault-injection test,High
+LOC-007,Localization,Interface,"Simulator ground truth shall be used only for debugging and independent evaluation, not for mapping, localization, planning, or control.",Baseline candidate,Inspection and test,Medium
+NAV-001,Navigation,Functional,"The mission manager shall reject malformed, out-of-map, occupied, or operationally prohibited goals without commanding motion.",Baseline candidate,Test,Medium
+NAV-002,Navigation,Performance,The system shall acknowledge or reject a submitted goal within two seconds.,Baseline candidate,Test,Medium
+NAV-003,Navigation,Performance,The system shall provide the first navigation feedback within one second after goal acceptance.,Baseline candidate,Test,Medium
+NAV-004,Navigation,Performance,A valid accepted goal requiring movement shall produce the first nonzero navigation command within five seconds.,Baseline candidate,Test,Medium
+NAV-005,Navigation,Performance,"While navigation is active, mission feedback shall update at least once per second with no unexplained gap longer than two seconds.",Baseline candidate,Test,Medium
+NAV-006,Navigation,Interface,"Mission feedback shall identify mission state, elapsed time, remaining distance when available, recovery activity, required-system health, and warning or fault conditions.",Baseline candidate,Test and inspection,Medium
+NAV-007,Navigation,Functional,The system shall use the approved saved map for global planning and current LiDAR observations for local obstacle response.,Baseline candidate,Test and demonstration,High
+NAV-008,Navigation,Performance,Navigation and automatic-recovery commands shall not exceed 0.25 m/s linear speed or 0.75 rad/s angular speed.,Baseline candidate,Test,High
+NAV-009,Navigation,Performance,Successful goal completion shall have ground-truth position error no greater than 0.20 m.,Baseline candidate,Test and analysis,Medium
+NAV-010,Navigation,Performance,Successful goal completion shall have ground-truth heading error no greater than 10 degrees.,Baseline candidate,Test and analysis,Medium
+NAV-011,Navigation,Performance,"Successful goal completion shall maintain the position and heading tolerances, linear speed no greater than 0.01 m/s, and angular speed no greater than 0.02 rad/s for five continuous seconds.",Baseline candidate,Test and analysis,Medium
+NAV-012,Navigation,Performance,A navigation trial shall reach a valid terminal state within 180 seconds after goal acceptance.,Baseline candidate,Test,Medium
+NAV-013,Navigation,Functional,"In TB-A, the system shall detect the temporary box, use an available safe route, and reach the goal without contact or manual steering.",Baseline candidate,Test,High
+NAV-014,Navigation,Functional,"In TB-B, the system shall detect the blocked route, exhaust only permitted recovery actions, stop, report failure, and return stationary to Ready.",Baseline candidate,Test,High
+NAV-015,Navigation,Functional,"In TB-C, the system shall clear the removed temporary obstacle and continue the still-active goal when the recovery period has not expired.",Provisional target,Test,Medium
+NAV-016,Navigation,Safety,"If the TB-C goal has already terminated, the system shall remain stationary until the operator explicitly submits a new goal.",Baseline candidate,Test,High
+REC-001,Recovery,Functional,Automatic recovery shall not by itself fail a trial; a completed trial satisfying all criteria shall be recorded as Pass - recovery used.,Baseline candidate,Test and inspection,Medium
+REC-002,Recovery,Performance,"Following loss of a feasible path, the system shall attempt normal replanning for no more than 10 seconds before escalating recovery.",Provisional target,Test,Medium
+REC-003,Recovery,Functional,No more than one controlled local-costmap clear and repopulation shall be permitted in one recovery sequence.,Provisional target,Test,Medium
+REC-004,Recovery,Safety,The initial V1 recovery configuration shall not use backup or repeated spin behaviors.,Baseline candidate,Inspection and test,High
+REC-005,Recovery,Performance,The complete recovery sequence shall not exceed 30 seconds.,Provisional target,Test,Medium
+REC-006,Recovery,Safety,"Exhausted recovery shall command zero motion, report failure, return stationary to Ready, and not restart the failed goal automatically.",Baseline candidate,Test,High
+OBS-001,Live obstacles,Performance,A newly placed stationary obstacle observed by LiDAR shall appear in the active obstacle representation within 0.50 seconds of its first valid detection.,Provisional target,Test,High
+OBS-002,Live obstacles,Performance,A removed temporary obstacle shall clear from the active obstacle representation within three seconds when unobstructed LiDAR observations confirm free space.,Provisional target,Test,Medium
+OBS-003,Live obstacles,Safety,The local planner shall not command a path through a currently observed lethal obstacle even when that space is free in the saved map.,Baseline candidate,Test,High
+OBS-004,Live obstacles,Evidence,"TB-A, TB-B, and TB-C evidence shall include the relevant LiDAR, costmap, path, velocity-command, and mission-state records.",Baseline candidate,Inspection,Medium
+OBS-005,Live obstacles,Functional,The moving-cylinder stretch test shall evaluate whether changing obstacle position produces a predictable stop or avoidance response without contact.,Stretch,Exploratory test,Medium
+SAFE-001,Safety,Safety,"The robot shall register zero contact with walls, permanent obstacles, temporary obstacles, and controlled moving test objects during the frozen acceptance campaign.",Baseline candidate,Test,High
+SAFE-002,Safety,Safety,The robot shall maintain at least 0.20 m separation between its collision geometry and obstacles during controlled mapping and navigation.,Provisional target,Test and analysis,High
+SAFE-003,Safety,Safety,A temporary obstacle introduced ahead of a moving robot shall initially be at least 1.0 m from the front of its collision geometry.,Baseline candidate,Inspection and test,High
+SAFE-004,Safety,Safety,A velocity command shall be considered stale when no valid replacement is received for 0.50 seconds.,Baseline candidate,Test,High
+SAFE-005,Safety,Performance,"Following watchdog expiry, the base controller shall issue or hold zero velocity within 0.10 seconds.",Provisional target,Test,High
+SAFE-006,Safety,Performance,"Within one second after watchdog expiry, measured linear speed shall be no greater than 0.01 m/s and angular speed no greater than 0.02 rad/s.",Provisional target,Test,High
+SAFE-007,Safety,Performance,Motion after watchdog expiry shall not exceed 0.20 m before the stopped condition is achieved.,Provisional target,Test and analysis,High
+SAFE-008,Safety,Safety,"Stale or missing LiDAR, odometry, or required TF data shall inhibit new motion and stop active autonomous motion.",Baseline candidate,Fault-injection test,High
+SAFE-009,Safety,Safety,"A detected collision shall stop motion, fail the trial, preserve evidence, and inhibit further acceptance testing until reviewed.",Baseline candidate,Test,High
+SAFE-010,Safety,Safety,"Manual Safety Stop shall cancel the active goal, command zero velocity, latch motion inhibition, and require explicit operator reset followed by readiness checks.",Baseline candidate,Test,High
+SAFE-011,Safety,Safety,Activation of the simulated Emergency Stop input shall bypass normal mission sequencing and initiate motion inhibition within 0.10 seconds.,Provisional target,Test,High
+SAFE-012,Safety,Safety,"Emergency Stop shall cancel the active goal, command zero, block subsequent motion commands, and remain latched until explicit reset.",Baseline candidate,Test,High
+SAFE-013,Safety,Safety,Resetting Emergency Stop shall not produce motion and shall require the complete readiness sequence before a new goal can be accepted.,Baseline candidate,Test,High
+SAFE-014,Safety,Evidence,Diagnostics and evidence collection shall remain active when practical while simulated Emergency Stop is latched; orderly shutdown may follow only after motion inhibition is verified.,Baseline candidate,Test and inspection,High
+PERF-001,Performance,Performance,The physics simulation shall use a fixed 60 Hz step during controlled trials.,Provisional target,Inspection and test,Medium
+PERF-002,Performance,Performance,Mean simulation real-time factor shall be at least 0.95 during a valid trial.,Provisional target,Test and analysis,Medium
+PERF-003,Performance,Performance,Real-time factor shall not remain below 0.90 for longer than two continuous seconds.,Provisional target,Test and analysis,Medium
+PERF-004,Performance,Performance,LiDAR output shall maintain at least 9 Hz for the planned nominal 10 Hz configuration.,Provisional target,Test,Medium
+PERF-005,Performance,Performance,Odometry and the required dynamic base TF chain shall each maintain at least 27 Hz for their planned nominal 30 Hz configuration.,Provisional target,Test,Medium
+PERF-006,Performance,Performance,"Required LiDAR, odometry, and dynamic TF data used by navigation shall not be older than 0.25 seconds.",Provisional target,Test,High
+PERF-007,Performance,Performance,Command latency through the simulated robot interface shall not exceed 100 ms.,Provisional target,Test,Medium
+PERF-008,Performance,Reliability,"The system shall operate for 30 continuous minutes without an unexplained crash, accumulating fault, or material timing degradation.",Baseline candidate,Test,Medium
+DIAG-001,Diagnostics,Interface,"The mission manager shall expose at least Preparing, Ready, Navigating, Recovering, Succeeded, Failed, Canceled, Manual Stop, Emergency Stop, and Inhibited states.",Baseline candidate,Test and inspection,Medium
+DIAG-002,Diagnostics,Reliability,"Startup and nominal trials shall contain no safety-critical alarm, unresolved functional error, or non-approved recurring warning affecting required operation.",Baseline candidate,Test and inspection,Medium
+DIAG-003,Diagnostics,Interface,"Every rejected, canceled, timed-out, or failed mission shall record an outcome and actionable reason.",Baseline candidate,Test,Medium
+DIAG-004,Diagnostics,Interface,Expected automatic-recovery events shall be distinguishable from system-health faults.,Baseline candidate,Test and inspection,Low
+EVID-001,Evidence,Evidence,"Every controlled trial shall record requirement and test IDs, date and time, operator, scenario, start, goal, and result classification.",Baseline candidate,Inspection,Low
+EVID-002,Evidence,Evidence,"Every controlled trial shall identify the repository revision and exact world, robot, map, launch profile, mission, and parameter versions used.",Baseline candidate,Inspection,Medium
+EVID-003,Evidence,Evidence,"Every controlled trial shall record completion time, final pose error, final mission state, collision status, interventions, recoveries, and applicable warnings or faults.",Baseline candidate,Inspection,Medium
+EVID-004,Evidence,Evidence,"Performance evidence shall record topic rates, data age, latency, real-time factor, resource use, CPU and GPU temperature, and detected thermal throttling.",Monitoring only,Inspection,Low
+EVID-005,Evidence,Evidence,Failed and invalid trials shall be retained and shall not be deleted or relabeled to improve reported performance.,Baseline candidate,Inspection,Medium
+EVID-006,Evidence,Evidence,Final pose accuracy shall be measured using simulator ground truth independently from the localization estimate being evaluated.,Baseline candidate,Test and analysis,Medium
+EVID-007,Evidence,Evidence,"Every frozen requirement shall have a verification method, planned test or inspection, result, and supporting-evidence reference.",Baseline candidate,Inspection,Medium
+EVID-008,Evidence,Evidence,"Verification rigor shall be assigned from requirement risk and variability: high-risk motion responses require 10 consecutive passes, medium-risk variable behavior requires five repetitions, and deterministic low-risk items may use one test or inspection.",Baseline candidate,Inspection and analysis,Medium
+EVID-009,Evidence,Evidence,"Repeated tests shall report attempts, passes, failures, invalid trials, observed range, mean and standard deviation when meaningful, and a confidence interval for proportions.",Baseline candidate,Inspection and analysis,Medium
+EVID-010,Evidence,Evidence,A failed repetition of a high-risk stop or motion-inhibition test shall remain in the evidence and shall reset the consecutive-pass sequence.,Baseline candidate,Inspection,High
+EVID-011,Evidence,Evidence,Release-level reproducibility shall be demonstrated from the controlled setup procedure without undocumented configuration changes; independent execution is preferred and any absence of independent reproduction shall be recorded.,Baseline candidate,Demonstration,Medium
+CFG-001,Configuration,Configuration,"Code, world, robot, maps, missions, parameters, launchers, and test procedures shall be version controlled or uniquely version identified.",Baseline candidate,Inspection,Medium
+CFG-002,Configuration,Configuration,The acceptance configuration shall be frozen before the formal campaign and shall not change between counted trials.,Baseline candidate,Inspection,High
+CFG-003,Configuration,Configuration,"A change to a provisional value shall include measured justification, impact review, and a baseline revision before affected acceptance testing.",Baseline candidate,Inspection and analysis,Medium
+CFG-004,Configuration,Configuration,A trial executed with an unidentified or incorrect configuration shall be classified as invalid.,Baseline candidate,Inspection,Medium
+ACC-001,Acceptance,Evidence,"The nominal campaign shall contain 10 frozen start-goal scenarios, each performed three times, for 30 counted trials.",Baseline candidate,Inspection and test,Medium
+ACC-002,Acceptance,Performance,At least 27 of the 30 nominal trials shall satisfy every successful-trial criterion.,Baseline candidate,Analysis,Medium
+ACC-003,Acceptance,Performance,Each individual nominal scenario shall succeed in at least two of its three repetitions.,Baseline candidate,Analysis,Medium
+ACC-004,Acceptance,Evidence,"The campaign shall include three clean cold-start and localization tests distributed across S1, S2, and S3.",Baseline candidate,Test,Medium
+ACC-005,Acceptance,Evidence,"TB-A, TB-B, TB-C, localization loss, LiDAR loss, TF loss, command loss, cancellation, Manual Safety Stop, Emergency Stop, and shutdown shall be evaluated separately from the nominal success percentage.",Baseline candidate,Test and inspection,High
+ACC-006,Acceptance,Evidence,"An invalid trial shall be retained, excluded from the pass-rate denominator, and repeated using the correct frozen procedure.",Baseline candidate,Inspection and analysis,Medium
+ACC-007,Acceptance,Safety,"A collision, uncontrolled-motion event, or failure to stop shall block release until investigated and formally dispositioned.",Baseline candidate,Inspection and analysis,High
+TRN-001,Hardware transition,Safety,"Before physical autonomous testing, the confirmed robot shall have an independently validated emergency-stop or motor-disable mechanism appropriate to its hardware; the V1 simulated Emergency Stop shall not be represented as physical safety validation.",Baseline candidate,Inspection and staged test,High

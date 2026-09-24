@@ -1,0 +1,100 @@
+requirement_id,source,design_allocation,verification_method,planned_test_id,risk_class,result,evidence_reference
+OPS-001,ConOps: Startup and readiness,Launch and readiness manager,Test,TC-START-01,Medium,Open,Pending implementation
+OPS-002,ConOps: Startup and readiness,Launch and readiness manager,Test,TC-START-02,Medium,Open,Pending implementation
+OPS-003,ConOps: Operating modes,Mode and command arbiter,Test,TC-MODE-01,High,Open,Pending implementation
+OPS-004,ConOps: System context,Mode and command arbiter,Test and inspection,TC-CMD-OWN-01,High,Open,Pending implementation
+OPS-005,ConOps: Cancellation,Mission manager,Test,TC-CANCEL-01,Medium,Open,Pending implementation
+OPS-006,ConOps: Orderly shutdown,Launch and readiness manager,Test,TC-SHUTDOWN-01,Medium,Open,Pending implementation
+MAP-001,ConOps: Mapping workflow,SLAM configuration,Test and inspection,TC-MAP-INPUT-01,Medium,Open,Pending implementation
+MAP-002,Step 2 decision,Mapping teleoperation limiter,Test,TC-MAP-SPEED-01,Medium,Open,Pending implementation
+MAP-003,ConOps: World concept,SLAM and map QA,Inspection and analysis,TC-MAP-CONTENT-01,Medium,Open,Pending implementation
+MAP-004,Step 2 decision,SLAM configuration,Inspection,TC-MAP-RES-01,Low,Open,Pending implementation
+MAP-005,ConOps: Evidence record,Map and configuration store,Inspection,TC-MAP-ID-01,Low,Open,Pending implementation
+MAP-006,ConOps: Saved-map navigation,Map server and launch system,Test,TC-MAP-RELOAD-01,Medium,Open,Pending implementation
+MAP-007,ConOps: Mapping workflow,Map and configuration store,Test and inspection,TC-MAP-PROTECT-01,Medium,Open,Pending implementation
+MAP-008,Step 2 decision,Map QA evaluator,Analysis,TC-MAP-ACC-01,Medium,Open,Pending implementation
+MAP-009,Step 2 decision,Map QA evaluator,Analysis,TC-MAP-ACC-02,Medium,Open,Pending implementation
+MAP-010,Step 2 decision,Map QA evaluator,Analysis and demonstration,TC-MAP-TOPO-01,High,Open,Pending implementation
+LOC-001,ConOps: Saved-map navigation,AMCL and mission manager,Test,TC-LOC-INIT-01,Medium,Open,Pending implementation
+LOC-002,Step 2 decision,AMCL and readiness monitor,Test,TC-LOC-TIME-01,Medium,Open,Pending implementation
+LOC-003,Step 2 decision,AMCL and readiness monitor,Test,TC-LOC-STATIC-01,Medium,Open,Pending implementation
+LOC-004,Step 2 decision,Localization readiness monitor,Test and analysis,TC-LOC-READY-01,High,Open,Pending implementation
+LOC-005,ConOps: Navigation setup,Mission manager,Test,TC-LOC-BLOCK-01,High,Open,Pending implementation
+LOC-006,ConOps: Fault response,Safety supervisor,Fault-injection test,TC-LOC-LOSS-01,High,Open,Pending implementation
+LOC-007,ConOps: Robot concept,Simulator interfaces,Inspection and test,TC-GT-ISOLATE-01,Medium,Open,Pending implementation
+NAV-001,ConOps: Goal entry,Mission manager,Test,TC-GOAL-VALID-01,Medium,Open,Pending implementation
+NAV-002,Step 2 decision,Mission manager,Test,TC-GOAL-RESP-01,Medium,Open,Pending implementation
+NAV-003,Step 2 decision,Mission manager,Test,TC-FEEDBACK-01,Medium,Open,Pending implementation
+NAV-004,Step 2 decision,Nav2 and mission manager,Test,TC-GOAL-MOVE-01,Medium,Open,Pending implementation
+NAV-005,Step 2 decision,Mission manager,Test,TC-FEEDBACK-02,Medium,Open,Pending implementation
+NAV-006,ConOps: Mission handling,Mission and diagnostics managers,Test and inspection,TC-FEEDBACK-03,Medium,Open,Pending implementation
+NAV-007,ConOps: Saved-map navigation,Nav2 planner and costmaps,Test and demonstration,TC-NAV-SOURCES-01,High,Open,Pending implementation
+NAV-008,Step 2 decision,Nav2 controller and velocity limiter,Test,TC-NAV-SPEED-01,High,Open,Pending implementation
+NAV-009,Step 2 decision,Acceptance evaluator,Test and analysis,TC-GOAL-ACC-01,Medium,Open,Pending implementation
+NAV-010,Step 2 decision,Acceptance evaluator,Test and analysis,TC-GOAL-ACC-02,Medium,Open,Pending implementation
+NAV-011,Step 2 decision,Acceptance evaluator,Test and analysis,TC-GOAL-SETTLE-01,Medium,Open,Pending implementation
+NAV-012,Step 2 decision,Mission manager,Test,TC-NAV-TIMEOUT-01,Medium,Open,Pending implementation
+NAV-013,ConOps: Temporary-box scenarios,"Nav2 costmaps, planner, and controller",Test,TC-TB-A-01,High,Open,Pending implementation
+NAV-014,ConOps: Temporary-box scenarios,Nav2 and mission manager,Test,TC-TB-B-01,High,Open,Pending implementation
+NAV-015,Step 2 decision,Nav2 obstacle layer and mission manager,Test,TC-TB-C-01,Medium,Open,Pending implementation
+NAV-016,Step 2 decision,Mission manager,Test,TC-TB-C-02,High,Open,Pending implementation
+REC-001,Step 2 decision,Mission manager and evidence collector,Test and inspection,TC-REC-CLASS-01,Medium,Open,Pending implementation
+REC-002,Step 2 decision,Nav2 behavior tree,Test,TC-REC-REPLAN-01,Medium,Open,Pending implementation
+REC-003,Step 2 decision,Nav2 behavior tree,Test,TC-REC-CLEAR-01,Medium,Open,Pending implementation
+REC-004,Step 2 decision,Nav2 behavior tree,Inspection and test,TC-REC-ACT-01,High,Open,Pending implementation
+REC-005,Step 2 decision,Mission manager and Nav2,Test,TC-REC-LIMIT-01,Medium,Open,Pending implementation
+REC-006,ConOps: Recovery behavior,Mission manager and safety supervisor,Test,TC-REC-FAIL-01,High,Open,Pending implementation
+OBS-001,Step 2 decision,Nav2 obstacle layer,Test,TC-OBS-MARK-01,High,Open,Pending implementation
+OBS-002,Step 2 decision,Nav2 obstacle layer,Test,TC-OBS-CLEAR-01,Medium,Open,Pending implementation
+OBS-003,Step 2 decision,Nav2 costmaps and planner,Test,TC-OBS-LETHAL-01,High,Open,Pending implementation
+OBS-004,Step 2 decision,Evidence collector,Inspection,TC-OBS-EVID-01,Medium,Open,Pending implementation
+OBS-005,ConOps: Moving-cylinder stretch,Nav2 obstacle layer and controller,Exploratory test,TC-DYN-01,Medium,Open,Pending implementation
+SAFE-001,ConOps: Obstacle-avoidance behavior,Collision monitor,Test,TC-COLLISION-01,High,Open,Pending implementation
+SAFE-002,Step 2 decision,Costmap inflation and acceptance evaluator,Test and analysis,TC-CLEARANCE-01,High,Open,Pending implementation
+SAFE-003,Step 2 decision,Scenario controller,Inspection and test,TC-OBS-INSERT-01,High,Open,Pending implementation
+SAFE-004,ConOps: Command loss,Base controller watchdog,Test,TC-WATCHDOG-01,High,Open,Pending implementation
+SAFE-005,Step 2 decision,Base controller watchdog,Test,TC-WATCHDOG-02,High,Open,Pending implementation
+SAFE-006,Step 2 decision,Base controller and acceptance evaluator,Test,TC-WATCHDOG-03,High,Open,Pending implementation
+SAFE-007,Step 2 decision,Acceptance evaluator,Test and analysis,TC-WATCHDOG-04,High,Open,Pending implementation
+SAFE-008,ConOps: Fault response,Safety supervisor,Fault-injection test,TC-DATA-LOSS-01,High,Open,Pending implementation
+SAFE-009,ConOps: Fault response,Collision monitor and safety supervisor,Test,TC-COLLISION-02,High,Open,Pending implementation
+SAFE-010,ConOps: Manual stop,Safety supervisor,Test,TC-MANSTOP-01,High,Open,Pending implementation
+SAFE-011,Step 2 decision,Emergency-stop supervisor,Test,TC-ESTOP-01,High,Open,Pending implementation
+SAFE-012,Step 2 decision,Emergency-stop supervisor,Test,TC-ESTOP-02,High,Open,Pending implementation
+SAFE-013,Step 2 decision,Emergency-stop supervisor and readiness manager,Test,TC-ESTOP-03,High,Open,Pending implementation
+SAFE-014,Step 2 decision,"Diagnostics, evidence, and launch managers",Test and inspection,TC-ESTOP-04,High,Open,Pending implementation
+PERF-001,Step 2 decision,Isaac Sim configuration,Inspection and test,TC-PERF-PHYS-01,Medium,Open,Pending implementation
+PERF-002,Step 2 decision,Performance monitor,Test and analysis,TC-PERF-RTF-01,Medium,Open,Pending implementation
+PERF-003,Step 2 decision,Performance monitor,Test and analysis,TC-PERF-RTF-02,Medium,Open,Pending implementation
+PERF-004,Step 2 decision,Sensor-rate monitor,Test,TC-PERF-LIDAR-01,Medium,Open,Pending implementation
+PERF-005,Step 2 decision,Sensor and TF rate monitor,Test,TC-PERF-ODOM-01,Medium,Open,Pending implementation
+PERF-006,Step 2 decision,Data-freshness monitor,Test,TC-PERF-AGE-01,High,Open,Pending implementation
+PERF-007,Step 2 decision,Command-path monitor,Test,TC-PERF-CMD-01,Medium,Open,Pending implementation
+PERF-008,ConOps: Acceptance concept,System test harness,Test,TC-SOAK-01,Medium,Open,Pending implementation
+DIAG-001,ConOps: Operating modes,Mission and diagnostics managers,Test and inspection,TC-STATE-01,Medium,Open,Pending implementation
+DIAG-002,Step 2 decision,Diagnostics manager,Test and inspection,TC-DIAG-CLEAN-01,Medium,Open,Pending implementation
+DIAG-003,ConOps: Mission handling,Mission manager,Test,TC-DIAG-RESULT-01,Medium,Open,Pending implementation
+DIAG-004,Step 2 decision,Diagnostics manager,Test and inspection,TC-DIAG-CLASS-01,Low,Open,Pending implementation
+EVID-001,ConOps: Evidence record,Evidence collector,Inspection,TC-EVID-META-01,Low,Open,Pending implementation
+EVID-002,ConOps: Evidence record,Evidence collector,Inspection,TC-EVID-CFG-01,Medium,Open,Pending implementation
+EVID-003,ConOps: Evidence record,Evidence collector,Inspection,TC-EVID-RESULT-01,Medium,Open,Pending implementation
+EVID-004,Step 2 decision,Performance and evidence monitors,Inspection,TC-EVID-PERF-01,Low,Open,Pending implementation
+EVID-005,ConOps: Acceptance principle,Evidence store,Inspection,TC-EVID-RETAIN-01,Medium,Open,Pending implementation
+EVID-006,ConOps: Evidence record,Acceptance evaluator,Test and analysis,TC-EVID-GT-01,Medium,Open,Pending implementation
+EVID-007,Development plan: Step 2,Traceability register,Inspection,TC-TRACE-01,Medium,Open,Pending implementation
+EVID-008,Step 2 decision,Risk and verification registers,Inspection and analysis,TC-RIGOR-01,Medium,Open,Pending implementation
+EVID-009,Step 2 decision,Metrics reporter,Inspection and analysis,TC-STATS-01,Medium,Open,Pending implementation
+EVID-010,Step 2 decision,Test harness and evidence store,Inspection,TC-RIGOR-02,High,Open,Pending implementation
+EVID-011,Step 2 decision,Release process,Demonstration,TC-REPRO-01,Medium,Open,Pending implementation
+CFG-001,ConOps: Configuration and traceability,Configuration manager,Inspection,TC-CFG-ID-01,Medium,Open,Pending implementation
+CFG-002,ConOps: Configuration and traceability,Configuration manager,Inspection,TC-CFG-FREEZE-01,High,Open,Pending implementation
+CFG-003,ConOps: Baseline rule,Configuration manager,Inspection and analysis,TC-CFG-CHANGE-01,Medium,Open,Pending implementation
+CFG-004,Step 2 decision,Test harness,Inspection,TC-CFG-INVALID-01,Medium,Open,Pending implementation
+ACC-001,ConOps: Nominal campaign,Acceptance campaign,Inspection and test,TC-ACC-NOM-01,Medium,Open,Pending implementation
+ACC-002,ConOps: Nominal campaign,Acceptance evaluator,Analysis,TC-ACC-RATE-01,Medium,Open,Pending implementation
+ACC-003,Step 2 decision,Acceptance evaluator,Analysis,TC-ACC-COVER-01,Medium,Open,Pending implementation
+ACC-004,ConOps: Acceptance concept,Acceptance campaign,Test,TC-ACC-START-01,Medium,Open,Pending implementation
+ACC-005,ConOps: Separate resilience tests,Resilience campaign,Test and inspection,TC-ACC-RES-01,High,Open,Pending implementation
+ACC-006,Step 2 decision,Acceptance evaluator,Inspection and analysis,TC-ACC-INVALID-01,Medium,Open,Pending implementation
+ACC-007,ConOps: Acceptance principle,Release review,Inspection and analysis,TC-ACC-BLOCK-01,High,Open,Pending implementation
+TRN-001,ConOps: Safety boundary,V2 integration gate,Inspection and staged test,TC-V2-ESTOP-01,High,Open,Pending implementation
