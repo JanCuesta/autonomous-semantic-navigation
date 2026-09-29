@@ -1,10 +1,46 @@
-<?xml version="1.0"?>
-<robot name="asn_robot">
-
-  <link name="base_link"/>
-  <link name="laser_frame"/>
- 
-
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="create_3">
+  <link name="world"/>
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0.00933769997 0.000512443134 0.0719223395" rpy="0 0 0"/>
+      <mass value="2.54999971"/>
+      <inertia ixx="0.0191059571" ixy="-9.81622046e-05" ixz="0.000530142308" iyy="0.0190240142" iyz="4.91184554e-05" izz="0.0362139689"/>
+    </inertial>
+    <visual name="mesh_0">
+      <geometry>
+        <mesh filename="./meshes/mesh_0_1.obj"/>
+      </geometry>
+    </visual>
+    <visual name="mesh_1">
+      <geometry>
+        <mesh filename="./meshes/mesh_1_2.obj"/>
+      </geometry>
+    </visual>
+    <visual name="mesh_2">
+      <origin xyz="0.125 0 0.0121999998" rpy="-1.57079636 0 0"/>
+      <geometry>
+        <sphere radius="0.00999999978"/>
+      </geometry>
+    </visual>
+    <collision name="create3_base_collision">
+      <origin xyz="0 0 0.0491999984" rpy="0 0 1.57079636"/>
+      <geometry>
+        <cylinder radius="0.164000005" length="0.0599999987"/>
+      </geometry>
+    </collision>
+    <collision name="mesh_1">
+      <geometry>
+        <mesh filename="./meshes/mesh_1_3.obj"/>
+      </geometry>
+    </collision>
+    <collision name="mesh_2">
+      <origin xyz="0.125 0 0.0121999998" rpy="-1.57079636 0 0"/>
+      <geometry>
+        <sphere radius="0.00999999978"/>
+      </geometry>
+    </collision>
+  </link>
   <link name="wheel_drop_left">
     <inertial>
       <mass value="0.0500000007"/>
@@ -53,45 +89,44 @@
       </geometry>
     </collision>
   </link>
-
-
+  <joint name="floating_base" type="floating">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
   <joint name="wheel_drop_left_joint" type="prismatic">
     <origin xyz="0 0.116499998 0.0401999988" rpy="0 -1.57079624 1.57079627"/>
     <parent link="base_link"/>
     <child link="wheel_drop_left"/>
     <axis xyz="-1 0 0"/>
-    <limit lower="0" upper="0.0299999993" effort="3.40282347e+38" velocity="0.1"/>
+    <limit lower="0" upper="0.0299999993" effort="3.40282347e+38"/>
     <dynamics friction="0.100000001"/>
+    <!-- isaac:source_drive {"armature": 0.0, "drive": {"damping": 10000000.0, "max_force": 3.4028234663852886e+38, "stiffness": 0.0, "target_position": 0.0}, "instance": "linear", "source": "physx"} -->
   </joint>
   <joint name="wheel_drop_right_joint" type="prismatic">
     <origin xyz="0 -0.116499998 0.0401999988" rpy="0 -1.57079624 1.57079627"/>
     <parent link="base_link"/>
     <child link="wheel_drop_right"/>
     <axis xyz="-1 0 0"/>
-    <limit lower="0" upper="0.0299999993" effort="3.40282347e+38" velocity="0.1"/>
+    <limit lower="0" upper="0.0299999993" effort="3.40282347e+38"/>
     <dynamics friction="0.100000001"/>
+    <!-- isaac:source_drive {"armature": 0.0, "drive": {"damping": 10000000.0, "max_force": 3.4028234663852886e+38, "stiffness": 0.0, "target_position": 0.0}, "instance": "linear", "source": "physx"} -->
   </joint>
   <joint name="left_wheel_joint" type="continuous">
     <origin xyz="0 0 0" rpy="0 -1.57079623 1.57079627"/>
     <parent link="wheel_drop_left"/>
     <child link="left_wheel"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="3.40282347e+38" velocity="0.1" />
+    <limit effort="3.40282347e+38"/>
     <dynamics friction="0"/>
+    <!-- isaac:source_drive {"armature": 0.0, "drive": {"damping": 10000000.0, "max_force": 3.4028234663852886e+38, "stiffness": 0.0, "target_position": 0.0}, "instance": "angular", "source": "physx"} -->
   </joint>
   <joint name="right_wheel_joint" type="continuous">
     <origin xyz="0 0 0" rpy="0 -1.57079623 1.57079627"/>
     <parent link="wheel_drop_right"/>
     <child link="right_wheel"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="3.40282347e+38" velocity="0.1"/>
+    <limit effort="3.40282347e+38"/>
     <dynamics friction="0"/>
+    <!-- isaac:source_drive {"armature": 0.0, "drive": {"damping": 10000000.0, "max_force": 3.4028234663852886e+38, "stiffness": 0.0, "target_position": 0.0}, "instance": "angular", "source": "physx"} -->
   </joint>
-  <joint name="base_to_laser" type="fixed">
-    <parent link="base_link"/>
-    <child link="laser_frame"/>
-    <origin xyz="-0.04 0 0.193" rpy="0 0 0"/>
-  </joint>
-
-  
 </robot>
