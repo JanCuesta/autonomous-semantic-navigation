@@ -1,0 +1,192 @@
+{
+  "status": "recorded",
+  "error": null,
+  "wheel_radius_m": 0.03575,
+  "phases": [
+    {
+      "name": "BASELINE",
+      "start": 781.65,
+      "end": 782.65,
+      "ROS": {
+        "left": {
+          "samples": 51,
+          "covered_s": 1.0,
+          "angle_change_rad": -0.00282442569732666,
+          "velocity_integral_rad": 0.21144174494209889,
+          "residual_rad": -0.21426617063942555,
+          "velocity_min": 0.059672385454177856,
+          "velocity_max": 0.2892751395702362
+        },
+        "right": {
+          "samples": 51,
+          "covered_s": 1.0,
+          "angle_change_rad": -0.0028573274612426758,
+          "velocity_integral_rad": 0.4464876939222645,
+          "residual_rad": -0.4493450213835072,
+          "velocity_min": 0.37726646661758423,
+          "velocity_max": 0.5073869824409485
+        }
+      },
+      "ISAAC": {
+        "left": {
+          "samples": 61,
+          "covered_s": 1.0,
+          "angle_change_rad": -0.0028170347213745117,
+          "velocity_integral_rad": 0.17688288853193404,
+          "residual_rad": -0.17969992325330855,
+          "velocity_min": 0.059672385454177856,
+          "velocity_max": 0.28924763202667236
+        },
+        "right": {
+          "samples": 61,
+          "covered_s": 1.0,
+          "angle_change_rad": -0.0028575658798217773,
+          "velocity_integral_rad": 0.4443800335129111,
+          "residual_rad": -0.4472375993927329,
+          "velocity_min": 0.37726646661758423,
+          "velocity_max": 0.5073869824409485
+        }
+      },
+      "targets": {
+        "left": [
+          0.0,
+          0.0
+        ],
+        "right": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "name": "MOVE",
+      "start": 782.65,
+      "end": 783.65,
+      "ROS": {
+        "left": {
+          "samples": 51,
+          "covered_s": 1.0,
+          "angle_change_rad": 1.1406356990337372,
+          "velocity_integral_rad": 1.1867172656738874,
+          "residual_rad": -0.04608156664015017,
+          "velocity_min": 0.14010436832904816,
+          "velocity_max": 1.5332366228103638
+        },
+        "right": {
+          "samples": 51,
+          "covered_s": 1.0,
+          "angle_change_rad": 1.2304510474205017,
+          "velocity_integral_rad": 2.9237243254162144,
+          "residual_rad": -1.6932732779957127,
+          "velocity_min": 0.46264058351516724,
+          "velocity_max": 4.032330513000488
+        }
+      },
+      "ISAAC": {
+        "left": {
+          "samples": 61,
+          "covered_s": 1.0,
+          "angle_change_rad": 1.1186934411525726,
+          "velocity_integral_rad": 1.11950312017771,
+          "residual_rad": -0.0008096790251372887,
+          "velocity_min": 0.06205255910754204,
+          "velocity_max": 1.5332366228103638
+        },
+        "right": {
+          "samples": 61,
+          "covered_s": 1.0,
+          "angle_change_rad": 1.2071233987808228,
+          "velocity_integral_rad": 2.7691148286064586,
+          "residual_rad": -1.5619914298256359,
+          "velocity_min": 0.37726646661758423,
+          "velocity_max": 4.032330513000488
+        }
+      },
+      "targets": {
+        "left": [
+          0.0,
+          1.3986014127731323
+        ],
+        "right": [
+          0.0,
+          1.3986014127731323
+        ]
+      }
+    },
+    {
+      "name": "STOP",
+      "start": 783.65,
+      "end": 785.65,
+      "ROS": {
+        "left": {
+          "samples": 101,
+          "covered_s": 2.0,
+          "angle_change_rad": 0.09847646951675415,
+          "velocity_integral_rad": 0.5117781038848016,
+          "residual_rad": -0.41330163436804745,
+          "velocity_min": 0.01693723537027836,
+          "velocity_max": 1.2460167407989502
+        },
+        "right": {
+          "samples": 101,
+          "covered_s": 2.0,
+          "angle_change_rad": 0.1038932204246521,
+          "velocity_integral_rad": 1.386950931042756,
+          "residual_rad": -1.2830577106181038,
+          "velocity_min": 0.4084836542606354,
+          "velocity_max": 4.312108039855957
+        }
+      },
+      "ISAAC": {
+        "left": {
+          "samples": 121,
+          "covered_s": 2.0,
+          "angle_change_rad": 0.12041741609573364,
+          "velocity_integral_rad": 0.4616638753563383,
+          "residual_rad": -0.34124645926060465,
+          "velocity_min": 0.01693723537027836,
+          "velocity_max": 1.2460167407989502
+        },
+        "right": {
+          "samples": 121,
+          "covered_s": 2.0,
+          "angle_change_rad": 0.1272207498550415,
+          "velocity_integral_rad": 1.4378912044068557,
+          "residual_rad": -1.3106704545518142,
+          "velocity_min": 0.4084836542606354,
+          "velocity_max": 4.312108039855957
+        }
+      },
+      "targets": {
+        "left": [
+          0.0,
+          1.3986014127731323
+        ],
+        "right": [
+          0.0,
+          1.3986014127731323
+        ]
+      }
+    }
+  ],
+  "expected_steady_wheel_rad_s": 1.3986013986013988,
+  "actual_isaac_displacement": {
+    "dx_m": -0.046630859375,
+    "dy_m": 0.0021882057189941406,
+    "distance_m": 0.04668217315335335,
+    "covered_s": 3.0
+  },
+  "ros_odom_displacement": {
+    "dx_m": 0.044681782014106504,
+    "dy_m": -0.010776501559361863,
+    "distance_m": 0.045962970202273266,
+    "covered_s": 2.966666667000027
+  },
+  "last_stop_second_displacement": {
+    "dx_m": 0.00010347366333007812,
+    "dy_m": -4.0531158447265625e-06,
+    "distance_m": 0.00010355301420527133,
+    "covered_s": 1.0
+  },
+  "wheel_angle_distance_m": 0.04600053380057215
+}
