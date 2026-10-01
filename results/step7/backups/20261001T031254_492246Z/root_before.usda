@@ -485,9 +485,6 @@ def Xform "World" (
 
         over "base_link"
         {
-            string isaac:nameOverride (
-                displayName = "Name Override"
-            )
             vector3f physics:angularVelocity = (-0.5187904, -39.03851, 0.81671154)
             vector3f physics:velocity = (-0.0028525451, -0.009975344, -0.0029231806)
             quatd xformOp:orient = (0.9999037965128107, -0.0000658384525331854, -0.013870236485882167, -0.0000996212403825044)
@@ -503,14 +500,6 @@ def Xform "World" (
             {
                 float state:linear:physics:position = 0.000023636932
                 float state:linear:physics:velocity = -0.0008306827
-            }
-
-            over "rplidar_link"
-            {
-                over "Example_Rotary_2D"
-                {
-                    float omni:sensor:Core:nearRangeM = 0.1
-                }
             }
         }
 
@@ -548,18 +537,9 @@ def Xform "World" (
 
             over "right_wheel_joint"
             {
-                bool[] isaac:actuator (
-                    displayName = "Actuator"
-                )
-                string isaac:NameOverride (
-                    displayName = "Joint Name Override"
-                )
-                token[] isaac:physics:DofOffsetOpOrder (
-                    displayName = "Dof Offset Op Order"
-                )
                 float state:angular:physics:position = -0.005079641
                 float state:angular:physics:velocity = 39.90909
-                token visibility = "inherited"
+                token visibility = "invisible"
             }
         }
 
@@ -769,7 +749,7 @@ def "Render" (
                 bool omni:rtx:scene:useViewLightingMode
                 rel orderedVars = </Render/Vars/LdrColor>
                 custom bool overrideClipRange = 0
-                uniform int2 resolution = (640, 360)
+                uniform int2 resolution = (1280, 720)
             }
 
             def RenderProduct "Replicator" (
@@ -868,10 +848,10 @@ def Camera "Camera" (
     float focalLength = 18.147562
     float focusDistance = 400
     bool omni:kit:cameraLock = 0
-    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -1.7587955524173748)
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -6.8728128525851515)
     quatd xformOp:orient = (0.842458204545744, 0.12638909333406861, 0.07770214357690729, 0.5179308327984609)
     double3 xformOp:scale = (0.10000000149011612, 1, 1)
-    double3 xformOp:translate = (4.689636794520936, 0.7115504948529464, 1.7351894535712677)
+    double3 xformOp:translate = (5.985533130280938, -0.14953130873305132, 6.610447329295296)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 }
 
