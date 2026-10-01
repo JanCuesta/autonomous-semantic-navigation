@@ -1,0 +1,3580 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1264"
+   height="843"
+   viewBox="0 0 1264 843"
+   version="1.1"
+   id="svg741"
+   sodipodi:docname="indoor_navigation_test_environment_full_editable.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:export-filename="indoor_navigation_test_environment_full_editable.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview743"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.51736255"
+     inkscape:cx="618.52177"
+     inkscape:cy="557.63603"
+     inkscape:window-width="1854"
+     inkscape:window-height="1011"
+     inkscape:window-x="66"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="panels" />
+  <defs
+     id="defs16">
+    <rect
+       x="1304.2435"
+       y="853.41847"
+       width="628.63222"
+       height="220.78146"
+       id="rect4500" />
+    <rect
+       x="789.75381"
+       y="484.78255"
+       width="192.3122"
+       height="69.882927"
+       id="rect1974" />
+    <rect
+       x="455.15753"
+       y="445.03692"
+       width="9.1720645"
+       height="23.298193"
+       id="rect905" />
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <marker
+       id="redArrow"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2" />
+    </marker>
+    <marker
+       id="blueArrow"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M0,0 L8,4 L0,8 Z"
+         fill="#1d5bb6"
+         id="path5" />
+    </marker>
+    <marker
+       id="greenArrow"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#23a658"
+         id="path8" />
+    </marker>
+    <marker
+       id="blackArrow"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11" />
+    </marker>
+    <style
+       id="style14">
+  .title{font-family:'Times New Roman',serif;font-size:26px;font-weight:700;fill:#111}.txt{font-family:'Times New Roman',serif;font-size:14px;fill:#111}.lbl{font-family:'Times New Roman',serif;font-size:16px;font-weight:700;fill:#111}.dimtxt{font-family:'Times New Roman',serif;font-size:16px;fill:#111}.phtxt{font-family:'Times New Roman',serif;font-size:17px;font-weight:700;fill:#1c2d3d}.tbl{font-family:'Times New Roman',serif;font-size:13px;fill:#111}.tblb{font-family:'Times New Roman',serif;font-size:13px;font-weight:700;fill:#111}.tiny{font-family:'Times New Roman',serif;font-size:10px;fill:#222}
+  .wall{fill:#899cab;stroke:#263747;stroke-width:1.8}.floorA{fill:#faf7ef}.floorB{fill:#faf7ef}.corridor{fill:#e9f3fb;stroke:#263747;stroke-width:14;stroke-linejoin:miter}.box{fill:#b8b8b8;stroke:#202020;stroke-width:1.4}.cyl{fill:#9b9b9b;stroke:#202020;stroke-width:1.4}.desk{fill:#c99d74;stroke:#503019;stroke-width:1.4}.temp{fill:none;stroke:#d99a37;stroke-width:2;stroke-dasharray:7 5}.goal{fill:#e53935;stroke:#a31b1b;stroke-width:1.2}.start{stroke:#1d5bb6;stroke-width:3.6;stroke-linecap:round}.arrowRed{stroke:#e3272d;stroke-width:2.4;fill:none}.arrowBlue{stroke:#1d5bb6;stroke-width:2.4;fill:none}.dim{stroke:#111;stroke-width:1.2;fill:none}.door{fill:#fbfbfb;stroke:#777;stroke-width:0.9}.hatch{stroke:#8d8d8d;stroke-width:0.8}.panel{fill:#fff;stroke:#93a7b8;stroke-width:1}.phead{fill:#e7eef4}.grid{stroke:#a9b7c3;stroke-width:0.8}.tag{fill:#e6eef5}.axisx{stroke:#e3272d;stroke-width:2.5}.axisy{stroke:#23a658;stroke-width:2.5}
+ </style>
+    <marker
+       id="redArrow-7"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5" />
+    </marker>
+    <marker
+       id="redArrow-5"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-6" />
+    </marker>
+    <marker
+       id="blueArrow-0"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#1d5bb6"
+         id="path5-9" />
+    </marker>
+    <marker
+       id="blueArrow-0-6"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#1d5bb6"
+         id="path5-9-0" />
+    </marker>
+    <marker
+       id="blueArrow-0-2"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#1d5bb6"
+         id="path5-9-6" />
+    </marker>
+    <marker
+       id="blueArrow-0-2-8"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#1d5bb6"
+         id="path5-9-6-7" />
+    </marker>
+    <marker
+       id="blueArrow-0-2-8-2"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#1d5bb6"
+         id="path5-9-6-7-0" />
+    </marker>
+    <marker
+       id="blueArrow-0-6-3"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#1d5bb6"
+         id="path5-9-0-7" />
+    </marker>
+    <marker
+       id="redArrow-7-9"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-2" />
+    </marker>
+    <marker
+       id="redArrow-7-8"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9" />
+    </marker>
+    <marker
+       id="redArrow-7-8-2"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9-9" />
+    </marker>
+    <marker
+       id="redArrow-7-8-1"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9-94" />
+    </marker>
+    <marker
+       id="redArrow-7-8-8"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9-4" />
+    </marker>
+    <marker
+       id="redArrow-7-8-0"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9-3" />
+    </marker>
+    <marker
+       id="redArrow-7-8-10"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9-6" />
+    </marker>
+    <marker
+       id="redArrow-7-8-10-0"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9-6-6" />
+    </marker>
+    <marker
+       id="redArrow-7-8-10-0-5"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 8 8"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#e3272d"
+         id="path2-5-9-6-6-5" />
+    </marker>
+    <marker
+       id="blueArrow-0-6-7"
+       markerWidth="8"
+       markerHeight="8"
+       refX="7"
+       refY="4"
+       orient="auto"
+       markerUnits="strokeWidth">
+      <path
+         d="M 0,0 8,4 0,8 Z"
+         fill="#1d5bb6"
+         id="path5-9-0-4" />
+    </marker>
+    <marker
+       id="blackArrow-2"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11-9" />
+    </marker>
+    <marker
+       id="marker976"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path974" />
+    </marker>
+    <marker
+       id="blackArrow-0"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11-93" />
+    </marker>
+    <marker
+       id="marker1067"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path1065" />
+    </marker>
+    <marker
+       id="blackArrow-6"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11-1" />
+    </marker>
+    <marker
+       id="marker1162"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path1160" />
+    </marker>
+    <marker
+       id="blackArrow-3"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 7,0 0,3.5 7,7 Z"
+         fill="#111111"
+         id="path11-7" />
+    </marker>
+    <marker
+       id="marker1297"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path1295" />
+    </marker>
+    <marker
+       id="blackArrow-8"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11-97" />
+    </marker>
+    <marker
+       id="marker2274"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path2272" />
+    </marker>
+    <marker
+       id="blackArrow-1"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11-2" />
+    </marker>
+    <marker
+       id="marker2374"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path2372" />
+    </marker>
+    <marker
+       id="blackArrow-8-7"
+       markerWidth="5"
+       markerHeight="5"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="userSpaceOnUse"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11-97-5" />
+    </marker>
+    <marker
+       id="marker3256"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path3254" />
+    </marker>
+    <marker
+       id="blackArrow-8-5"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path11-97-6" />
+    </marker>
+    <marker
+       id="marker28333"
+       markerWidth="7"
+       markerHeight="7"
+       refX="3.5"
+       refY="3.5"
+       orient="auto-start-reverse"
+       markerUnits="strokeWidth"
+       viewBox="0 0 7 7"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 7,3.5 0,7 Z"
+         fill="#111111"
+         id="path28331" />
+    </marker>
+  </defs>
+  <line
+     x1="447.75623"
+     y1="547.40314"
+     x2="458.77997"
+     y2="531.91461"
+     class="hatch"
+     id="line72-8-4-0"
+     style="stroke:#8d8d8d;stroke-width:0.764433" />
+  <rect
+     x="279.09741"
+     y="300.03442"
+     width="122.8675"
+     height="254.35829"
+     class="wall"
+     id="rect22-7"
+     style="fill:#899cab;stroke:#263747;stroke-width:0.906695" />
+  <rect
+     x="378.9267"
+     y="436.52884"
+     width="118.90774"
+     height="122.41085"
+     class="wall"
+     id="rect22-7-0"
+     style="fill:#899cab;stroke:#263747;stroke-width:0.589148;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0" />
+  <rect
+     x="-399.38428"
+     y="433.88147"
+     width="12.973459"
+     height="238.28336"
+     class="wall"
+     id="rect22-7-8"
+     style="fill:#899cab;stroke:#263747;stroke-width:0;stroke-dasharray:none"
+     transform="scale(-1,1)" />
+  <rect
+     x="-544.552"
+     y="364.69412"
+     width="96"
+     height="119.38162"
+     class="floorB"
+     id="rect28-4-3"
+     style="fill:#faf7ef;stroke-width:0.343235"
+     transform="rotate(-90)" />
+  <rect
+     x="-577.2793"
+     y="291.25955"
+     width="275.24789"
+     height="95.578979"
+     class="floorB"
+     id="rect28-4"
+     style="fill:#faf7ef;stroke-width:0.520033"
+     transform="rotate(-90)" />
+  <line
+     x1="484.13623"
+     y1="508.61948"
+     x2="484.13623"
+     y2="543.6853"
+     class="dim"
+     id="line247-2-6"
+     style="fill:none;stroke:#111111;stroke-width:1.41828" />
+  <line
+     x1="232.2121"
+     y1="375.94791"
+     x2="282.87366"
+     y2="375.94791"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-7)"
+     id="line302-3-6-52"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.319;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart)"
+     inkscape:transform-center-x="10.175971"
+     inkscape:transform-center-y="-0.021554884" />
+  <text
+     x="608.02661"
+     y="36.014309"
+     class="title"
+     text-anchor="middle"
+     id="text20"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.3333px;line-height:10;font-family:sans-serif;-inkscape-font-specification:sans-serif"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:29.3333px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'"
+       id="tspan1073">Indoor Navigation Test Environment</tspan></text>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Environment"
+     id="environment">
+    <rect
+       x="103.49262"
+       y="84.632812"
+       width="549.38702"
+       height="218.02495"
+       class="wall"
+       id="rect22" />
+    <rect
+       x="118.70561"
+       y="98.163544"
+       width="520"
+       height="191"
+       class="floorA"
+       id="rect24"
+       style="stroke-width:0.984044" />
+    <rect
+       x="103.5051"
+       y="545.81232"
+       width="551.61072"
+       height="217.98083"
+       class="wall"
+       id="rect26" />
+    <rect
+       x="120.19408"
+       y="558.64526"
+       width="519.41101"
+       height="190"
+       class="floorB"
+       id="rect28"
+       style="stroke-width:1.00721" />
+    <line
+       x1="166.67171"
+       y1="636.13464"
+       x2="166.67171"
+       y2="663.12122"
+       class="arrowBlue"
+       marker-end="url(#blueArrow-0-6-3)"
+       id="line302-3-6-5-7-32-1"
+       style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8-10-0)"
+       inkscape:transform-center-x="-0.31419268"
+       inkscape:transform-center-y="-17.166124" />
+    <rect
+       x="303.57053"
+       y="289.21954"
+       width="72.069145"
+       height="14.474077"
+       class="door"
+       id="rect34" />
+    <line
+       x1="320.39722"
+       y1="304.56287"
+       x2="331.39722"
+       y2="287.56287"
+       class="hatch"
+       id="line38" />
+    <line
+       x1="331.0899"
+       y1="305.14453"
+       x2="342.0899"
+       y2="288.14453"
+       class="hatch"
+       id="line42" />
+    <line
+       x1="343.70151"
+       y1="304.54425"
+       x2="354.70151"
+       y2="287.54425"
+       class="hatch"
+       id="line46" />
+    <line
+       x1="354.9325"
+       y1="305.07748"
+       x2="365.9325"
+       y2="288.07748"
+       class="hatch"
+       id="line50" />
+    <line
+       x1="366.6051"
+       y1="304.64529"
+       x2="377.6051"
+       y2="287.64529"
+       class="hatch"
+       id="line54" />
+    <rect
+       x="395.58893"
+       y="544.9502"
+       width="82.429115"
+       height="13.41457"
+       class="door"
+       id="rect60" />
+    <line
+       x1="454.63391"
+       y1="558.50403"
+       x2="465.66849"
+       y2="545.00806"
+       class="hatch"
+       id="line64" />
+    <line
+       x1="395.79224"
+       y1="558.69373"
+       x2="406.81992"
+       y2="544.81836"
+       class="hatch"
+       id="line72" />
+    <line
+       x1="442.85513"
+       y1="558.56824"
+       x2="453.88739"
+       y2="544.94385"
+       class="hatch"
+       id="line74" />
+    <line
+       x1="421.23529"
+       y1="558.33569"
+       x2="432.2641"
+       y2="544.58618"
+       class="hatch"
+       id="line78" />
+    <rect
+       x="252.60509"
+       y="166.64529"
+       width="130"
+       height="53"
+       class="tag"
+       id="rect86" />
+    <text
+       x="317.6051"
+       y="187.64529"
+       class="lbl"
+       text-anchor="middle"
+       id="text88"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Room A</text>
+    <text
+       x="317.6051"
+       y="209.64529"
+       class="txt"
+       text-anchor="middle"
+       id="text90"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(5.0 m × 2.5 m)</text>
+    <rect
+       x="305.6051"
+       y="579.64526"
+       width="135"
+       height="54"
+       class="tag"
+       id="rect92" />
+    <text
+       x="372.6051"
+       y="601.64526"
+       class="lbl"
+       text-anchor="middle"
+       id="text94"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Room B</text>
+    <text
+       x="372.6051"
+       y="624.64526"
+       class="txt"
+       text-anchor="middle"
+       id="text96"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(5.0 m × 2.5 m)</text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Obstacles"
+     id="obstacles">
+    <rect
+       x="179.60509"
+       y="188.64529"
+       width="43"
+       height="42"
+       class="box"
+       id="rect99" />
+    <circle
+       cx="408.6051"
+       cy="213.64529"
+       r="21"
+       class="cyl"
+       id="circle101" />
+    <rect
+       x="571.6051"
+       y="200.64529"
+       width="18"
+       height="40"
+       class="box"
+       id="rect103" />
+    <circle
+       cx="250.60509"
+       cy="632.64526"
+       r="20"
+       class="cyl"
+       id="circle105" />
+    <rect
+       x="312.92471"
+       y="656.04193"
+       width="110"
+       height="42"
+       class="desk"
+       id="rect107" />
+    <circle
+       cx="565.10089"
+       cy="672.17609"
+       r="17"
+       class="cyl"
+       id="circle109" />
+    <rect
+       x="440.6051"
+       y="106.64529"
+       width="42"
+       height="42"
+       class="temp"
+       id="rect111" />
+    <text
+       x="461.6051"
+       y="165.64529"
+       class="lbl"
+       text-anchor="middle"
+       id="text113"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">TB-A</text>
+    <text
+       x="461.6051"
+       y="184.64529"
+       class="txt"
+       text-anchor="middle"
+       id="text115"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(room)</text>
+    <rect
+       x="322.6051"
+       y="395.64529"
+       width="42"
+       height="42"
+       class="temp"
+       id="rect117" />
+    <text
+       x="343.6051"
+       y="454.64529"
+       class="lbl"
+       text-anchor="middle"
+       id="text119"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">TB-C</text>
+    <text
+       x="343.6051"
+       y="473.64529"
+       class="txt"
+       text-anchor="middle"
+       id="text121"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(corridor)</text>
+    <rect
+       x="506.6051"
+       y="578.64526"
+       width="42"
+       height="42"
+       class="temp"
+       id="rect123" />
+    <text
+       x="527.6051"
+       y="637.64526"
+       class="lbl"
+       text-anchor="middle"
+       id="text125"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">TB-B</text>
+    <text
+       x="527.6051"
+       y="656.64526"
+       class="txt"
+       text-anchor="middle"
+       id="text127"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(room)</text>
+    <line
+       x1="544.92334"
+       y1="673.40765"
+       x2="512.04437"
+       y2="673.40765"
+       class="arrowRed"
+       marker-end="url(#redArrow)"
+       id="line129" />
+    <line
+       x1="586.68372"
+       y1="672.75568"
+       x2="617.68372"
+       y2="672.75568"
+       class="arrowRed"
+       marker-end="url(#redArrow)"
+       id="line131" />
+    <text
+       x="566.17487"
+       y="702.38849"
+       class="lbl"
+       text-anchor="middle"
+       id="text133"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">MC</text>
+    <text
+       x="566.6051"
+       y="715.51825"
+       class="txt"
+       text-anchor="middle"
+       id="text135"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(room)</text>
+  </g>
+  <line
+     x1="407.55875"
+     y1="558.69373"
+     x2="418.58643"
+     y2="544.81836"
+     class="hatch"
+     id="line72-8-4"
+     style="stroke:#8d8d8d;stroke-width:0.723659" />
+  <line
+     x1="308.96805"
+     y1="304.54712"
+     x2="319.96805"
+     y2="287.54712"
+     class="hatch"
+     id="line38-6"
+     style="stroke:#8d8d8d;stroke-width:0.8" />
+  <line
+     x1="431.09073"
+     y1="558.69373"
+     x2="442.11847"
+     y2="544.81836"
+     class="hatch"
+     id="line72-8"
+     style="stroke:#8d8d8d;stroke-width:0.723659" />
+  <line
+     x1="174.68486"
+     y1="714.10266"
+     x2="201.67143"
+     y2="714.10266"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-7-32-1-4"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8-10-0-5)"
+     inkscape:transform-center-x="17.166154"
+     inkscape:transform-center-y="-0.31419568" />
+  <line
+     x1="492.22852"
+     y1="232.53723"
+     x2="492.22852"
+     y2="205.55066"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-7-3"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8-2)"
+     inkscape:transform-center-x="0.31422581"
+     inkscape:transform-center-y="17.16612" />
+  <line
+     x1="551.56195"
+     y1="145.59471"
+     x2="524.57538"
+     y2="145.59471"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-7-7"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8-1)"
+     inkscape:transform-center-x="-17.166121"
+     inkscape:transform-center-y="0.31422188" />
+  <line
+     x1="247.11148"
+     y1="703.03461"
+     x2="247.11148"
+     y2="676.04803"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0)"
+     id="line302-3"
+     style="fill:none;stroke:#1d5bb6;stroke-width:1.92021;marker-end:url(#blueArrow-0)"
+     inkscape:transform-center-x="0.021551618"
+     inkscape:transform-center-y="5.4205609" />
+  <text
+     x="162.56624"
+     y="744.48358"
+     class="lbl"
+     text-anchor="middle"
+     id="text198-7"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#111111">G8</text>
+  <line
+     x1="340.59711"
+     y1="249.194"
+     x2="340.59711"
+     y2="222.20744"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7)"
+     inkscape:transform-center-x="0.021543966"
+     inkscape:transform-center-y="5.4205609" />
+  <line
+     x1="175.23569"
+     y1="118.24358"
+     x2="202.22224"
+     y2="118.24358"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-2"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-9)"
+     inkscape:transform-center-x="35.538468"
+     inkscape:transform-center-y="40.964835" />
+  <line
+     x1="306.46124"
+     y1="116.40366"
+     x2="279.47467"
+     y2="116.40366"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-7"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8)"
+     inkscape:transform-center-x="-17.166121"
+     inkscape:transform-center-y="0.31422188" />
+  <polygon
+     points="378,119 398,119 388,98 "
+     class="goal"
+     id="polygon178-2"
+     style="fill:#e53935;stroke:#a31b1b;stroke-width:1.2"
+     transform="translate(-225.23429,607.87738)" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Starts_and_Goals"
+     id="markers">
+    <line
+       x1="611.6051"
+       y1="104.64529"
+       x2="631.6051"
+       y2="124.64529"
+       class="start"
+       id="line138" />
+    <line
+       x1="611.6051"
+       y1="124.64529"
+       x2="631.6051"
+       y2="104.64529"
+       class="start"
+       id="line140" />
+    <text
+       x="622.6051"
+       y="146.64529"
+       class="lbl"
+       text-anchor="middle"
+       id="text142"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">S1</text>
+    <line
+       x1="135.04659"
+       y1="249.10544"
+       x2="155.04659"
+       y2="269.10544"
+       class="start"
+       id="line144" />
+    <line
+       x1="136.03647"
+       y1="267.99985"
+       x2="156.03647"
+       y2="247.99985"
+       class="start"
+       id="line146" />
+    <text
+       x="147.01678"
+       y="283.36462"
+       class="lbl"
+       text-anchor="middle"
+       id="text148"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">S2</text>
+    <line
+       x1="235.83728"
+       y1="704.24365"
+       x2="255.83728"
+       y2="724.24365"
+       class="start"
+       id="line152" />
+    <line
+       x1="236.64775"
+       y1="724.35809"
+       x2="256.64777"
+       y2="704.35809"
+       class="start"
+       id="line154" />
+    <text
+       x="245.95146"
+       y="740.75714"
+       class="lbl"
+       text-anchor="middle"
+       id="text156"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">S3</text>
+    <polygon
+       points="171,119 161,98 151,119 "
+       class="goal"
+       id="polygon166"
+       transform="translate(2.6050945,9.6452909)" />
+    <text
+       x="163.60509"
+       y="147.64529"
+       class="lbl"
+       text-anchor="middle"
+       id="text168"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G1</text>
+    <polygon
+       points="325,119 315,98 305,119 "
+       class="goal"
+       id="polygon172"
+       transform="translate(2.6050945,9.6452909)" />
+    <text
+       x="317.6051"
+       y="147.64529"
+       class="lbl"
+       text-anchor="middle"
+       id="text174"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G2</text>
+    <polygon
+       points="378,119 398,119 388,98 "
+       class="goal"
+       id="polygon178"
+       transform="translate(104.81535,137.02756)" />
+    <text
+       x="493.08633"
+       y="269.6954"
+       class="lbl"
+       text-anchor="middle"
+       id="text180"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G9</text>
+    <polygon
+       points="588,116 578,137 598,137 "
+       class="goal"
+       id="polygon184"
+       transform="translate(-18.396192,17.5242)" />
+    <text
+       x="570.15326"
+       y="170.91071"
+       class="lbl"
+       text-anchor="middle"
+       id="text186"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G3</text>
+    <polygon
+       points="348,264 338,243 328,264 "
+       class="goal"
+       id="polygon190"
+       transform="translate(2.6050945,9.6452909)" />
+    <text
+       x="353.6051"
+       y="268.64529"
+       class="lbl"
+       text-anchor="start"
+       id="text192"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G4</text>
+    <polygon
+       points="170,601 160,580 150,601 "
+       class="goal"
+       id="polygon196"
+       transform="translate(2.6050945,9.6452909)" />
+    <text
+       x="162.60509"
+       y="629.64526"
+       class="lbl"
+       text-anchor="middle"
+       id="text198"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G6</text>
+    <polygon
+       points="463,601 453,580 443,601 "
+       class="goal"
+       id="polygon202"
+       transform="translate(2.6050945,9.6452909)" />
+    <text
+       x="455.6051"
+       y="632.64526"
+       class="lbl"
+       text-anchor="middle"
+       id="text204"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G5</text>
+    <polygon
+       points="602,600 592,579 582,600 "
+       class="goal"
+       id="polygon208"
+       transform="translate(2.6050945,9.6452909)" />
+    <text
+       x="594.6051"
+       y="628.64526"
+       class="lbl"
+       text-anchor="middle"
+       id="text210"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G7</text>
+    <polygon
+       points="616,718 606,697 596,718 "
+       class="goal"
+       id="polygon214"
+       transform="translate(2.6050945,9.6452909)" />
+    <text
+       x="608.6051"
+       y="746.64526"
+       class="lbl"
+       text-anchor="middle"
+       id="text216"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">G10</text>
+    <text
+       xml:space="preserve"
+       style="fill:#111111;-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px"
+       x="344.0502"
+       y="680.40393"
+       id="text826"><tspan
+         sodipodi:role="line"
+         id="tspan824" /></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Dimensions_and_Axes"
+     id="dims">
+    <line
+       x1="48.630245"
+       y1="109.94698"
+       x2="48.630245"
+       y2="738.90094"
+       class="dim"
+       marker-start="url(#blackArrow)"
+       marker-end="url(#blackArrow)"
+       id="line229" />
+    <text
+       x="-426.27948"
+       y="36.145168"
+       class="dimtxt"
+       text-anchor="start"
+       id="text235"
+       transform="rotate(-90)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">6.5 m</text>
+    <text
+       x="182.2995"
+       y="-680.48407"
+       class="dimtxt"
+       text-anchor="start"
+       id="text243"
+       transform="rotate(90)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">2.5 m</text>
+    <line
+       x1="92.647141"
+       y1="567.94672"
+       x2="92.647141"
+       y2="739.57153"
+       class="dim"
+       marker-start="url(#blackArrow)"
+       marker-end="url(#blackArrow)"
+       id="line245" />
+    <line
+       x1="81.990906"
+       y1="558.67633"
+       x2="117.05683"
+       y2="558.67633"
+       class="dim"
+       id="line247" />
+    <text
+       x="-664.48853"
+       y="77.49588"
+       class="dimtxt"
+       text-anchor="start"
+       id="text251"
+       transform="rotate(-90)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">2.5 m</text>
+    <line
+       x1="131.429"
+       y1="775.62036"
+       x2="626.30908"
+       y2="775.62036"
+       class="dim"
+       marker-start="url(#blackArrow)"
+       marker-end="url(#blackArrow)"
+       id="line253" />
+    <text
+       x="382.00739"
+       y="798.3324"
+       class="dimtxt"
+       text-anchor="middle"
+       id="text259"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">5.0 m</text>
+    <text
+       x="342.4393"
+       y="319.41031"
+       class="dimtxt"
+       text-anchor="middle"
+       id="text261"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">0.9 m</text>
+    <line
+       x1="294.3862"
+       y1="375.94791"
+       x2="381.5676"
+       y2="375.94791"
+       class="dim"
+       marker-start="url(#blackArrow)"
+       marker-end="url(#blackArrow)"
+       id="line265" />
+    <text
+       x="255.75638"
+       y="369.03622"
+       class="dimtxt"
+       text-anchor="middle"
+       id="text267"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">1.1 m</text>
+    <line
+       x1="388.81421"
+       y1="463.418"
+       x2="388.81421"
+       y2="539.47278"
+       class="dim"
+       marker-start="url(#blackArrow)"
+       marker-end="url(#blackArrow)"
+       id="line269" />
+    <text
+       x="-530.04828"
+       y="382.07932"
+       class="dimtxt"
+       text-anchor="start"
+       id="text271"
+       transform="rotate(-90)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">1.1 m</text>
+    <line
+       x1="393.7713"
+       y1="454.99524"
+       x2="476.75232"
+       y2="454.99524"
+       class="dim"
+       marker-start="url(#blackArrow)"
+       marker-end="url(#blackArrow)"
+       id="line273" />
+    <text
+       x="574.02966"
+       y="519.79407"
+       class="dimtxt"
+       text-anchor="middle"
+       id="text275"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif"><tspan
+         sodipodi:role="line"
+         id="tspan1837"
+         x="574.02966"
+         y="519.79407">1.4 m</tspan></text>
+    <ellipse
+       cx="55.390137"
+       cy="816.18445"
+       class=""
+       fill="#111111"
+       id="circle277"
+       rx="3.209394"
+       ry="3.8175485"
+       style="stroke-width:0.700058" />
+    <line
+       x1="58.599529"
+       y1="816.18445"
+       x2="99.037895"
+       y2="816.18445"
+       class="arrowRed"
+       marker-end="url(#redArrow)"
+       id="line279" />
+    <text
+       x="110.09179"
+       y="778.63647"
+       class="dimtxt"
+       text-anchor="start"
+       id="text281"
+       transform="scale(0.94775141,1.055129)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.787027">+X (m)</text>
+    <line
+       x1="55.22105"
+       y1="815.104"
+       x2="55.22105"
+       y2="771.58398"
+       class="axisy"
+       marker-end="url(#greenArrow)"
+       id="line283" />
+    <text
+       x="35.493458"
+       y="725.53888"
+       class="dimtxt"
+       text-anchor="start"
+       id="text285"
+       transform="scale(0.94775141,1.055129)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.787027">+Y (m)</text>
+    <text
+       x="56.910316"
+       y="765.15619"
+       class="dimtxt"
+       text-anchor="start"
+       id="text287"
+       transform="scale(0.91689426,1.0906383)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.700058">(0, 0)</text>
+    <line
+       x1="80.21656"
+       y1="749.33203"
+       x2="115.21657"
+       y2="749.33203"
+       class="dim"
+       id="line247-3"
+       style="fill:none;stroke:#111111;stroke-width:1.41695" />
+    <line
+       x1="665.95331"
+       y1="109.42974"
+       x2="665.95331"
+       y2="281.39514"
+       class="dim"
+       marker-start="url(#blackArrow-6)"
+       marker-end="url(#blackArrow-6)"
+       id="line245-8"
+       style="fill:none;stroke:#111111;stroke-width:1.20119;marker-start:url(#blackArrow-6);marker-end:url(#blackArrow-6)" />
+    <line
+       x1="640.45288"
+       y1="99.598259"
+       x2="675.5188"
+       y2="99.598259"
+       class="dim"
+       id="line247-7"
+       style="fill:none;stroke:#111111;stroke-width:1.41969" />
+    <line
+       x1="640.45288"
+       y1="289.34692"
+       x2="675.5188"
+       y2="289.34692"
+       class="dim"
+       id="line247-3-9"
+       style="fill:none;stroke:#111111;stroke-width:1.41969" />
+    <line
+       x1="638.81671"
+       y1="787.55408"
+       x2="638.81671"
+       y2="752.48816"
+       class="dim"
+       id="line247-36"
+       style="fill:none;stroke:#111111;stroke-width:1.51503" />
+    <line
+       x1="120.21049"
+       y1="752.48816"
+       x2="120.21049"
+       y2="787.55408"
+       class="dim"
+       id="line247-3-7"
+       style="fill:none;stroke:#111111;stroke-width:1.51503" />
+    <line
+       x1="127.67307"
+       y1="70.371414"
+       x2="625.04547"
+       y2="70.371414"
+       class="dim"
+       marker-start="url(#blackArrow-0)"
+       marker-end="url(#blackArrow-0)"
+       id="line253-6"
+       style="fill:none;stroke:#111111;stroke-width:1.20302;marker-start:url(#blackArrow-0);marker-end:url(#blackArrow-0)" />
+    <text
+       x="393.28293"
+       y="64.146065"
+       class="dimtxt"
+       text-anchor="middle"
+       id="text259-0"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#111111">5.0 m</text>
+    <line
+       x1="637.91583"
+       y1="94.394173"
+       x2="637.91583"
+       y2="59.328247"
+       class="dim"
+       id="line247-36-6"
+       style="fill:none;stroke:#111111;stroke-width:1.51503" />
+    <line
+       x1="119.30963"
+       y1="59.328247"
+       x2="119.30963"
+       y2="94.394173"
+       class="dim"
+       id="line247-3-7-2"
+       style="fill:none;stroke:#111111;stroke-width:1.51503" />
+    <line
+       x1="42.207367"
+       y1="749.65063"
+       x2="77.207375"
+       y2="749.65063"
+       class="dim"
+       id="line247-3-2"
+       style="fill:none;stroke:#111111;stroke-width:1.41695" />
+    <line
+       x1="79.741272"
+       y1="99.306145"
+       x2="114.74127"
+       y2="99.306145"
+       class="dim"
+       id="line247-3-0"
+       style="fill:none;stroke:#111111;stroke-width:1.41695" />
+    <line
+       x1="41.732086"
+       y1="99.624748"
+       x2="76.732086"
+       y2="99.624748"
+       class="dim"
+       id="line247-3-2-2"
+       style="fill:none;stroke:#111111;stroke-width:1.41695" />
+    <line
+       x1="204.10335"
+       y1="317.75681"
+       x2="204.10335"
+       y2="536.16608"
+       class="dim"
+       marker-start="url(#blackArrow-3)"
+       marker-end="url(#blackArrow-3)"
+       id="line245-5"
+       style="fill:none;stroke:#111111;stroke-width:1.33644;marker-start:url(#blackArrow-3);marker-end:url(#marker1297)" />
+    <text
+       x="-390.86929"
+       y="217.90207"
+       class="dimtxt"
+       text-anchor="start"
+       id="text251-9"
+       transform="matrix(0,-1.1311756,0.88403605,0,0,0)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#111111;stroke-width:1.10249">2 m</text>
+    <line
+       x1="638.89349"
+       y1="521.30902"
+       x2="638.89349"
+       y2="556.37494"
+       class="dim"
+       id="line247-2"
+       style="fill:none;stroke:#111111;stroke-width:1.41828" />
+    <line
+       x1="497.34793"
+       y1="530.77295"
+       x2="632.21686"
+       y2="530.77295"
+       class="dim"
+       marker-start="url(#blackArrow-8)"
+       marker-end="url(#blackArrow-8)"
+       id="line265-3"
+       style="fill:none;stroke:#111111;stroke-width:1.49253;marker-start:url(#blackArrow-8);marker-end:url(#blackArrow-8)" />
+    <path
+       style="opacity:0.99;fill:#000000;stroke:#000000;stroke-width:0;stroke-linejoin:bevel;stroke-dasharray:none;stroke-dashoffset:0"
+       d="m 590.55477,490.80238 31.45174,-55.86081"
+       id="path10716" />
+    <text
+       x="440.22342"
+       y="475.27078"
+       class="dimtxt"
+       text-anchor="middle"
+       id="text275-3"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#111111"><tspan
+         sodipodi:role="line"
+         id="tspan1837-6"
+         x="440.22342"
+         y="475.27078">1.1 m</tspan></text>
+    <line
+       x1="406.20874"
+       y1="320.13159"
+       x2="621.56958"
+       y2="320.13159"
+       class="dim"
+       marker-start="url(#blackArrow-8-5)"
+       marker-end="url(#blackArrow-8-5)"
+       id="line265-3-2"
+       style="fill:none;stroke:#111111;stroke-width:1.486;stroke-dasharray:none;marker-start:url(#blackArrow-8-5);marker-end:url(#blackArrow-8-5)" />
+    <text
+       x="503.09326"
+       y="343.40875"
+       class="dimtxt"
+       text-anchor="middle"
+       id="text275-2"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#111111"><tspan
+         sodipodi:role="line"
+         id="tspan1837-7"
+         x="503.09326"
+         y="343.40875">2.5 m</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Legend_and_Tables"
+     id="panels">
+    <rect
+       x="720.38892"
+       y="55.425663"
+       width="262"
+       height="393"
+       class="panel"
+       id="rect290" />
+    <rect
+       x="720.38892"
+       y="55.425663"
+       width="262"
+       height="28"
+       class="phead"
+       id="rect292" />
+    <text
+       x="734.38892"
+       y="75.425667"
+       class="phtxt"
+       text-anchor="start"
+       id="text294"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic'">Legend</text>
+    <line
+       x1="743.30914"
+       y1="91.135674"
+       x2="763.30914"
+       y2="111.13567"
+       class="start"
+       id="line296" />
+    <line
+       x1="743.258"
+       y1="111.58664"
+       x2="763.258"
+       y2="91.586647"
+       class="start"
+       id="line298" />
+    <text
+       x="785.38892"
+       y="105.42567"
+       class="txt"
+       text-anchor="start"
+       id="text300"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Start pose (S1, S2, S3)</text>
+    <polygon
+       points="754,111 744,132 764,132 "
+       class="goal"
+       id="polygon304"
+       transform="translate(-0.79317665,8.4999965)" />
+    <text
+       x="785.38892"
+       y="135.42566"
+       class="txt"
+       text-anchor="start"
+       id="text308"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Goal pose (G1 – G10)</text>
+    <rect
+       x="739.38892"
+       y="150.42566"
+       width="26"
+       height="24"
+       class="box"
+       id="rect312" />
+    <text
+       x="785.38892"
+       y="168.42566"
+       class="txt"
+       text-anchor="start"
+       id="text314"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Static box (0.50 × 0.50 m)</text>
+    <circle
+       cx="753.29437"
+       cy="202.96326"
+       r="15"
+       class="cyl"
+       id="circle316" />
+    <text
+       x="784.03082"
+       y="208.33788"
+       class="txt"
+       text-anchor="start"
+       id="text318"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Static cylinder (0.45 m)</text>
+    <rect
+       x="732.87988"
+       y="227.72685"
+       width="40"
+       height="24"
+       class="desk"
+       id="rect320" />
+    <text
+       x="782.48553"
+       y="245.52431"
+       class="txt"
+       text-anchor="start"
+       id="text322"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Desk / table (1.20 × 0.60 m)</text>
+    <rect
+       x="746.38892"
+       y="262.42569"
+       width="14"
+       height="29"
+       class="box"
+       id="rect324" />
+    <text
+       x="785.38892"
+       y="280.42569"
+       class="txt"
+       text-anchor="start"
+       id="text326"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Localization pillar (0.30 × 0.60 m)</text>
+    <rect
+       x="731.8031"
+       y="306.57654"
+       width="45"
+       height="42"
+       class="temp"
+       id="rect328" />
+    <line
+       x1="638.41931"
+       y1="294.95901"
+       x2="638.41931"
+       y2="330.02487"
+       class="dim"
+       id="line247-2-6-9-1"
+       style="fill:none;stroke:#111111;stroke-width:1.41828" />
+    <text
+       x="786.38892"
+       y="315.42569"
+       class="txt"
+       text-anchor="start"
+       id="text330"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Temporary box location</text>
+    <text
+       x="786.38892"
+       y="333.42569"
+       class="txt"
+       text-anchor="start"
+       id="text332"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(0.50 × 0.50 m)</text>
+    <text
+       x="786.38892"
+       y="351.42569"
+       class="txt"
+       text-anchor="start"
+       id="text334"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(absent during mapping)</text>
+    <text
+       x="787.38892"
+       y="375.42569"
+       class="txt"
+       text-anchor="start"
+       id="text340"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Moving cylinder path (Ø 0.40 m)</text>
+    <text
+       x="787.38892"
+       y="393.42569"
+       class="txt"
+       text-anchor="start"
+       id="text342"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(stretch scenario, Room B only)</text>
+    <rect
+       x="731.38892"
+       y="402.42569"
+       width="45"
+       height="14"
+       class="door"
+       id="rect344" />
+    <line
+       x1="734.38892"
+       y1="416.42569"
+       x2="745.38892"
+       y2="402.42569"
+       class="hatch"
+       id="line348" />
+    <line
+       x1="741.38892"
+       y1="416.42569"
+       x2="752.38892"
+       y2="402.42569"
+       class="hatch"
+       id="line350" />
+    <line
+       x1="748.38892"
+       y1="416.42569"
+       x2="759.38892"
+       y2="402.42569"
+       class="hatch"
+       id="line352" />
+    <line
+       x1="755.38892"
+       y1="416.42569"
+       x2="766.38892"
+       y2="402.42569"
+       class="hatch"
+       id="line354" />
+    <line
+       x1="762.38892"
+       y1="416.42569"
+       x2="773.38892"
+       y2="402.42569"
+       class="hatch"
+       id="line356" />
+    <text
+       x="786.38892"
+       y="415.42569"
+       class="txt"
+       text-anchor="start"
+       id="text362"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Doorway (0.9 m clear width)</text>
+    <rect
+       x="732.38892"
+       y="428.42569"
+       width="45"
+       height="11"
+       class="wall"
+       id="rect364" />
+    <text
+       x="787.38892"
+       y="438.42569"
+       class="txt"
+       text-anchor="start"
+       id="text366"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Wall (0.2m width)</text>
+    <rect
+       x="995.37152"
+       y="55.408257"
+       width="250.03481"
+       height="189.08661"
+       class="panel"
+       id="rect368" />
+    <rect
+       x="995.38892"
+       y="55.425663"
+       width="250"
+       height="28"
+       class="phead"
+       id="rect370" />
+    <text
+       x="1009.3889"
+       y="75.425667"
+       class="phtxt"
+       text-anchor="start"
+       id="text372"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic'">Dimensions</text>
+    <line
+       x1="995.38892"
+       y1="83.425667"
+       x2="1245.3889"
+       y2="83.425667"
+       class="grid"
+       id="line374" />
+    <line
+       x1="995.38892"
+       y1="111.42567"
+       x2="1245.3889"
+       y2="111.42567"
+       class="grid"
+       id="line376" />
+    <line
+       x1="995.38892"
+       y1="139.42566"
+       x2="1245.3889"
+       y2="139.42566"
+       class="grid"
+       id="line378" />
+    <line
+       x1="995.38892"
+       y1="167.42566"
+       x2="1245.3889"
+       y2="167.42566"
+       class="grid"
+       id="line380" />
+    <line
+       x1="995.38892"
+       y1="195.42566"
+       x2="1245.3889"
+       y2="195.42566"
+       class="grid"
+       id="line382" />
+    <line
+       x1="995.38892"
+       y1="223.42566"
+       x2="1245.3889"
+       y2="223.42566"
+       class="grid"
+       id="line384" />
+    <line
+       x1="994.89764"
+       y1="243.80099"
+       x2="1244.8977"
+       y2="243.80099"
+       class="grid"
+       id="line386" />
+    <line
+       x1="1136.3889"
+       y1="83.425667"
+       x2="1136.3889"
+       y2="244.19011"
+       class="grid"
+       id="line388" />
+    <text
+       x="1007.3889"
+       y="102.42567"
+       class="txt"
+       text-anchor="start"
+       id="text390"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Overall size</text>
+    <text
+       x="1145.3889"
+       y="102.42567"
+       class="txt"
+       text-anchor="start"
+       id="text392"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">8.0 × 6.5 m</text>
+    <text
+       x="1007.3889"
+       y="130.42567"
+       class="txt"
+       text-anchor="start"
+       id="text394"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Room A</text>
+    <text
+       x="1145.3889"
+       y="130.42567"
+       class="txt"
+       text-anchor="start"
+       id="text396"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">5.0 × 2.5 m</text>
+    <text
+       x="1007.3889"
+       y="158.42566"
+       class="txt"
+       text-anchor="start"
+       id="text398"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Room B</text>
+    <text
+       x="1145.3889"
+       y="158.42566"
+       class="txt"
+       text-anchor="start"
+       id="text400"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">5.0 × 2.5 m</text>
+    <text
+       x="1007.3889"
+       y="186.42566"
+       class="txt"
+       text-anchor="start"
+       id="text402"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Corridor width</text>
+    <text
+       x="1145.3889"
+       y="186.42566"
+       class="txt"
+       text-anchor="start"
+       id="text404"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">1.1 m (clear)</text>
+    <text
+       x="1007.3889"
+       y="214.42566"
+       class="txt"
+       text-anchor="start"
+       id="text406"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Doorway width</text>
+    <text
+       x="1145.3889"
+       y="214.42566"
+       class="txt"
+       text-anchor="start"
+       id="text408"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">0.9 m (clear)</text>
+    <text
+       x="1007.3889"
+       y="238.42566"
+       class="txt"
+       text-anchor="start"
+       id="text410"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Corridor turn pocket</text>
+    <text
+       x="1010"
+       y="243.58661"
+       class="txt"
+       text-anchor="start"
+       id="text412"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px" />
+    <text
+       x="1145.6152"
+       y="238.77159"
+       class="txt"
+       text-anchor="start"
+       id="text414"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">1.1 × 1.1 m</text>
+    <rect
+       x="995.88873"
+       y="252.9877"
+       width="250"
+       height="184"
+       class="panel"
+       id="rect416" />
+    <rect
+       x="995.88873"
+       y="252.9877"
+       width="250"
+       height="28"
+       class="phead"
+       id="rect418" />
+    <text
+       x="1009.8887"
+       y="272.98773"
+       class="phtxt"
+       text-anchor="start"
+       id="text420"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic'">Objects (mapping)</text>
+    <line
+       x1="995.88873"
+       y1="280.98773"
+       x2="1245.8887"
+       y2="280.98773"
+       class="grid"
+       id="line422" />
+    <line
+       x1="995.88873"
+       y1="306.98773"
+       x2="1245.8887"
+       y2="306.98773"
+       class="grid"
+       id="line424" />
+    <line
+       x1="995.88873"
+       y1="332.98773"
+       x2="1245.8887"
+       y2="332.98773"
+       class="grid"
+       id="line426" />
+    <line
+       x1="995.88873"
+       y1="358.98773"
+       x2="1245.8887"
+       y2="358.98773"
+       class="grid"
+       id="line428" />
+    <line
+       x1="995.88873"
+       y1="384.98773"
+       x2="1245.8887"
+       y2="384.98773"
+       class="grid"
+       id="line430" />
+    <line
+       x1="995.88873"
+       y1="410.98773"
+       x2="1245.8887"
+       y2="410.98773"
+       class="grid"
+       id="line432" />
+    <line
+       x1="995.88873"
+       y1="436.98773"
+       x2="1245.8887"
+       y2="436.98773"
+       class="grid"
+       id="line434" />
+    <line
+       x1="1132.8887"
+       y1="280.98773"
+       x2="1132.8887"
+       y2="436.98773"
+       class="grid"
+       id="line436" />
+    <text
+       x="1007.8887"
+       y="298.98773"
+       class="txt"
+       text-anchor="start"
+       id="text438"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Static boxes</text>
+    <text
+       x="1142.8887"
+       y="298.98773"
+       class="txt"
+       text-anchor="start"
+       id="text440"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">2 (yes)</text>
+    <text
+       x="1007.8887"
+       y="324.98773"
+       class="txt"
+       text-anchor="start"
+       id="text442"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Static cylinders</text>
+    <text
+       x="1142.8887"
+       y="324.98773"
+       class="txt"
+       text-anchor="start"
+       id="text444"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">2 (yes)</text>
+    <text
+       x="1007.8887"
+       y="350.98773"
+       class="txt"
+       text-anchor="start"
+       id="text446"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Desk / table</text>
+    <text
+       x="1142.8887"
+       y="350.98773"
+       class="txt"
+       text-anchor="start"
+       id="text448"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">1 (yes)</text>
+    <text
+       x="1007.8887"
+       y="376.98773"
+       class="txt"
+       text-anchor="start"
+       id="text450"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Localization pillar</text>
+    <text
+       x="1142.8887"
+       y="376.98773"
+       class="txt"
+       text-anchor="start"
+       id="text452"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">1 (yes)</text>
+    <text
+       x="1007.8887"
+       y="402.98773"
+       class="txt"
+       text-anchor="start"
+       id="text454"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Temporary box</text>
+    <text
+       x="1142.8887"
+       y="402.98773"
+       class="txt"
+       text-anchor="start"
+       id="text456"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">1 (no)</text>
+    <text
+       x="1007.8887"
+       y="428.98773"
+       class="txt"
+       text-anchor="start"
+       id="text458"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Moving cylinder</text>
+    <text
+       x="1203.5226"
+       y="406.00125"
+       class="txt"
+       text-anchor="start"
+       id="text460"
+       transform="scale(0.94763726,1.0552561)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.947637">1 (no, stretch only)</text>
+    <rect
+       x="723"
+       y="661"
+       width="525"
+       height="93"
+       class="panel"
+       id="rect652" />
+    <rect
+       x="723"
+       y="661"
+       width="525"
+       height="28"
+       class="phead"
+       id="rect654" />
+    <text
+       x="732.31915"
+       y="680.08685"
+       class="phtxt"
+       text-anchor="start"
+       id="text656"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic'">Temporary box scenarios</text>
+    <line
+       x1="723"
+       y1="689"
+       x2="723"
+       y2="754"
+       class="grid"
+       id="line658" />
+    <line
+       x1="790"
+       y1="689"
+       x2="790"
+       y2="754"
+       class="grid"
+       id="line660" />
+    <line
+       x1="901"
+       y1="689"
+       x2="901"
+       y2="754"
+       class="grid"
+       id="line662" />
+    <line
+       x1="1248"
+       y1="689"
+       x2="1248"
+       y2="754"
+       class="grid"
+       id="line664" />
+    <line
+       x1="723"
+       y1="689"
+       x2="1248"
+       y2="689"
+       class="grid"
+       id="line666" />
+    <line
+       x1="723"
+       y1="705"
+       x2="1248"
+       y2="705"
+       class="grid"
+       id="line668" />
+    <line
+       x1="723"
+       y1="721"
+       x2="1248"
+       y2="721"
+       class="grid"
+       id="line670" />
+    <line
+       x1="723"
+       y1="737"
+       x2="1248"
+       y2="737"
+       class="grid"
+       id="line672" />
+    <line
+       x1="723"
+       y1="754"
+       x2="1248"
+       y2="754"
+       class="grid"
+       id="line674" />
+    <text
+       x="756"
+       y="701"
+       class="tblb"
+       text-anchor="middle"
+       id="text676"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">ID</text>
+    <text
+       x="845"
+       y="701"
+       class="tblb"
+       text-anchor="middle"
+       id="text678"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">Location</text>
+    <text
+       x="1087.261"
+       y="701.69702"
+       class="tblb"
+       text-anchor="middle"
+       id="text680"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Purpose</text>
+    <text
+       x="756"
+       y="717"
+       class="tbl"
+       text-anchor="middle"
+       id="text682"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">TB-A</text>
+    <text
+       x="845"
+       y="717"
+       class="tbl"
+       text-anchor="middle"
+       id="text684"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">RoomA</text>
+    <text
+       x="963.91309"
+       y="717.45837"
+       class="tbl"
+       text-anchor="start"
+       id="text686"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Obstacle removal and costmap clearing test</text>
+    <text
+       x="756"
+       y="733"
+       class="tbl"
+       text-anchor="middle"
+       id="text688"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">TB-B</text>
+    <text
+       x="845.29572"
+       y="750.05341"
+       class="tbl"
+       text-anchor="middle"
+       id="text690"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">Corridor</text>
+    <text
+       x="993.60706"
+       y="749.53522"
+       class="tbl"
+       text-anchor="start"
+       id="text692"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Block corridor (goal unreachable)</text>
+    <text
+       x="756"
+       y="749"
+       class="tbl"
+       text-anchor="middle"
+       id="text694"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">TB-C</text>
+    <text
+       x="963.91309"
+       y="732.80627"
+       class="tbl"
+       text-anchor="start"
+       id="text698"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Obstacle removal and costmap clearing test</text>
+    <rect
+       x="723"
+       y="761"
+       width="525"
+       height="75"
+       class="panel"
+       id="rect700" />
+    <rect
+       x="723"
+       y="761"
+       width="525"
+       height="28"
+       class="phead"
+       id="rect702" />
+    <text
+       x="731.40607"
+       y="778.81445"
+       class="phtxt"
+       text-anchor="start"
+       id="text704"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic'">Moving cylinder scenario</text>
+    <line
+       x1="723"
+       y1="789"
+       x2="723"
+       y2="836"
+       class="grid"
+       id="line706" />
+    <line
+       x1="790"
+       y1="789"
+       x2="790"
+       y2="836"
+       class="grid"
+       id="line708" />
+    <line
+       x1="900"
+       y1="789"
+       x2="900"
+       y2="836"
+       class="grid"
+       id="line710" />
+    <line
+       x1="1041"
+       y1="789"
+       x2="1041"
+       y2="836"
+       class="grid"
+       id="line712" />
+    <line
+       x1="1248"
+       y1="789"
+       x2="1248"
+       y2="836"
+       class="grid"
+       id="line714" />
+    <line
+       x1="723"
+       y1="789"
+       x2="1248"
+       y2="789"
+       class="grid"
+       id="line716" />
+    <line
+       x1="723"
+       y1="808"
+       x2="1248"
+       y2="808"
+       class="grid"
+       id="line718" />
+    <line
+       x1="723"
+       y1="836"
+       x2="1248"
+       y2="836"
+       class="grid"
+       id="line720" />
+    <text
+       x="756"
+       y="803"
+       class="tblb"
+       text-anchor="middle"
+       id="text722"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">ID</text>
+    <text
+       x="845"
+       y="803"
+       class="tblb"
+       text-anchor="middle"
+       id="text724"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">Location</text>
+    <text
+       x="971"
+       y="803"
+       class="tblb"
+       text-anchor="middle"
+       id="text726"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">Motion</text>
+    <text
+       x="1149.3003"
+       y="803"
+       class="tblb"
+       text-anchor="middle"
+       id="text728"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">Purpose</text>
+    <text
+       x="756"
+       y="827"
+       class="tbl"
+       text-anchor="middle"
+       id="text730"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">MC</text>
+    <text
+       x="845"
+       y="827"
+       class="tbl"
+       text-anchor="middle"
+       id="text732"
+       style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:12px">Room B</text>
+    <text
+       x="969.18005"
+       y="826.74274"
+       class="tbl"
+       text-anchor="middle"
+       id="text734"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif">Horizontal (left ↔ right)</text>
+    <text
+       x="1050.8246"
+       y="836.36255"
+       class="tbl"
+       text-anchor="start"
+       id="text736"
+       transform="scale(1.0215882,0.978868)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.978867">Dynamic obstacle crossing</text>
+    <text
+       x="996.97656"
+       y="891.76831"
+       class="tbl"
+       text-anchor="start"
+       id="text738"
+       transform="scale(1.0733295,0.93168034)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.93168">(stop / avoid and continue)</text>
+    <line
+       x1="756.36078"
+       y1="380.29181"
+       x2="782.10645"
+       y2="380.29181"
+       class="arrowRed"
+       marker-end="url(#redArrow-5)"
+       id="line131-2"
+       style="fill:none;stroke:#e3272d;stroke-width:2.18717;marker-end:url(#redArrow-5)" />
+    <line
+       x1="918.90338"
+       y1="103.86222"
+       x2="951.99457"
+       y2="103.86222"
+       class="arrowBlue"
+       marker-end="url(#blueArrow-0-2-8)"
+       id="line302-3-1-9"
+       style="fill:none;stroke:#1d5bb6;stroke-width:2.12633;marker-end:url(#blueArrow-0-2-8)"
+       inkscape:transform-center-x="6.6467909"
+       inkscape:transform-center-y="-0.021476141" />
+    <line
+       x1="917.81683"
+       y1="133.55304"
+       x2="950.97754"
+       y2="133.55304"
+       class="arrowBlue"
+       marker-end="url(#blueArrow-0-2-8-2)"
+       id="line302-3-1-9-2"
+       style="opacity:0.99;fill:#ff0000;stroke:#cb0000;stroke-width:2.12896;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#redArrow)"
+       inkscape:transform-center-x="6.6607491"
+       inkscape:transform-center-y="-0.021466102" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;opacity:0.99;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.52;stroke-dasharray:none;stroke-opacity:1;-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
+       x="1278.9674"
+       y="701.78192"
+       id="text20989"><tspan
+         sodipodi:role="line"
+         id="tspan20987" /></text>
+    <text
+       x="845.18549"
+       y="733.52771"
+       class="tbl"
+       text-anchor="middle"
+       id="text684-4"
+       style="font-size:12px;font-family:sans-serif;fill:#111111;-inkscape-font-specification:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Room B</text>
+    <text
+       xml:space="preserve"
+       id="text903"
+       style="font-size:12px;white-space:pre;shape-inside:url(#rect905);display:inline;opacity:0.99;fill:#000000;stroke:#000000;stroke-width:0.747;stroke-linejoin:bevel;-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal" />
+    <text
+       xml:space="preserve"
+       id="text1972"
+       style="font-size:12px;white-space:pre;shape-inside:url(#rect1974);display:inline;opacity:0.99;fill:#000000;stroke:#000000;stroke-width:0.8;stroke-linejoin:bevel;-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal" />
+    <rect
+       x="720.84235"
+       y="463.17853"
+       width="260.22873"
+       height="104.36996"
+       fill="#ffffff"
+       stroke="#8295a3"
+       stroke-width="0.822009"
+       id="rect2210" />
+    <rect
+       x="720.89642"
+       y="456.95392"
+       width="260.12064"
+       height="28.143173"
+       fill="#e5eef5"
+       stroke="#8295a3"
+       stroke-width="0.930105"
+       id="rect2212" />
+    <text
+       x="728.87781"
+       y="476.15698"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="14.2481px"
+       font-weight="bold"
+       text-anchor="start"
+       id="text2214"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic';stroke-width:1.09601">Start poses (x, y, yaw)</text>
+    <line
+       x1="720.84235"
+       y1="485.15115"
+       x2="981.07104"
+       y2="485.15115"
+       stroke="#a7b5bf"
+       stroke-width="0.767208"
+       id="line2216" />
+    <line
+       x1="720.84235"
+       y1="504.92651"
+       x2="981.07104"
+       y2="504.92651"
+       stroke="#a7b5bf"
+       stroke-width="0.767208"
+       id="line2218" />
+    <line
+       x1="766.76508"
+       y1="485.15115"
+       x2="766.76508"
+       y2="567.54846"
+       stroke="#a7b5bf"
+       stroke-width="0.767208"
+       id="line2220" />
+    <line
+       x1="837.83594"
+       y1="485.15115"
+       x2="837.83594"
+       y2="567.54846"
+       stroke="#a7b5bf"
+       stroke-width="0.767208"
+       id="line2222" />
+    <line
+       x1="908.9068"
+       y1="485.15115"
+       x2="908.9068"
+       y2="567.54846"
+       stroke="#a7b5bf"
+       stroke-width="0.767208"
+       id="line2224" />
+    <text
+       x="745.58154"
+       y="498.24246"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2226"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">ID</text>
+    <text
+       x="804.21814"
+       y="498.24246"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2228"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">x (m)</text>
+    <text
+       x="875.45886"
+       y="498.24246"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2230"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">y (m)</text>
+    <text
+       x="947.24762"
+       y="498.24246"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2232"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">yaw (°)</text>
+    <text
+       x="745.58154"
+       y="518.71594"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2234"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">S1</text>
+    <text
+       x="804.21814"
+       y="518.71594"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2236"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">4.50</text>
+    <text
+       x="875.45886"
+       y="518.71594"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2238"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">7.55</text>
+    <text
+       x="947.24762"
+       y="518.71594"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2240"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">180</text>
+    <line
+       x1="720.84235"
+       y1="525.80048"
+       x2="981.07104"
+       y2="525.80048"
+       stroke="#a7b5bf"
+       stroke-width="0.767208"
+       id="line2242" />
+    <text
+       x="745.58154"
+       y="539.54016"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2244"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">S2</text>
+    <text
+       x="804.21814"
+       y="539.54016"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2246"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">0.45</text>
+    <text
+       x="875.45886"
+       y="539.54016"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2248"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">6.20</text>
+    <text
+       x="947.24762"
+       y="539.54016"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2250"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">0</text>
+    <line
+       x1="720.84235"
+       y1="546.6745"
+       x2="981.07104"
+       y2="546.6745"
+       stroke="#a7b5bf"
+       stroke-width="0.767208"
+       id="line2252" />
+    <text
+       x="745.58154"
+       y="560.36438"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2254"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">S3</text>
+    <text
+       x="804.21814"
+       y="560.36438"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2256"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">1.55</text>
+    <text
+       x="875.45886"
+       y="560.36438"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2258"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">1.75</text>
+    <text
+       x="947.24762"
+       y="560.36438"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="10.9601px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2260"
+       transform="scale(0.9976155,1.0023902)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.09601">90</text>
+    <rect
+       x="996.6687"
+       y="445.83237"
+       width="250.89352"
+       height="208.26578"
+       fill="#ffffff"
+       stroke="#8295a3"
+       stroke-width="0.828073"
+       id="rect2262" />
+    <rect
+       x="996.7121"
+       y="440.89478"
+       width="250.80678"
+       height="27.050156"
+       fill="#e5eef5"
+       stroke="#8295a3"
+       stroke-width="0.914815"
+       id="rect2264" />
+    <text
+       x="1008.1879"
+       y="458.5256"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="14.3533px"
+       font-weight="bold"
+       text-anchor="start"
+       id="text2266"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic';stroke-width:1.10409">Goal poses (x, y, yaw)</text>
+    <line
+       x1="996.6687"
+       y1="467.98831"
+       x2="1247.5623"
+       y2="467.98831"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2268" />
+    <line
+       x1="996.6687"
+       y1="487.92865"
+       x2="1247.5623"
+       y2="487.92865"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2270" />
+    <line
+       x1="1039.5846"
+       y1="467.98831"
+       x2="1039.5846"
+       y2="654.09808"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2272" />
+    <line
+       x1="1105.6093"
+       y1="467.98831"
+       x2="1105.6093"
+       y2="654.09808"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2274" />
+    <line
+       x1="1171.6339"
+       y1="467.98831"
+       x2="1171.6339"
+       y2="654.09808"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2276" />
+    <text
+       x="1021.538"
+       y="480.77872"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2278"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">ID</text>
+    <text
+       x="1076.191"
+       y="480.77872"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2280"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">x (m)</text>
+    <text
+       x="1142.4368"
+       y="480.77872"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2282"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">y (m)</text>
+    <text
+       x="1213.6511"
+       y="480.77872"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="bold"
+       text-anchor="middle"
+       id="text2284"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">yaw (°)</text>
+    <text
+       x="1021.538"
+       y="498.22351"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2286"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G1</text>
+    <text
+       x="1076.191"
+       y="498.22351"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2288"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0.55</text>
+    <text
+       x="1142.4368"
+       y="498.22351"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2290"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">7.55</text>
+    <text
+       x="1213.6511"
+       y="498.22351"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2292"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0</text>
+    <line
+       x1="996.6687"
+       y1="504.54559"
+       x2="1247.5623"
+       y2="504.54559"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2294" />
+    <text
+       x="1021.538"
+       y="514.78503"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2296"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G2</text>
+    <text
+       x="1076.191"
+       y="514.78503"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2298"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">1.90</text>
+    <text
+       x="1142.4368"
+       y="514.78503"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2300"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">7.55</text>
+    <text
+       x="1213.6511"
+       y="514.78503"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2302"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">180</text>
+    <line
+       x1="996.6687"
+       y1="521.16248"
+       x2="1247.5623"
+       y2="521.16248"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2304" />
+    <text
+       x="1021.538"
+       y="531.34644"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2306"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G3</text>
+    <text
+       x="1076.191"
+       y="531.34644"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2308"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">4.40</text>
+    <text
+       x="1142.4368"
+       y="531.34644"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2310"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">7.50</text>
+    <text
+       x="1213.6511"
+       y="531.34644"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2312"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">180</text>
+    <line
+       x1="996.6687"
+       y1="537.77948"
+       x2="1247.5623"
+       y2="537.77948"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2314" />
+    <text
+       x="1021.538"
+       y="547.9079"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2316"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G4</text>
+    <text
+       x="1076.191"
+       y="547.9079"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2318"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">1.70</text>
+    <text
+       x="1142.4368"
+       y="547.9079"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2320"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">6.00</text>
+    <text
+       x="1213.6511"
+       y="547.9079"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2322"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">90</text>
+    <line
+       x1="996.6687"
+       y1="554.39636"
+       x2="1247.5623"
+       y2="554.39636"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2324" />
+    <text
+       x="1021.538"
+       y="564.46936"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2326"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G5</text>
+    <text
+       x="1076.191"
+       y="564.46936"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2328"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">3.20</text>
+    <text
+       x="1142.4368"
+       y="564.46936"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2330"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">1.85</text>
+    <text
+       x="1213.6511"
+       y="564.46936"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2332"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0</text>
+    <line
+       x1="996.6687"
+       y1="571.01337"
+       x2="1247.5623"
+       y2="571.01337"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2334" />
+    <text
+       x="1021.538"
+       y="581.03088"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2336"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G6</text>
+    <text
+       x="1076.191"
+       y="581.03088"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2338"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0.40</text>
+    <text
+       x="1142.4368"
+       y="581.03088"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2340"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">1.00</text>
+    <text
+       x="1213.6511"
+       y="581.03088"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2342"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">270</text>
+    <line
+       x1="996.6687"
+       y1="587.63031"
+       x2="1247.5623"
+       y2="587.63031"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2344" />
+    <text
+       x="1021.538"
+       y="597.59229"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2346"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G7</text>
+    <text
+       x="1076.191"
+       y="597.59229"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2348"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">4.55</text>
+    <text
+       x="1142.4368"
+       y="597.59229"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2350"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">1.80</text>
+    <text
+       x="1213.6511"
+       y="597.59229"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2352"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">90</text>
+    <line
+       x1="996.6687"
+       y1="604.24719"
+       x2="1247.5623"
+       y2="604.24719"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2354" />
+    <text
+       x="1021.538"
+       y="614.15375"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2356"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G8</text>
+    <text
+       x="1076.191"
+       y="614.15375"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2358"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0.50</text>
+    <text
+       x="1142.4368"
+       y="614.15375"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2360"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0.45</text>
+    <text
+       x="1213.6511"
+       y="614.15375"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2362"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0</text>
+    <line
+       x1="996.6687"
+       y1="620.8642"
+       x2="1247.5623"
+       y2="620.8642"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2364" />
+    <text
+       x="1021.538"
+       y="630.71521"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2366"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G9</text>
+    <text
+       x="1076.191"
+       y="630.71521"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2368"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">3.20</text>
+    <text
+       x="1142.4368"
+       y="630.71521"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2370"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">6.20</text>
+    <text
+       x="1213.6511"
+       y="630.71521"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2372"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">90</text>
+    <line
+       x1="996.6687"
+       y1="637.48114"
+       x2="1247.5623"
+       y2="637.48114"
+       stroke="#a7b5bf"
+       stroke-width="0.772868"
+       id="line2374" />
+    <text
+       x="1021.538"
+       y="647.27667"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2376"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">G10</text>
+    <text
+       x="1076.191"
+       y="647.27667"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2378"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">4.50</text>
+    <text
+       x="1142.4368"
+       y="647.27667"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2380"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">0.45</text>
+    <text
+       x="1213.6511"
+       y="647.27667"
+       fill="#152331"
+       font-family="'DejaVu Serif', serif"
+       font-size="11.0409px"
+       font-weight="normal"
+       text-anchor="middle"
+       id="text2382"
+       transform="scale(0.99666058,1.0033506)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:1.10409">180</text>
+    <text
+       xml:space="preserve"
+       id="text4498"
+       style="fill:#000000;stroke:#000000;stroke-width:0.8;opacity:0.99;font-size:12px;stroke-linejoin:bevel;white-space:pre;shape-inside:url(#rect4500);-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal" />
+    <line
+       x1="719.37531"
+       y1="83.790855"
+       x2="982.20093"
+       y2="83.790855"
+       class="grid"
+       id="line374-3"
+       style="stroke:#a9b7c3;stroke-width:0.820264" />
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic';opacity:0.99;fill:#000000;stroke:#000000;stroke-width:0.8;stroke-linejoin:bevel"
+       x="1334.6534"
+       y="628.77216"
+       id="text4175"><tspan
+         sodipodi:role="line"
+         id="tspan4173"
+         x="1334.6534"
+         y="628.77216">º</tspan></text>
+  </g>
+  <line
+     x1="753.70911"
+     y1="380.2887"
+     x2="727.5083"
+     y2="380.2887"
+     class="arrowRed"
+     marker-end="url(#redArrow-7)"
+     id="line129-3"
+     style="fill:none;stroke:#e3272d;stroke-width:2.14244;marker-end:url(#redArrow-7)" />
+  <line
+     x1="160.23135"
+     y1="258.4263"
+     x2="187.21791"
+     y2="258.4263"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6)"
+     id="line302-3-6"
+     style="fill:none;stroke:#1d5bb6;stroke-width:1.92021;marker-end:url(#blueArrow-0-6)"
+     inkscape:transform-center-x="5.4205613"
+     inkscape:transform-center-y="-0.021554884" />
+  <line
+     x1="608.19434"
+     y1="114.11916"
+     x2="581.20776"
+     y2="114.11916"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-2)"
+     id="line302-3-1"
+     style="fill:none;stroke:#1d5bb6;stroke-width:1.92021;marker-end:url(#blueArrow-0-2)"
+     inkscape:transform-center-x="-5.4205871"
+     inkscape:transform-center-y="0.021551195" />
+  <line
+     x1="466.25751"
+     y1="597.54449"
+     x2="493.24408"
+     y2="597.54449"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-7-5"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8-8)"
+     inkscape:transform-center-x="17.166154"
+     inkscape:transform-center-y="-0.31419568" />
+  <line
+     x1="593.65045"
+     y1="732.19867"
+     x2="566.66388"
+     y2="732.19867"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-7-6"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8-0)"
+     inkscape:transform-center-x="-17.166121"
+     inkscape:transform-center-y="0.31422188" />
+  <line
+     x1="594.31116"
+     y1="587.3548"
+     x2="594.31116"
+     y2="560.36823"
+     class="arrowBlue"
+     marker-end="url(#blueArrow-0-6-3)"
+     id="line302-3-6-5-7-32"
+     style="fill:none;stroke:#ab1b1b;stroke-width:1.92021;stroke-opacity:1;marker-end:url(#redArrow-7-8-10)"
+     inkscape:transform-center-x="0.31422568"
+     inkscape:transform-center-y="17.166151" />
+  <line
+     x1="466.40402"
+     y1="558.69373"
+     x2="477.4317"
+     y2="544.81836"
+     class="hatch"
+     id="line72-8-4-5"
+     style="stroke:#8d8d8d;stroke-width:0.723659" />
+  <path
+     style="opacity:0.99;fill:#000000;stroke:#000000;stroke-width:0.719;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:4.314, 4.314;stroke-dashoffset:0"
+     d="m 437.26955,429.9184 0.0405,5.55412 0.94665,129.61321"
+     id="path26880"
+     sodipodi:nodetypes="ccc" />
+  <line
+     x1="386.99017"
+     y1="305.80313"
+     x2="386.99017"
+     y2="340.86899"
+     class="dim"
+     id="line247-2-6-9"
+     style="fill:none;stroke:#111111;stroke-width:1.41828" />
+  <path
+     style="opacity:0.99;fill:#000000;stroke:#000000;stroke-width:0.601437;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3.60862, 3.60862;stroke-dashoffset:0"
+     d="m 340.66771,281.79487 0.0433,3.63449 1.01224,84.81596"
+     id="path26880-0"
+     sodipodi:nodetypes="ccc" />
+</svg>
