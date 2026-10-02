@@ -1,0 +1,110 @@
+{
+  "status": "recorded",
+  "error": null,
+  "scenario": "straight",
+  "wheel_radius_m": 0.03575,
+  "wheel_separation_m": 0.233,
+  "ground_truth_source": "/World/V1_Robot articulation root = base_link",
+  "odometry_source": "/diff_drive_controller/odom",
+  "odometry_mode": "position feedback, open_loop=false",
+  "raw_wheel_velocity_issue": "Deferred from Step 7; raw velocity integrals are not used for Step 8 acceptance.",
+  "phases": [
+    {
+      "name": "BASELINE",
+      "start": 1306.7,
+      "end": 1307.7,
+      "requested_linear_mps": 0.0,
+      "requested_angular_rad_s": 0.0
+    },
+    {
+      "name": "FORWARD",
+      "start": 1307.7,
+      "end": 1309.7,
+      "requested_linear_mps": 0.05,
+      "requested_angular_rad_s": 0.0
+    },
+    {
+      "name": "SETTLE",
+      "start": 1309.7,
+      "end": 1311.7,
+      "requested_linear_mps": 0.0,
+      "requested_angular_rad_s": 0.0
+    }
+  ],
+  "trial_window": {
+    "start": 1307.7,
+    "end": 1311.7
+  },
+  "isaac_ground_truth": {
+    "samples": 241,
+    "covered_s": 4.0,
+    "start": {
+      "x_m": 4.730725288391113,
+      "y_m": 1.408676028251648,
+      "yaw_rad": -2.240981166457103
+    },
+    "end": {
+      "x_m": 4.674315929412842,
+      "y_m": 1.3376134634017944,
+      "yaw_rad": -2.2415847879862416
+    },
+    "dx_global_m": -0.056409358978271484,
+    "dy_global_m": -0.07106256484985352,
+    "distance_m": 0.09072984020364598,
+    "forward_m": 0.09072981377572248,
+    "lateral_m": -6.925028413192619e-05,
+    "yaw_change_rad": -0.0006036215291387315,
+    "yaw_change_deg": -0.03458496604288235
+  },
+  "ros_odometry": {
+    "samples": 120,
+    "covered_s": 3.9500000000000455,
+    "start": {
+      "x_m": -0.2089052633246554,
+      "y_m": -0.3190425462299494,
+      "yaw_rad": 0.19489956044396223
+    },
+    "end": {
+      "x_m": -0.11988242686283666,
+      "y_m": -0.3015363974815084,
+      "yaw_rad": 0.19431852219954196
+    },
+    "dx_global_m": 0.08902283646181873,
+    "dy_global_m": 0.017506148748440975,
+    "distance_m": 0.0907277832624068,
+    "forward_m": 0.09072775913454897,
+    "lateral_m": -6.616746578799737e-05,
+    "yaw_change_rad": -0.0005810382444202677,
+    "yaw_change_deg": -0.0332910391409721
+  },
+  "wheel_position_kinematics": {
+    "samples": 200,
+    "covered_s": 3.966666667000027,
+    "left_angle_change_rad": 2.539784073829651,
+    "right_angle_change_rad": 2.5359472185373306,
+    "left_distance_m": 0.09079728063941,
+    "right_distance_m": 0.09066011306270956,
+    "forward_m": 0.09072869685105978,
+    "yaw_change_rad": -0.0005887020459246561,
+    "yaw_change_deg": -0.03373014262219956
+  },
+  "comparison": {
+    "odom_minus_ground_truth": {
+      "forward_error_m": -2.0546411735045123e-06,
+      "lateral_error_m": 3.082818343928817e-06,
+      "translation_vector_error_m": 3.7047698030409413e-06,
+      "heading_error_rad": 2.2583284718463714e-05,
+      "heading_error_deg": 0.0012939269019102584
+    },
+    "wheel_positions_minus_ground_truth": {
+      "forward_error_m": -1.1169246627029672e-06,
+      "heading_error_rad": 1.4919483214075372e-05,
+      "heading_error_deg": 0.0008548234206827953
+    },
+    "odom_minus_wheel_positions": {
+      "forward_error_m": -9.377165108015451e-07,
+      "heading_error_rad": 7.663801504388344e-06,
+      "heading_error_deg": 0.0004391034812274632
+    }
+  }
+}

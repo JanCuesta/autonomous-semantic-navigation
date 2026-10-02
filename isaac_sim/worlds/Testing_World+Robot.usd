@@ -478,9 +478,9 @@ def Xform "World" (
         prepend payload = @../robots/V1_Robot.usd@
     )
     {
-        quatd xformOp:orient = (1, 0, 0, 0)
+        quatd xformOp:orient = (0.2288240011076134, 0.023027658307444344, -0.10177004066960363, -0.9678595777756638)
         double3 xformOp:scale = (1, 1, 1)
-        double3 xformOp:translate = (4.414715766906738, 1.0665068626403809, 5.658931101493181e-8)
+        double3 xformOp:translate = (3.722511581389596, 1.5070142614891953, 0.36502175281178606)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
         over "base_link"
@@ -516,6 +516,9 @@ def Xform "World" (
 
         over "wheel_drop_left"
         {
+            string isaac:nameOverride (
+                displayName = "Name Override"
+            )
             vector3f physics:angularVelocity = (-0.5187904, -39.03851, 0.81671154)
             vector3f physics:velocity = (0.017029021, -0.010383944, -0.00011436493)
             quatd xformOp:orient = (-0.706992198456746, 0.7070853114207674, 0.009737269021680244, 0.009878222830704738)
@@ -530,6 +533,9 @@ def Xform "World" (
 
         over "left_wheel"
         {
+            string isaac:nameOverride (
+                displayName = "Name Override"
+            )
             vector3f physics:angularVelocity = (-0.5108142, 0.5860076, 0.8115985)
             vector3f physics:velocity = (0.017029021, -0.010383944, -0.00011436493)
             quatd xformOp:orient = (-0.7069921984428073, 0.707085311420765, 0.009737264365067343, 0.00987822841864015)
@@ -868,10 +874,10 @@ def Camera "Camera" (
     float focalLength = 18.147562
     float focusDistance = 400
     bool omni:kit:cameraLock = 0
-    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -1.7587955524173748)
-    quatd xformOp:orient = (0.842458204545744, 0.12638909333406861, 0.07770214357690729, 0.5179308327984609)
-    double3 xformOp:scale = (0.10000000149011612, 1, 1)
-    double3 xformOp:translate = (4.689636794520936, 0.7115504948529464, 1.7351894535712677)
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -4.976515027360428)
+    quatd xformOp:orient = (0.9721180428771945, 0.22930395197305953, -0.013196713169139914, -0.04724463021001753)
+    double3 xformOp:scale = (1, 0.10000000149011612, 1)
+    double3 xformOp:translate = (3.118193149588059, -0.8503097706651832, 4.017986633726649)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 }
 
