@@ -1,0 +1,878 @@
+============================================================
+STEP 9 — MAPPING LAUNCH CONTEXT
+Generated: 2026-10-03T20:08:54-07:00
+PWD: /home/master-jan/projects/autonomous-semantic-navigation
+ROS_DISTRO: jazzy
+============================================================
+
+#################### GIT STATUS ####################
+ M isaac_sim/worlds/Testing_World+Robot.usd
+ M ros2_ws/src/asn_simulation/CMakeLists.txt
+ M ros2_ws/src/asn_simulation/config/ros2_controllers.yaml
+ D ros2_ws/src/asn_simulation/config/ros2_controllers.yaml.pre_step8_tf_backup
+ M ros2_ws/src/asn_simulation/package.xml
+ M ros2_ws/src/asn_simulation/scripts/asn_wheel_odom_unwrapped.py
+?? results/step9/
+?? ros2_ws/src/asn_bringup/launch/simulation.launch.py
+?? ros2_ws/src/asn_navigation/launch/
+?? ros2_ws/src/asn_navigation/rviz/
+?? ros2_ws/src/asn_simulation/config/legacy/
+
+#################### PACKAGE TREE ####################
+ros2_ws/src/asn_bringup/CMakeLists.txt
+ros2_ws/src/asn_bringup/config/.gitkeep
+ros2_ws/src/asn_bringup/launch/.gitkeep
+ros2_ws/src/asn_bringup/launch/__pycache__/simulation.launch.cpython-312.pyc
+ros2_ws/src/asn_bringup/launch/simulation.launch.py
+ros2_ws/src/asn_bringup/LICENSE
+ros2_ws/src/asn_bringup/package.xml
+ros2_ws/src/asn_description/CMakeLists.txt
+ros2_ws/src/asn_description/LICENSE
+ros2_ws/src/asn_description/meshes/.gitkeep
+ros2_ws/src/asn_description/package.xml
+ros2_ws/src/asn_description/rviz/.gitkeep
+ros2_ws/src/asn_description/urdf/.gitkeep
+ros2_ws/src/asn_description/urdf/robot.urdf
+ros2_ws/src/asn_navigation/behavior_trees/.gitkeep
+ros2_ws/src/asn_navigation/CMakeLists.txt
+ros2_ws/src/asn_navigation/config/.gitkeep
+ros2_ws/src/asn_navigation/config/slam_toolbox_mapping.yaml
+ros2_ws/src/asn_navigation/launch/mapping.launch.py
+ros2_ws/src/asn_navigation/LICENSE
+ros2_ws/src/asn_navigation/maps/.gitkeep
+ros2_ws/src/asn_navigation/maps/v1_sim_map.pgm
+ros2_ws/src/asn_navigation/maps/v1_sim_map.yaml
+ros2_ws/src/asn_navigation/package.xml
+ros2_ws/src/asn_navigation/rviz/mapping.rviz
+ros2_ws/src/asn_simulation/CMakeLists.txt
+ros2_ws/src/asn_simulation/config/.gitkeep
+ros2_ws/src/asn_simulation/config/legacy/ros2_controllers.yaml.pre_step8_tf_backup
+ros2_ws/src/asn_simulation/config/ros2_controllers.yaml
+ros2_ws/src/asn_simulation/launch/.gitkeep
+ros2_ws/src/asn_simulation/LICENSE
+ros2_ws/src/asn_simulation/package.xml
+ros2_ws/src/asn_simulation/scripts/asn_wheel_odom_unwrapped.py
+
+============================================================
+FILE: ros2_ws/src/asn_bringup/package.xml
+============================================================
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>asn_bringup</name>
+  <version>0.0.0</version>
+  <description>System launch profiles and shared startup configuration</description>
+  <maintainer email="jan.cuesta@icloud.com">master-jan</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+
+============================================================
+FILE: ros2_ws/src/asn_bringup/CMakeLists.txt
+============================================================
+cmake_minimum_required(VERSION 3.8)
+project(asn_bringup)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# find dependencies
+find_package(ament_cmake REQUIRED)
+# uncomment the following section in order to fill in
+# further dependencies manually.
+# find_package(<dependency> REQUIRED)
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+install(
+  DIRECTORY launch config
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_package()
+
+============================================================
+FILE: ros2_ws/src/asn_bringup/launch/simulation.launch.py
+============================================================
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+import os
+from ament_index_python.packages import get_package_share_directory
+
+def generate_launch_description():
+
+    joint_state_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+
+    diff_drive_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "diff_drive_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+    odometry = Node(
+        package="asn_simulation",
+        executable="asn_wheel_odom_unwrapped",
+        name="asn_wheel_odom_unwrapped",
+        parameters=[{
+            "use_sim_time": True,
+            "wheel_radius": 0.03575,
+            "wheel_separation": 0.23993,
+            "publish_tf": True,
+        }],
+    )
+
+
+
+    description_share = get_package_share_directory("asn_description")
+
+    urdf_path = os.path.join(
+        description_share,
+        "urdf",
+        "robot.urdf"
+    )
+
+    with open(urdf_path, "r") as file:
+        robot_description = file.read()
+
+
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
+        parameters=[{
+            "use_sim_time": True,
+            "robot_description": robot_description,
+        }],
+    )
+
+    return LaunchDescription([
+        joint_state_broadcaster,
+        diff_drive_controller,
+        odometry,
+        robot_state_publisher
+    ])
+============================================================
+FILE: ros2_ws/src/asn_bringup/launch/mapping.launch.py
+============================================================
+FILE NOT FOUND
+
+============================================================
+FILE: ros2_ws/src/asn_navigation/package.xml
+============================================================
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>asn_navigation</name>
+  <version>0.0.0</version>
+  <description>Mapping, localization, and navigation configuration</description>  <maintainer email="jan.cuesta@icloud.com">master-jan</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+
+============================================================
+FILE: ros2_ws/src/asn_navigation/CMakeLists.txt
+============================================================
+cmake_minimum_required(VERSION 3.8)
+project(asn_navigation)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# find dependencies
+find_package(ament_cmake REQUIRED)
+# uncomment the following section in order to fill in
+# further dependencies manually.
+# find_package(<dependency> REQUIRED)
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+install(
+  DIRECTORY config maps behavior_trees
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_package()
+
+============================================================
+FILE: ros2_ws/src/asn_navigation/config/slam_toolbox_mapping.yaml
+============================================================
+slam_toolbox:
+  ros__parameters:
+
+    # Plugin params
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+
+    # ROS Parameters
+    odom_frame: odom
+    map_frame: map
+    base_frame: base_link
+    scan_topic: /scan
+    use_sim_time: true
+    use_map_saver: true
+    mode: mapping #localization
+
+    # if you'd like to immediately start continuing a map at a given pose
+    # or at the dock, but they are mutually exclusive, if pose is given
+    # will use pose
+    #map_file_name: test_steve
+    # map_start_pose: [0.0, 0.0, 0.0]
+    #map_start_at_dock: true
+
+    debug_logging: false
+    throttle_scans: 1
+    transform_publish_period: 0.02 #if 0 never publishes odometry
+    map_update_interval: 5.0
+    resolution: 0.05
+    restamp_tf: false
+    min_laser_range: 0.0 #for rastering images
+    max_laser_range: 20.0 #for rastering images
+    minimum_time_interval: 0.5
+    transform_timeout: 0.2
+    tf_buffer_duration: 30.0
+    stack_size_to_use: 40000000 #// program needs a larger stack size to serialize large maps
+    enable_interactive_mode: true
+
+    # General Parameters
+    use_scan_matching: true
+    use_scan_barycenter: true
+    minimum_travel_distance: 0.5
+    minimum_travel_heading: 0.5
+    check_min_dist_and_heading_precisely: false
+    scan_buffer_size: 10
+    scan_buffer_maximum_scan_distance: 10.0
+    link_match_minimum_response_fine: 0.1  
+    link_scan_maximum_distance: 1.5
+    loop_search_maximum_distance: 3.0
+    do_loop_closing: true 
+    loop_match_minimum_chain_size: 10           
+    loop_match_maximum_variance_coarse: 3.0  
+    loop_match_minimum_response_coarse: 0.35    
+    loop_match_minimum_response_fine: 0.45
+
+    # Correlation Parameters - Correlation Parameters
+    correlation_search_space_dimension: 0.5
+    correlation_search_space_resolution: 0.01
+    correlation_search_space_smear_deviation: 0.1 
+
+    # Correlation Parameters - Loop Closure Parameters
+    loop_search_space_dimension: 8.0
+    loop_search_space_resolution: 0.05
+    loop_search_space_smear_deviation: 0.03
+
+    # Scan Matcher Parameters
+    distance_variance_penalty: 0.5      
+    angle_variance_penalty: 1.0    
+
+    fine_search_angle_offset: 0.00349     
+    coarse_search_angle_offset: 0.349   
+    coarse_angle_resolution: 0.0349        
+    minimum_angle_penalty: 0.9
+    minimum_distance_penalty: 0.5
+    use_response_expansion: true
+    min_pass_through: 2
+    occupancy_threshold: 0.1
+
+============================================================
+FILE: ros2_ws/src/asn_navigation/rviz/mapping.rviz
+============================================================
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Status1
+        - /RobotModel1
+      Splitter Ratio: 0.5
+    Tree Height: 707
+  - Class: rviz_common/Selection
+    Name: Selection
+  - Class: rviz_common/Tool Properties
+    Expanded:
+      - /2D Goal Pose1
+      - /Publish Point1
+    Name: Tool Properties
+    Splitter Ratio: 0.5886790156364441
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz_common/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: LaserScan
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 10
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 0.699999988079071
+      Binary representation: false
+      Binary threshold: 100
+      Class: rviz_default_plugins/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /map
+      Update Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /map_updates
+      Use Timestamp: false
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /scan
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Filter (blacklist): ""
+      Filter (whitelist): ""
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        base_link:
+          Value: true
+        laser_frame:
+          Value: true
+        left_wheel:
+          Value: true
+        map:
+          Value: true
+        odom:
+          Value: true
+        right_wheel:
+          Value: true
+        wheel_drop_left:
+          Value: true
+        wheel_drop_right:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        map:
+          odom:
+            base_link:
+              laser_frame:
+                {}
+              wheel_drop_left:
+                left_wheel:
+                  {}
+              wheel_drop_right:
+                right_wheel:
+                  {}
+      Update Interval: 0
+      Value: true
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz_default_plugins/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: false
+      Enabled: true
+      Keep: 100
+      Name: Odometry
+      Position Tolerance: 0.10000000149011612
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 255; 25; 0
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 1
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /odom
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        laser_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_drop_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_drop_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+      Mass Properties:
+        Inertia: false
+        Mass: false
+      Name: RobotModel
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+      Line color: 128; 128; 0
+    - Class: rviz_default_plugins/SetInitialPose
+      Covariance x: 0.25
+      Covariance y: 0.25
+      Covariance yaw: 0.06853891909122467
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /initialpose
+    - Class: rviz_default_plugins/SetGoal
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /goal_pose
+    - Class: rviz_default_plugins/PublishPoint
+      Single click: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /clicked_point
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 10
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.785398006439209
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 0.785398006439209
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 1011
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd00000004000000000000015600000351fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003f00000351000000cc00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f00000351fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003f00000351000000a900fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000039f0000003efc0100000002fb0000000800540069006d006501000000000000039f0000026f00fffffffb0000000800540069006d006501000000000000045000000000000000000000012e0000035100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 927
+  X: 66
+  Y: 32
+
+============================================================
+FILE: ros2_ws/src/asn_simulation/package.xml
+============================================================
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>asn_simulation</name>
+  <version>0.0.0</version>
+  <description>Isaac Sim integration and simulated robot configuration</description>
+  <maintainer email="jan.cuesta@icloud.com">master-jan</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf2_ros</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+
+============================================================
+FILE: ros2_ws/src/asn_simulation/CMakeLists.txt
+============================================================
+cmake_minimum_required(VERSION 3.8)
+project(asn_simulation)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+install(
+  PROGRAMS
+    scripts/asn_wheel_odom_unwrapped.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME asn_wheel_odom_unwrapped
+)
+
+install(
+  DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_package()
+============================================================
+FILE: ros2_ws/src/asn_simulation/config/ros2_controllers.yaml
+============================================================
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+    use_sim_time: true # <--- CRITICAL FOR SIMULATION
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    diff_drive_controller:
+      type: diff_drive_controller/DiffDriveController
+
+diff_drive_controller:
+  ros__parameters:
+    left_wheel_names: ["left_wheel_joint"]
+    right_wheel_names: ["right_wheel_joint"]
+    wheel_separation: 0.233
+    wheel_radius: 0.03575
+
+    odom_frame_id: odom
+    base_frame_id: base_link
+    open_loop: false
+    position_feedback: true
+    enable_odom_tf: false
+    publish_rate: 30.0
+    cmd_vel_timeout: 0.5
+
+    linear.x.max_velocity: 0.40
+    linear.x.min_velocity: -0.40
+    linear.x.max_acceleration: 0.60
+    linear.x.max_deceleration: -0.80
+    angular.z.max_velocity: 1.10
+    angular.z.min_velocity: -1.10
+    angular.z.max_acceleration: 1.80
+    angular.z.max_deceleration: -2.20
+#################### INSTALLED PROJECT PACKAGES ####################
+
+--- asn_bringup ---
+/home/master-jan/projects/autonomous-semantic-navigation/ros2_ws/install/asn_bringup
+
+--- asn_navigation ---
+/home/master-jan/projects/autonomous-semantic-navigation/ros2_ws/install/asn_navigation
+
+--- asn_simulation ---
+/home/master-jan/projects/autonomous-semantic-navigation/ros2_ws/install/asn_simulation
+
+--- asn_description ---
+/home/master-jan/projects/autonomous-semantic-navigation/ros2_ws/install/asn_description
+
+--- slam_toolbox ---
+/opt/ros/jazzy
+
+#################### SLAM TOOLBOX EXECUTABLES ####################
+slam_toolbox async_slam_toolbox_node
+slam_toolbox lifelong_slam_toolbox_node
+slam_toolbox localization_slam_toolbox_node
+slam_toolbox map_and_localization_slam_toolbox_node
+slam_toolbox merge_maps_kinematic
+slam_toolbox sync_slam_toolbox_node
+
+#################### SLAM TOOLBOX LAUNCH FILES ####################
+/opt/ros/jazzy/share/slam_toolbox/launch/localization_launch.py
+/opt/ros/jazzy/share/slam_toolbox/launch/merge_maps_kinematic_launch.py
+/opt/ros/jazzy/share/slam_toolbox/launch/offline_launch.py
+/opt/ros/jazzy/share/slam_toolbox/launch/online_async_launch.py
+/opt/ros/jazzy/share/slam_toolbox/launch/online_sync_launch.py
+
+#################### online_async_launch.py ####################
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import (DeclareLaunchArgument, EmitEvent, LogInfo,
+                            RegisterEventHandler)
+from launch.conditions import IfCondition
+from launch.events import matches_action
+from launch.substitutions import (AndSubstitution, LaunchConfiguration,
+                                  NotSubstitution)
+from launch_ros.actions import LifecycleNode
+from launch_ros.event_handlers import OnStateTransition
+from launch_ros.events.lifecycle import ChangeState
+from lifecycle_msgs.msg import Transition
+
+
+def generate_launch_description():
+    autostart = LaunchConfiguration('autostart')
+    use_lifecycle_manager = LaunchConfiguration("use_lifecycle_manager")
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    slam_params_file = LaunchConfiguration('slam_params_file')
+
+    declare_autostart_cmd = DeclareLaunchArgument(
+        'autostart', default_value='true',
+        description='Automatically startup the slamtoolbox. '
+                    'Ignored when use_lifecycle_manager is true.')
+    declare_use_lifecycle_manager = DeclareLaunchArgument(
+        'use_lifecycle_manager', default_value='false',
+        description='Enable bond connection during node activation')
+    declare_use_sim_time_argument = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='true',
+        description='Use simulation/Gazebo clock')
+    declare_slam_params_file_cmd = DeclareLaunchArgument(
+        'slam_params_file',
+        default_value=os.path.join(get_package_share_directory("slam_toolbox"),
+                                   'config', 'mapper_params_online_async.yaml'),
+        description='Full path to the ROS2 parameters file to use for the slam_toolbox node')
+
+    start_async_slam_toolbox_node = LifecycleNode(
+        parameters=[
+          slam_params_file,
+          {
+            'use_lifecycle_manager': use_lifecycle_manager,
+            'use_sim_time': use_sim_time
+          }
+        ],
+        package='slam_toolbox',
+        executable='async_slam_toolbox_node',
+        name='slam_toolbox',
+        output='screen',
+        namespace=''
+    )
+
+    configure_event = EmitEvent(
+        event=ChangeState(
+          lifecycle_node_matcher=matches_action(start_async_slam_toolbox_node),
+          transition_id=Transition.TRANSITION_CONFIGURE
+        ),
+        condition=IfCondition(AndSubstitution(autostart, NotSubstitution(use_lifecycle_manager)))
+    )
+
+    activate_event = RegisterEventHandler(
+        OnStateTransition(
+            target_lifecycle_node=start_async_slam_toolbox_node,
+            start_state="configuring",
+            goal_state="inactive",
+            entities=[
+                LogInfo(msg="[LifecycleLaunch] Slamtoolbox node is activating."),
+                EmitEvent(event=ChangeState(
+                    lifecycle_node_matcher=matches_action(start_async_slam_toolbox_node),
+                    transition_id=Transition.TRANSITION_ACTIVATE
+                ))
+            ]
+        ),
+        condition=IfCondition(AndSubstitution(autostart, NotSubstitution(use_lifecycle_manager)))
+    )
+
+    ld = LaunchDescription()
+
+    ld.add_action(declare_autostart_cmd)
+    ld.add_action(declare_use_lifecycle_manager)
+    ld.add_action(declare_use_sim_time_argument)
+    ld.add_action(declare_slam_params_file_cmd)
+    ld.add_action(start_async_slam_toolbox_node)
+    ld.add_action(configure_event)
+    ld.add_action(activate_event)
+
+    return ld
+
+#################### PROJECT EXECUTABLES ####################
+asn_simulation asn_wheel_odom_unwrapped

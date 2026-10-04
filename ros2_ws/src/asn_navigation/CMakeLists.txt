@@ -24,7 +24,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config maps behavior_trees
+  DIRECTORY config maps behavior_trees rviz
   DESTINATION share/${PROJECT_NAME}
 )
 

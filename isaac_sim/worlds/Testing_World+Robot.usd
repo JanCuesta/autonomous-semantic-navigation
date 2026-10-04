@@ -7,8 +7,8 @@
                 double radius = 5.544594192504883
             }
             dictionary Perspective = {
-                double3 position = (2.26233593025659, 3.6193555330502787, 8.763024742449435)
-                double3 target = (2.261205426035681, 5.279343334879356, 5.490631247270452)
+                double3 position = (2.6468325193692634, -0.2766985730496592, 5.539178364511431)
+                double3 target = (2.646044745049936, 0.8800381613132335, 3.258861749538217)
             }
             dictionary Right = {
                 double3 position = (0, -5.000000111758711, 0)
@@ -337,7 +337,7 @@ def Xform "World" (
             custom int refinementLevel = 2
             quatd xformOp:orient = (1, 0, 0, 0)
             double3 xformOp:scale = (0.45, 0.45, 1)
-            double3 xformOp:translate = (0.8, 1.8, 0.5000000074505806)
+            double3 xformOp:translate = (0.9, 1.600000023841858, 0.5000000074505806)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
         }
 
@@ -378,7 +378,7 @@ def Xform "World" (
             uniform token subdivisionScheme = "none"
             quatd xformOp:orient = (1, 0, 0, 0)
             double3 xformOp:scale = (1.2, 0.6, 0.75)
-            double3 xformOp:translate = (1.8000000268220901, 0.9000000134110451, 0.375)
+            double3 xformOp:translate = (2.3, 0.9000000134110451, 0.375)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
         }
 
@@ -480,7 +480,7 @@ def Xform "World" (
     {
         quatd xformOp:orient = (0.2288240011076134, 0.023027658307444344, -0.10177004066960363, -0.9678595777756638)
         double3 xformOp:scale = (1, 1, 1)
-        double3 xformOp:translate = (3.722511581389596, 1.5070142614891953, 0.36502175281178606)
+        double3 xformOp:translate = (3.722511581389596, 1.5070142614891953, 0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
         over "base_link"
@@ -874,10 +874,10 @@ def Camera "Camera" (
     float focalLength = 18.147562
     float focusDistance = 400
     bool omni:kit:cameraLock = 0
-    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -4.976515027360428)
-    quatd xformOp:orient = (0.9721180428771945, 0.22930395197305953, -0.013196713169139914, -0.04724463021001753)
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -7.496218275756975)
+    quatd xformOp:orient = (1, 0, 0, 0)
     double3 xformOp:scale = (1, 0.10000000149011612, 1)
-    double3 xformOp:translate = (3.118193149588059, -0.8503097706651832, 4.017986633726649)
+    double3 xformOp:translate = (2.500000037252903, 1.5749441684348986, 5.700000084936619)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 }
 
@@ -902,10 +902,10 @@ over "OmniverseKit_Persp" (
     float exposure:time = 0.02
     float focalLength = 18.147562
     float focusDistance = 400
-    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -3.669348711631377)
-    float3 xformOp:rotateXYZ = (26.89733, -3.7090424e-14, 0.039020233)
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -2.556928696255687)
+    float3 xformOp:rotateXYZ = (26.89733, -4.223087e-14, 0.039020233)
     float3 xformOp:scale = (1, 1, 1)
-    double3 xformOp:translate = (2.26233593025659, 3.6193555330502787, 8.763024742449435)
+    double3 xformOp:translate = (2.6468325193692634, -0.2766985730496592, 5.539178364511431)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
 }
 
@@ -1038,5 +1038,41 @@ def "Graph"
             custom uint64 outputs:context
         }
     }
+}
+
+def Camera "Camera_01" (
+    prepend apiSchemas = ["OmniRtxCameraAutoExposureAPI_1", "OmniRtxCameraExposureAPI_1"]
+)
+{
+    float2 clippingRange = (0.01, 10000000)
+    float exposure:fStop = 5
+    float exposure:responsivity = 1.1026709
+    float exposure:time = 0.02
+    float focalLength = 18.147562
+    float focusDistance = 400
+    bool omni:kit:cameraLock = 0
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -7.496218275756975)
+    quatd xformOp:orient = (1, 0, 0, 0)
+    double3 xformOp:scale = (1, 0.10000000149011612, 1)
+    double3 xformOp:translate = (1.7530161777747602, 4.300000064074993, 5.600000083446503)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+}
+
+def Camera "Camera_02" (
+    prepend apiSchemas = ["OmniRtxCameraAutoExposureAPI_1", "OmniRtxCameraExposureAPI_1"]
+)
+{
+    float2 clippingRange = (0.01, 10000000)
+    float exposure:fStop = 5
+    float exposure:responsivity = 1.1026709
+    float exposure:time = 0.02
+    float focalLength = 18.147562
+    float focusDistance = 400
+    bool omni:kit:cameraLock = 0
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -7.496218275756975)
+    quatd xformOp:orient = (1, 0, 0, 0)
+    double3 xformOp:scale = (1, 0.10000000149011612, 1)
+    double3 xformOp:translate = (2.500000037252903, 6.600000098347664, 5.700000084936619)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 }
 

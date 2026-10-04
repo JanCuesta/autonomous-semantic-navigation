@@ -22,11 +22,11 @@ diff_drive_controller:
     publish_rate: 30.0
     cmd_vel_timeout: 0.5
 
-    linear.x.max_velocity: 0.10
-    linear.x.min_velocity: -0.10
-    linear.x.max_acceleration: 0.20
-    linear.x.max_deceleration: -0.30
-    angular.z.max_velocity: 0.50
-    angular.z.min_velocity: -0.50
-    angular.z.max_acceleration: 1.0
-    angular.z.max_deceleration: -1.0
+    linear.x.max_velocity: 0.40
+    linear.x.min_velocity: -0.40
+    linear.x.max_acceleration: 0.60
+    linear.x.max_deceleration: -0.80
+    angular.z.max_velocity: 1.10
+    angular.z.min_velocity: -1.10
+    angular.z.max_acceleration: 1.80
+    angular.z.max_deceleration: -2.20
