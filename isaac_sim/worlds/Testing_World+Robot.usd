@@ -29,6 +29,7 @@
         }
         int refinementOverrideImplVersion = 0
         dictionary renderSettings = {
+            bool "rtx:ecoMode:enabled" = 0
         }
     }
     defaultPrim = "World"
@@ -764,7 +765,7 @@ def "Render" (
                 token omni:rtx:rendermode = "RealTimePathTracing"
                 color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
                 bool omni:rtx:rt:demoire = 0
-                bool omni:rtx:rt:ecoMode:enabled
+                bool omni:rtx:rt:ecoMode:enabled = 0
                 bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
                 int omni:rtx:rt:sss:samples = 1
                 uint omni:rtx:rtpt:maxBounces = 2
@@ -786,7 +787,7 @@ def "Render" (
             {
                 rel camera = </World/V1_Robot/base_link/rplidar_link/Example_Rotary_2D>
                 bool omni:rtx:material:db:syncLoads = 1
-                bool omni:rtx:rt:ecoMode:enabled
+                bool omni:rtx:rt:ecoMode:enabled = 0
                 bool omni:rtx:scene:hydra:materialSyncLoads = 1
                 rel orderedVars = </Render/Vars/LdrColor>
                 custom bool overrideClipRange = 0
