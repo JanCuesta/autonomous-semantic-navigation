@@ -1,20 +1,56 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+
 <package format="3">
+
   <name>asn_mission</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="jan.cuesta@icloud.com">master-jan</maintainer>
+
+  <description>
+    Navigation mission management, readiness monitoring,
+    Nav2 goal supervision, and mission state reporting.
+  </description>
+
+  <maintainer email="jan.cuesta@icloud.com">
+    master-jan
+  </maintainer>
+
   <license>Apache-2.0</license>
 
+
+  <!-- Build system -->
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclcpp</depend>
 
+  <!-- ROS 2 core -->
+  <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
+
+
+  <!-- Messages -->
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>nav_msgs</depend>
+
+
+  <!-- Nav2 -->
+  <depend>nav2_msgs</depend>
+
+
+  <!-- ros2_control readiness -->
+  <depend>controller_manager_msgs</depend>
+
+
+  <!-- Testing -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+
 
   <export>
     <build_type>ament_cmake</build_type>
   </export>
+
 </package>
