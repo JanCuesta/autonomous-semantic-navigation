@@ -1,0 +1,383 @@
+{
+  "scenario": "arc",
+  "repeats": 1,
+  "planned_phases": [
+    {
+      "name": "baseline",
+      "duration": 1.5,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": null,
+      "repeat": null
+    },
+    {
+      "name": "arc_forward_r1",
+      "duration": 4.0,
+      "v": 0.25,
+      "w": 0.75,
+      "kind": "arc",
+      "trial": "arc_forward_r1",
+      "repeat": 1
+    },
+    {
+      "name": "arc_forward_r1_settle",
+      "duration": 2.0,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": "arc_forward_r1",
+      "repeat": 1
+    },
+    {
+      "name": "arc_reverse_r1",
+      "duration": 4.0,
+      "v": -0.25,
+      "w": -0.75,
+      "kind": "arc",
+      "trial": "arc_reverse_r1",
+      "repeat": 1
+    },
+    {
+      "name": "arc_reverse_r1_settle",
+      "duration": 2.0,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": "arc_reverse_r1",
+      "repeat": 1
+    },
+    {
+      "name": "final_settle",
+      "duration": 2.0,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": null,
+      "repeat": null
+    }
+  ],
+  "planned_maneuvers": 2,
+  "phases": [
+    {
+      "name": "baseline",
+      "duration": 1.5,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": null,
+      "repeat": null,
+      "start": 330.7,
+      "end": 332.2
+    },
+    {
+      "name": "arc_forward_r1",
+      "duration": 4.0,
+      "v": 0.25,
+      "w": 0.75,
+      "kind": "arc",
+      "trial": "arc_forward_r1",
+      "repeat": 1,
+      "start": 332.2,
+      "end": 336.2
+    },
+    {
+      "name": "arc_forward_r1_settle",
+      "duration": 2.0,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": "arc_forward_r1",
+      "repeat": 1,
+      "start": 336.2,
+      "end": 338.2
+    },
+    {
+      "name": "arc_reverse_r1",
+      "duration": 4.0,
+      "v": -0.25,
+      "w": -0.75,
+      "kind": "arc",
+      "trial": "arc_reverse_r1",
+      "repeat": 1,
+      "start": 338.2,
+      "end": 342.2
+    },
+    {
+      "name": "arc_reverse_r1_settle",
+      "duration": 2.0,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": "arc_reverse_r1",
+      "repeat": 1,
+      "start": 342.2,
+      "end": 344.2
+    },
+    {
+      "name": "final_settle",
+      "duration": 2.0,
+      "v": 0.0,
+      "w": 0.0,
+      "kind": "idle",
+      "trial": null,
+      "repeat": null,
+      "start": 344.2,
+      "end": 346.2
+    }
+  ],
+  "ground_truth_source": "/World/V1_Robot articulation root = base_link",
+  "odometry_source": "/odom",
+  "command_topic": "/diff_drive_controller/cmd_vel",
+  "max_interpolation_gap_sim_s": 0.2,
+  "source_snapshot": {
+    "files": {
+      "ros2_ws/src/asn_simulation/config/ros2_controllers.yaml": {
+        "sha256": "a854b2e73eb6a0184d170b171d585cc6f17eadf20584a621da6692c59dc8c584",
+        "content": "controller_manager:\n  ros__parameters:\n    update_rate: 50\n    use_sim_time: true # <--- CRITICAL FOR SIMULATION\n    joint_state_broadcaster:\n      type: joint_state_broadcaster/JointStateBroadcaster\n    diff_drive_controller:\n      type: diff_drive_controller/DiffDriveController\n\ndiff_drive_controller:\n  ros__parameters:\n    left_wheel_names: [\"left_wheel_joint\"]\n    right_wheel_names: [\"right_wheel_joint\"]\n    wheel_separation: 0.233\n    wheel_radius: 0.03575\n\n    odom_frame_id: odom\n    base_frame_id: base_link\n    open_loop: false\n    position_feedback: true\n    enable_odom_tf: false\n    publish_rate: 30.0\n    cmd_vel_timeout: 0.5\n\n    linear.x.max_velocity: 0.40\n    linear.x.min_velocity: -0.40\n    linear.x.max_acceleration: 0.60\n    linear.x.max_deceleration: -0.80\n    angular.z.max_velocity: 1.10\n    angular.z.min_velocity: -1.10\n    angular.z.max_acceleration: 1.80\n    angular.z.max_deceleration: -2.20"
+      },
+      "ros2_ws/src/asn_navigation/config/nav2_navigation.yaml": {
+        "sha256": "d14667434c8476bdffb3b6f63781195fe9ffd5fbb23b77a87ce538fe4f178b85",
+        "content": "amcl:\n  ros__parameters:\n    alpha1: 0.2\n    alpha2: 0.2\n    alpha3: 0.2\n    alpha4: 0.2\n    alpha5: 0.2\n    base_frame_id: base_footprint\n    beam_skip_distance: 0.5\n    beam_skip_error_threshold: 0.9\n    beam_skip_threshold: 0.3\n    do_beamskip: false\n    global_frame_id: map\n    lambda_short: 0.1\n    laser_likelihood_max_dist: 2.0\n    laser_max_range: 100.0\n    laser_min_range: -1.0\n    laser_model_type: likelihood_field\n    max_beams: 60\n    max_particles: 2000\n    min_particles: 500\n    odom_frame_id: odom\n    pf_err: 0.05\n    pf_z: 0.99\n    recovery_alpha_fast: 0.0\n    recovery_alpha_slow: 0.0\n    resample_interval: 1\n    robot_model_type: nav2_amcl::DifferentialMotionModel\n    save_pose_rate: 0.5\n    sigma_hit: 0.2\n    tf_broadcast: true\n    transform_tolerance: 1.0\n    update_min_a: 0.2\n    update_min_d: 0.25\n    z_hit: 0.5\n    z_max: 0.05\n    z_rand: 0.5\n    z_short: 0.05\n    scan_topic: scan\nbt_navigator:\n  ros__parameters:\n    global_frame: map\n    robot_base_frame: base_link\n    odom_topic: /odom\n    bt_loop_duration: 10\n    default_server_timeout: 20\n    wait_for_service_timeout: 1000\n    action_server_result_timeout: 900.0\n    navigators:\n    - navigate_to_pose\n    - navigate_through_poses\n    navigate_to_pose:\n      plugin: nav2_bt_navigator::NavigateToPoseNavigator\n    navigate_through_poses:\n      plugin: nav2_bt_navigator::NavigateThroughPosesNavigator\n    error_code_names:\n    - compute_path_error_code\n    - follow_path_error_code\ncontroller_server:\n  ros__parameters:\n    controller_frequency: 20.0\n    costmap_update_timeout: 0.3\n    min_x_velocity_threshold: 0.001\n    min_y_velocity_threshold: 0.5\n    min_theta_velocity_threshold: 0.001\n    failure_tolerance: 0.3\n    progress_checker_plugins:\n    - progress_checker\n    goal_checker_plugins:\n    - general_goal_checker\n    controller_plugins:\n    - FollowPath\n    use_realtime_priority: false\n    progress_checker:\n      plugin: nav2_controller::SimpleProgressChecker\n      required_movement_radius: 0.5\n      movement_time_allowance: 10.0\n    general_goal_checker:\n      stateful: true\n      plugin: nav2_controller::SimpleGoalChecker\n      xy_goal_tolerance: 0.25\n      yaw_goal_tolerance: 0.25\n    FollowPath:\n      plugin: nav2_mppi_controller::MPPIController\n      time_steps: 56\n      model_dt: 0.05\n      batch_size: 2000\n      ax_max: 0.6\n      ax_min: -0.8\n      ay_max: 3.0\n      ay_min: -3.0\n      az_max: 1.8\n      vx_std: 0.2\n      vy_std: 0.2\n      wz_std: 0.4\n      vx_max: 0.4\n      vx_min: -0.4\n      vy_max: 0.5\n      wz_max: 1.1\n      iteration_count: 1\n      prune_distance: 1.7\n      transform_tolerance: 0.1\n      temperature: 0.3\n      gamma: 0.015\n      motion_model: DiffDrive\n      visualize: true\n      regenerate_noises: true\n      TrajectoryVisualizer:\n        trajectory_step: 5\n        time_step: 3\n      AckermannConstraints:\n        min_turning_r: 0.2\n      critics:\n      - ConstraintCritic\n      - CostCritic\n      - GoalCritic\n      - GoalAngleCritic\n      - PathAlignCritic\n      - PathFollowCritic\n      - PathAngleCritic\n      - PreferForwardCritic\n      ConstraintCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 4.0\n      GoalCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 5.0\n        threshold_to_consider: 1.4\n      GoalAngleCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 3.0\n        threshold_to_consider: 0.5\n      PreferForwardCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 5.0\n        threshold_to_consider: 0.5\n      CostCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 3.81\n        near_collision_cost: 253\n        critical_cost: 300.0\n        consider_footprint: false\n        collision_cost: 1000000.0\n        near_goal_distance: 1.0\n        trajectory_point_step: 2\n      PathAlignCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 14.0\n        max_path_occupancy_ratio: 0.05\n        trajectory_point_step: 4\n        threshold_to_consider: 0.5\n        offset_from_furthest: 20\n        use_path_orientations: false\n      PathFollowCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 10.0\n        offset_from_furthest: 5\n        threshold_to_consider: 1.4\n      PathAngleCritic:\n        enabled: true\n        cost_power: 1\n        cost_weight: 2.0\n        offset_from_furthest: 4\n        threshold_to_consider: 0.5\n        max_angle_to_furthest: 1.0\n        mode: 0\n    enable_stamped_cmd_vel: true\nlocal_costmap:\n  local_costmap:\n    ros__parameters:\n      update_frequency: 5.0\n      publish_frequency: 2.0\n      global_frame: odom\n      robot_base_frame: base_link\n      rolling_window: true\n      width: 3\n      height: 3\n      resolution: 0.05\n      robot_radius: 0.22\n      plugins:\n      - voxel_layer\n      - inflation_layer\n      inflation_layer:\n        plugin: nav2_costmap_2d::InflationLayer\n        cost_scaling_factor: 3.0\n        inflation_radius: 0.27\n      voxel_layer:\n        plugin: nav2_costmap_2d::VoxelLayer\n        enabled: true\n        publish_voxel_map: true\n        origin_z: 0.0\n        z_resolution: 0.05\n        z_voxels: 16\n        max_obstacle_height: 2.0\n        mark_threshold: 0\n        observation_sources: scan\n        scan:\n          topic: /scan\n          max_obstacle_height: 2.0\n          clearing: true\n          marking: true\n          data_type: LaserScan\n          raytrace_max_range: 3.0\n          raytrace_min_range: 0.0\n          obstacle_max_range: 2.5\n          obstacle_min_range: 0.0\n      static_layer:\n        plugin: nav2_costmap_2d::StaticLayer\n        map_subscribe_transient_local: true\n      always_send_full_costmap: true\nglobal_costmap:\n  global_costmap:\n    ros__parameters:\n      update_frequency: 1.0\n      publish_frequency: 1.0\n      global_frame: map\n      robot_base_frame: base_link\n      robot_radius: 0.22\n      resolution: 0.05\n      track_unknown_space: true\n      plugins:\n      - static_layer\n      - obstacle_layer\n      - inflation_layer\n      obstacle_layer:\n        plugin: nav2_costmap_2d::ObstacleLayer\n        enabled: true\n        observation_sources: scan\n        scan:\n          topic: /scan\n          max_obstacle_height: 2.0\n          clearing: true\n          marking: true\n          data_type: LaserScan\n          raytrace_max_range: 3.0\n          raytrace_min_range: 0.0\n          obstacle_max_range: 2.5\n          obstacle_min_range: 0.0\n      static_layer:\n        plugin: nav2_costmap_2d::StaticLayer\n        map_subscribe_transient_local: true\n      inflation_layer:\n        plugin: nav2_costmap_2d::InflationLayer\n        cost_scaling_factor: 3.0\n        inflation_radius: 0.27\n      always_send_full_costmap: true\nmap_saver:\n  ros__parameters:\n    save_map_timeout: 5.0\n    free_thresh_default: 0.25\n    occupied_thresh_default: 0.65\n    map_subscribe_transient_local: true\nplanner_server:\n  ros__parameters:\n    expected_planner_frequency: 20.0\n    planner_plugins:\n    - GridBased\n    costmap_update_timeout: 1.0\n    GridBased:\n      plugin: nav2_navfn_planner::NavfnPlanner\n      tolerance: 0.5\n      use_astar: false\n      allow_unknown: true\nsmoother_server:\n  ros__parameters:\n    smoother_plugins:\n    - simple_smoother\n    simple_smoother:\n      plugin: nav2_smoother::SimpleSmoother\n      tolerance: 1.0e-10\n      max_its: 1000\n      do_refinement: true\nbehavior_server:\n  ros__parameters:\n    local_costmap_topic: local_costmap/costmap_raw\n    global_costmap_topic: global_costmap/costmap_raw\n    local_footprint_topic: local_costmap/published_footprint\n    global_footprint_topic: global_costmap/published_footprint\n    cycle_frequency: 10.0\n    behavior_plugins:\n    - spin\n    - backup\n    - drive_on_heading\n    - assisted_teleop\n    - wait\n    spin:\n      plugin: nav2_behaviors::Spin\n    backup:\n      plugin: nav2_behaviors::BackUp\n    drive_on_heading:\n      plugin: nav2_behaviors::DriveOnHeading\n    wait:\n      plugin: nav2_behaviors::Wait\n    assisted_teleop:\n      plugin: nav2_behaviors::AssistedTeleop\n    local_frame: odom\n    global_frame: map\n    robot_base_frame: base_link\n    transform_tolerance: 0.1\n    simulate_ahead_time: 2.0\n    max_rotational_vel: 1.1\n    min_rotational_vel: 0.4\n    rotational_acc_lim: 1.8\n    enable_stamped_cmd_vel: true\nwaypoint_follower:\n  ros__parameters:\n    loop_rate: 20\n    stop_on_failure: false\n    action_server_result_timeout: 900.0\n    waypoint_task_executor_plugin: wait_at_waypoint\n    wait_at_waypoint:\n      plugin: nav2_waypoint_follower::WaitAtWaypoint\n      enabled: true\n      waypoint_pause_duration: 200\nroute_server:\n  ros__parameters:\n    boundary_radius_to_achieve_node: 1.0\n    radius_to_achieve_node: 2.0\n    smooth_corners: true\n    operations:\n    - AdjustSpeedLimit\n    - ReroutingService\n    - CollisionMonitor\n    ReroutingService:\n      plugin: nav2_route::ReroutingService\n    AdjustSpeedLimit:\n      plugin: nav2_route::AdjustSpeedLimit\n    CollisionMonitor:\n      plugin: nav2_route::CollisionMonitor\n      max_collision_dist: 3.0\n    edge_cost_functions:\n    - DistanceScorer\n    - CostmapScorer\n    DistanceScorer:\n      plugin: nav2_route::DistanceScorer\n    CostmapScorer:\n      plugin: nav2_route::CostmapScorer\nvelocity_smoother:\n  ros__parameters:\n    smoothing_frequency: 20.0\n    stamp_smoothed_velocity_with_smoothing_time: false\n    scale_velocities: false\n    feedback: OPEN_LOOP\n    max_velocity:\n    - 0.4\n    - 0.0\n    - 1.1\n    min_velocity:\n    - -0.4\n    - 0.0\n    - -1.1\n    max_accel:\n    - 0.6\n    - 0.0\n    - 1.8\n    max_decel:\n    - -0.8\n    - 0.0\n    - -2.2\n    odom_topic: odom\n    odom_duration: 0.1\n    deadband_velocity:\n    - 0.0\n    - 0.0\n    - 0.0\n    velocity_timeout: 1.0\n    enable_stamped_cmd_vel: true\ncollision_monitor:\n  ros__parameters:\n    base_frame_id: base_link\n    odom_frame_id: odom\n    cmd_vel_in_topic: cmd_vel_smoothed\n    cmd_vel_out_topic: /diff_drive_controller/cmd_vel\n    state_topic: collision_monitor_state\n    transform_tolerance: 0.2\n    source_timeout: 1.0\n    base_shift_correction: true\n    stop_pub_timeout: 2.0\n    polygons:\n    - FootprintApproach\n    FootprintApproach:\n      type: polygon\n      action_type: approach\n      footprint_topic: /local_costmap/published_footprint\n      time_before_collision: 1.2\n      simulation_time_step: 0.1\n      min_points: 6\n      visualize: false\n      enabled: true\n    observation_sources:\n    - scan\n    scan:\n      type: scan\n      topic: scan\n      min_height: 0.15\n      max_height: 2.0\n      enabled: true\n    enable_stamped_cmd_vel: true\ndocking_server:\n  ros__parameters:\n    controller_frequency: 50.0\n    initial_perception_timeout: 5.0\n    wait_charge_timeout: 5.0\n    dock_approach_timeout: 30.0\n    undock_linear_tolerance: 0.05\n    undock_angular_tolerance: 0.1\n    max_retries: 3\n    base_frame: base_link\n    fixed_frame: odom\n    dock_backwards: false\n    dock_prestaging_tolerance: 0.5\n    dock_plugins:\n    - simple_charging_dock\n    simple_charging_dock:\n      plugin: opennav_docking::SimpleChargingDock\n      docking_threshold: 0.05\n      staging_x_offset: -0.7\n      use_external_detection_pose: true\n      use_battery_status: false\n      use_stall_detection: false\n      external_detection_timeout: 1.0\n      external_detection_translation_x: -0.18\n      external_detection_translation_y: 0.0\n      external_detection_rotation_roll: -1.57\n      external_detection_rotation_pitch: -1.57\n      external_detection_rotation_yaw: 0.0\n      filter_coef: 0.1\n    controller:\n      k_phi: 3.0\n      k_delta: 2.0\n      v_linear_min: 0.15\n      v_linear_max: 0.15\n      use_collision_detection: true\n      costmap_topic: local_costmap/costmap_raw\n      footprint_topic: local_costmap/published_footprint\n      transform_tolerance: 0.1\n      projection_time: 5.0\n      simulation_step: 0.1\n      dock_collision_threshold: 0.3\nloopback_simulator:\n  ros__parameters:\n    base_frame_id: base_footprint\n    odom_frame_id: odom\n    map_frame_id: map\n    scan_frame_id: base_scan\n    update_duration: 0.02\n    scan_range_min: 0.05\n    scan_range_max: 30.0\n    scan_angle_min: -3.1415\n    scan_angle_max: 3.1415\n    scan_angle_increment: 0.02617\n    scan_use_inf: true\n"
+      },
+      "ros2_ws/src/asn_simulation/scripts/asn_wheel_odom_unwrapped.py": {
+        "sha256": "d26c04b8c6d0c04ccf717eb33ece0605110f83a4e46c6f4fe97fb624d27ad06e",
+        "content": "#!/usr/bin/env python3\n\"\"\"Simulation-only continuous wheel odometry for Step 8 / V1.\n\nWhy this exists:\nIsaac Sim 6.1's in-process isaacsim_ros2_control hardware interface exposes\ncontinuous wheel-joint positions that can jump by approximately +/-4*pi.\ndiff_drive_controller with position_feedback=true interprets those jumps as\nreal wheel motion, corrupting odometry on sufficiently long trajectories.\n\nThis node:\n- subscribes only to /joint_states,\n- unwraps each wheel increment sample-to-sample,\n- integrates differential-drive odometry,\n- publishes /odom,\n- optionally publishes odom -> base_link,\n- never consumes Isaac global/root pose.\n\nIt is intentionally simulation-specific. V2 physical hardware should use real\nencoder feedback/base-driver odometry after hardware validation.\n\nExample:\n  python3 asn_wheel_odom_unwrapped.py --ros-args \\\n      -p use_sim_time:=true \\\n      -p wheel_radius:=0.03575 \\\n      -p wheel_separation:=0.23993 \\\n      -p publish_tf:=true\n\"\"\"\n\nimport math\n\nimport rclpy\nfrom rclpy.node import Node\nfrom rclpy.qos import qos_profile_sensor_data\nfrom geometry_msgs.msg import TransformStamped\nfrom nav_msgs.msg import Odometry\nfrom sensor_msgs.msg import JointState\nfrom tf2_ros import TransformBroadcaster\n\n\ndef wrap_increment(delta: float) -> float:\n    \"\"\"Return the equivalent angular increment in [-pi, pi].\"\"\"\n    return math.atan2(math.sin(delta), math.cos(delta))\n\n\ndef quaternion_from_yaw(yaw: float):\n    half = 0.5 * yaw\n    return 0.0, 0.0, math.sin(half), math.cos(half)\n\n\nclass UnwrappedWheelOdometry(Node):\n    def __init__(self):\n        super().__init__('asn_wheel_odom_unwrapped')\n\n        self.declare_parameter('wheel_radius', 0.03575)\n        self.declare_parameter('wheel_separation', 0.23993)\n        self.declare_parameter('left_joint', 'left_wheel_joint')\n        self.declare_parameter('right_joint', 'right_wheel_joint')\n        self.declare_parameter('odom_topic', '/odom')\n        self.declare_parameter('odom_frame', 'odom')\n        self.declare_parameter('base_frame', 'base_link')\n        self.declare_parameter('publish_tf', False)\n\n        self.radius = float(self.get_parameter('wheel_radius').value)\n        self.separation = float(self.get_parameter('wheel_separation').value)\n        self.left_joint = str(self.get_parameter('left_joint').value)\n        self.right_joint = str(self.get_parameter('right_joint').value)\n        self.odom_topic = str(self.get_parameter('odom_topic').value)\n        self.odom_frame = str(self.get_parameter('odom_frame').value)\n        self.base_frame = str(self.get_parameter('base_frame').value)\n        self.publish_tf = bool(self.get_parameter('publish_tf').value)\n\n        if self.radius <= 0.0 or self.separation <= 0.0:\n            raise ValueError('wheel_radius and wheel_separation must be positive.')\n\n        self.publisher = self.create_publisher(Odometry, self.odom_topic, 10)\n        self.tf_broadcaster = TransformBroadcaster(self) if self.publish_tf else None\n        self.subscription = self.create_subscription(\n            JointState, '/joint_states', self.on_joint_state, qos_profile_sensor_data\n        )\n\n        self.prev_left = None\n        self.prev_right = None\n        self.prev_stamp_s = None\n\n        self.x = 0.0\n        self.y = 0.0\n        self.yaw = 0.0\n\n        self.wrap_events_left = 0\n        self.wrap_events_right = 0\n\n        self.get_logger().info(\n            'Continuous wheel odometry ready: '\n            f'r={self.radius:.8f} m, b={self.separation:.8f} m, '\n            f'output={self.odom_topic}, publish_tf={self.publish_tf}'\n        )\n\n    @staticmethod\n    def stamp_seconds(stamp):\n        return float(stamp.sec) + float(stamp.nanosec) * 1e-9\n\n    def on_joint_state(self, msg: JointState):\n        try:\n            li = msg.name.index(self.left_joint)\n            ri = msg.name.index(self.right_joint)\n        except ValueError:\n            return\n\n        if li >= len(msg.position) or ri >= len(msg.position):\n            return\n\n        left = float(msg.position[li])\n        right = float(msg.position[ri])\n        stamp_s = self.stamp_seconds(msg.header.stamp)\n\n        if not all(math.isfinite(v) for v in (left, right, stamp_s)):\n            self.get_logger().error('Non-finite wheel position/timestamp received.')\n            return\n\n        if self.prev_left is None:\n            self.prev_left = left\n            self.prev_right = right\n            self.prev_stamp_s = stamp_s\n            return\n\n        if stamp_s <= self.prev_stamp_s:\n            if stamp_s < self.prev_stamp_s:\n                self.get_logger().warning('Joint-state time moved backwards; resetting increment history.')\n            self.prev_left = left\n            self.prev_right = right\n            self.prev_stamp_s = stamp_s\n            return\n\n        raw_dl = left - self.prev_left\n        raw_dr = right - self.prev_right\n        dl = wrap_increment(raw_dl)\n        dr = wrap_increment(raw_dr)\n\n        if abs(raw_dl - dl) > math.pi:\n            self.wrap_events_left += 1\n            self.get_logger().warning(\n                f'Left wheel wrap corrected: raw_delta={raw_dl:+.6f} rad, '\n                f'used_delta={dl:+.6f} rad, count={self.wrap_events_left}'\n            )\n\n        if abs(raw_dr - dr) > math.pi:\n            self.wrap_events_right += 1\n            self.get_logger().warning(\n                f'Right wheel wrap corrected: raw_delta={raw_dr:+.6f} rad, '\n                f'used_delta={dr:+.6f} rad, count={self.wrap_events_right}'\n            )\n\n        ds_l = self.radius * dl\n        ds_r = self.radius * dr\n        ds = 0.5 * (ds_l + ds_r)\n        dtheta = (ds_r - ds_l) / self.separation\n        dt = stamp_s - self.prev_stamp_s\n\n        mid = self.yaw + 0.5 * dtheta\n        self.x += ds * math.cos(mid)\n        self.y += ds * math.sin(mid)\n        self.yaw += dtheta\n\n        linear = ds / dt\n        angular = dtheta / dt\n\n        qx, qy, qz, qw = quaternion_from_yaw(self.yaw)\n\n        odom = Odometry()\n        odom.header.stamp = msg.header.stamp\n        odom.header.frame_id = self.odom_frame\n        odom.child_frame_id = self.base_frame\n\n        odom.pose.pose.position.x = self.x\n        odom.pose.pose.position.y = self.y\n        odom.pose.pose.position.z = 0.0\n        odom.pose.pose.orientation.x = qx\n        odom.pose.pose.orientation.y = qy\n        odom.pose.pose.orientation.z = qz\n        odom.pose.pose.orientation.w = qw\n\n        # Conservative provisional planar covariance for V1 simulation.\n        # These values are not a calibration claim; later estimation work can tune them.\n        odom.pose.covariance[0] = 1e-4\n        odom.pose.covariance[7] = 1e-4\n        odom.pose.covariance[14] = 1e6\n        odom.pose.covariance[21] = 1e6\n        odom.pose.covariance[28] = 1e6\n        odom.pose.covariance[35] = 4e-4\n\n        odom.twist.twist.linear.x = linear\n        odom.twist.twist.angular.z = angular\n        odom.twist.covariance[0] = 1e-4\n        odom.twist.covariance[7] = 1e-4\n        odom.twist.covariance[14] = 1e6\n        odom.twist.covariance[21] = 1e6\n        odom.twist.covariance[28] = 1e6\n        odom.twist.covariance[35] = 4e-4\n\n        self.publisher.publish(odom)\n\n        if self.tf_broadcaster is not None:\n            tf = TransformStamped()\n            tf.header.stamp = msg.header.stamp\n            tf.header.frame_id = self.odom_frame\n            tf.child_frame_id = self.base_frame\n            tf.transform.translation.x = self.x\n            tf.transform.translation.y = self.y\n            tf.transform.translation.z = 0.0\n            tf.transform.rotation.x = qx\n            tf.transform.rotation.y = qy\n            tf.transform.rotation.z = qz\n            tf.transform.rotation.w = qw\n            self.tf_broadcaster.sendTransform(tf)\n\n        self.prev_left = left\n        self.prev_right = right\n        self.prev_stamp_s = stamp_s\n\n\ndef main():\n    rclpy.init()\n    node = UnwrappedWheelOdometry()\n    try:\n        rclpy.spin(node)\n    except KeyboardInterrupt:\n        pass\n    finally:\n        node.destroy_node()\n        rclpy.shutdown()\n\n\nif __name__ == '__main__':\n    main()\n"
+      }
+    },
+    "git_head": "c744a51f861708c17c25ce8651e163aa4fc5d868",
+    "git_status": "M ros2_ws/src/asn_mission/CMakeLists.txt\n M ros2_ws/src/asn_mission/package.xml\n M ros2_ws/src/asn_mission/src/mission_manager.cpp\n?? results/validation/\n?? tests/validation/"
+  },
+  "error": null,
+  "controllers": {
+    "joint_state_broadcaster": "active",
+    "diff_drive_controller": "active"
+  },
+  "live_parameters": {
+    "controller": {
+      "wheel_radius": 0.03575,
+      "wheel_separation": 0.233,
+      "cmd_vel_timeout": 0.5,
+      "enable_odom_tf": false,
+      "open_loop": false,
+      "position_feedback": true,
+      "odom_frame_id": "odom",
+      "base_frame_id": "base_link",
+      "linear.x.max_velocity": 0.4,
+      "linear.x.min_velocity": -0.4,
+      "linear.x.max_acceleration": 0.6,
+      "linear.x.max_deceleration": -0.8,
+      "angular.z.max_velocity": 1.1,
+      "angular.z.min_velocity": -1.1,
+      "angular.z.max_acceleration": 1.8,
+      "angular.z.max_deceleration": -2.2
+    },
+    "odometry": {
+      "wheel_radius": 0.03575,
+      "wheel_separation": 0.23993,
+      "odom_topic": "/odom",
+      "odom_frame": "odom",
+      "base_frame": "base_link",
+      "publish_tf": true
+    }
+  },
+  "status": "recorded_pending_review",
+  "analysis_problems": [],
+  "maneuvers": [
+    {
+      "name": "arc_forward_r1",
+      "kind": "arc",
+      "repeat": 1,
+      "window": {
+        "start": 332.2,
+        "zero_command": 336.2,
+        "end": 338.2
+      },
+      "command_tracking": {
+        "requested_v_mps": 0.25,
+        "requested_w_rad_s": 0.75,
+        "measured_v_mps": 0.24897225336927845,
+        "measured_w_rad_s": 0.7246689827123898,
+        "v_error_mps": -0.0010277466307215544,
+        "w_error_rad_s": -0.025331017287610225,
+        "v_ratio": 0.9958890134771138,
+        "w_ratio": 0.9662253102831864,
+        "plateau_start": 333.01666666666665,
+        "plateau_end": 336.05,
+        "request_integral": {
+          "linear_m": 1.0,
+          "yaw_rad": 3.0
+        },
+        "note": "Request integral ignores acceleration; it is diagnostic, not acceptance."
+      },
+      "isaac_ground_truth": {
+        "forward_m": 0.09324726063929409,
+        "lateral_m": 0.6741315235491587,
+        "endpoint_distance_m": 0.6805500441991333,
+        "path_m": 0.9836442780678004,
+        "signed_path_m": 0.9831521444517108,
+        "yaw_change_rad": 2.865005243972072
+      },
+      "ros_odometry": {
+        "forward_m": 0.11142292213644486,
+        "lateral_m": 0.6828751337870425,
+        "endpoint_distance_m": 0.6919057131734752,
+        "path_m": 0.9895370494314352,
+        "signed_path_m": 0.9890700525567506,
+        "yaw_change_rad": 2.8288931907357644
+      },
+      "odom_minus_ground_truth": {
+        "translation_vector_error_m": 0.020169417216445155,
+        "signed_path_error_m": 0.005917908105039782,
+        "heading_error_rad": -0.036112053236307506,
+        "endpoint_heading_error_rad": -0.03611205323630751
+      },
+      "wheel_position_evidence": {
+        "left_angle_rad": 18.17347918685689,
+        "right_angle_rad": 37.15911116596828,
+        "signed_path_m": 0.9890700525567497,
+        "yaw_change_rad": 2.8288931907357644,
+        "wrap_events_left": 1,
+        "wrap_events_right": 3
+      },
+      "stopping": {
+        "stopped": true,
+        "stop_time_s": 0.3583333333333485,
+        "stop_distance_m": 0.04457019712171586,
+        "translation_threshold_mps": 0.01,
+        "angular_threshold_rad_s": 0.02,
+        "sustained_s": 0.5
+      },
+      "calibration_candidates": {}
+    },
+    {
+      "name": "arc_reverse_r1",
+      "kind": "arc",
+      "repeat": 1,
+      "window": {
+        "start": 338.2,
+        "zero_command": 342.2,
+        "end": 344.2
+      },
+      "command_tracking": {
+        "requested_v_mps": -0.25,
+        "requested_w_rad_s": -0.75,
+        "measured_v_mps": -0.251260554843318,
+        "measured_w_rad_s": -0.6990026475000198,
+        "v_error_mps": -0.0012605548433179958,
+        "w_error_rad_s": 0.050997352499980164,
+        "v_ratio": 1.005042219373272,
+        "w_ratio": 0.9320035300000264,
+        "plateau_start": 339.01666666666665,
+        "plateau_end": 342.05,
+        "request_integral": {
+          "linear_m": -1.0,
+          "yaw_rad": -3.0
+        },
+        "note": "Request integral ignores acceleration; it is diagnostic, not acceptance."
+      },
+      "isaac_ground_truth": {
+        "forward_m": -0.1148572867034301,
+        "lateral_m": 0.6983866965680905,
+        "endpoint_distance_m": 0.7077684467763197,
+        "path_m": 1.0044726471399192,
+        "signed_path_m": -1.0044565159599623,
+        "yaw_change_rad": -2.8024333775856025
+      },
+      "ros_odometry": {
+        "forward_m": -0.10337055118721072,
+        "lateral_m": 0.6876682634649711,
+        "endpoint_distance_m": 0.6953942129682104,
+        "path_m": 1.0004602418088497,
+        "signed_path_m": -1.0004602418088497,
+        "yaw_change_rad": -2.841361518352665
+      },
+      "odom_minus_ground_truth": {
+        "translation_vector_error_m": 0.01571082114358192,
+        "signed_path_error_m": 0.003996274151112589,
+        "heading_error_rad": -0.0389281407670623,
+        "endpoint_heading_error_rad": -0.0389281407670623
+      },
+      "wheel_position_evidence": {
+        "left_angle_rad": -18.450246356913937,
+        "right_angle_rad": -37.51955738064413,
+        "signed_path_m": -1.0004602418088504,
+        "yaw_change_rad": -2.8413615183526626,
+        "wrap_events_left": 1,
+        "wrap_events_right": 3
+      },
+      "stopping": {
+        "stopped": true,
+        "stop_time_s": 0.4416666666666629,
+        "stop_distance_m": 0.0577572780592419,
+        "translation_threshold_mps": 0.01,
+        "angular_threshold_rad_s": 0.02,
+        "sustained_s": 0.5
+      },
+      "calibration_candidates": {}
+    }
+  ],
+  "repeatability": {
+    "arc_forward": {
+      "repeats": 1,
+      "metrics": {
+        "actual_v_mps": {
+          "mean": 0.24897225336927845,
+          "stdev": null,
+          "min": 0.24897225336927845,
+          "max": 0.24897225336927845
+        },
+        "actual_w_rad_s": {
+          "mean": 0.7246689827123898,
+          "stdev": null,
+          "min": 0.7246689827123898,
+          "max": 0.7246689827123898
+        },
+        "translation_error_m": {
+          "mean": 0.020169417216445155,
+          "stdev": null,
+          "min": 0.020169417216445155,
+          "max": 0.020169417216445155
+        },
+        "heading_error_rad": {
+          "mean": -0.036112053236307506,
+          "stdev": null,
+          "min": -0.036112053236307506,
+          "max": -0.036112053236307506
+        }
+      }
+    },
+    "arc_reverse": {
+      "repeats": 1,
+      "metrics": {
+        "actual_v_mps": {
+          "mean": -0.251260554843318,
+          "stdev": null,
+          "min": -0.251260554843318,
+          "max": -0.251260554843318
+        },
+        "actual_w_rad_s": {
+          "mean": -0.6990026475000198,
+          "stdev": null,
+          "min": -0.6990026475000198,
+          "max": -0.6990026475000198
+        },
+        "translation_error_m": {
+          "mean": 0.01571082114358192,
+          "stdev": null,
+          "min": 0.01571082114358192,
+          "max": 0.01571082114358192
+        },
+        "heading_error_rad": {
+          "mean": -0.0389281407670623,
+          "stdev": null,
+          "min": -0.0389281407670623,
+          "max": -0.0389281407670623
+        }
+      }
+    }
+  },
+  "calibration_advisory": {
+    "note": "Candidates only. Review command tracking, direction/speed dependence and slip first. Radius affects heading too; re-evaluate separation after any radius change. No parameters modified."
+  }
+}

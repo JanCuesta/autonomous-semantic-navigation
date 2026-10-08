@@ -22,7 +22,7 @@ Example:
   python3 asn_wheel_odom_unwrapped.py --ros-args \
       -p use_sim_time:=true \
       -p wheel_radius:=0.03575 \
-      -p wheel_separation:=0.23993 \
+      -p wheel_separation:=0.23822 \
       -p publish_tf:=true
 """
 
@@ -52,7 +52,7 @@ class UnwrappedWheelOdometry(Node):
         super().__init__('asn_wheel_odom_unwrapped')
 
         self.declare_parameter('wheel_radius', 0.03575)
-        self.declare_parameter('wheel_separation', 0.23993)
+        self.declare_parameter('wheel_separation', 0.23822)
         self.declare_parameter('left_joint', 'left_wheel_joint')
         self.declare_parameter('right_joint', 'right_wheel_joint')
         self.declare_parameter('odom_topic', '/odom')

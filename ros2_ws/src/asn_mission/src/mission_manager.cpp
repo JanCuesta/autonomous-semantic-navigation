@@ -12,7 +12,7 @@
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
-
+#include "std_srvs/srv/trigger.hpp"
 #include "std_msgs/msg/string.hpp"
 
 #include "controller_manager_msgs/srv/list_controllers.hpp"
@@ -120,6 +120,25 @@ public:
                     std::placeholders::_1));
 
         // -------------------------------------------------
+        // CACNCEL GOAL SERVER
+        // -------------------------------------------------
+        cancel_service_ =
+            this->create_service<std_srvs::srv::Trigger>(
+                "/mission/cancel",
+                std::bind(
+                    &MissionManager::cancel_callback,
+                    this,
+                    std::placeholders::_1,
+                    std::placeholders::_2));
+
+        // -------------------------------------------------
+        // MAXUMUM GOAL TIME RUN
+        // -------------------------------------------------
+        goal_timeout_ =
+            this->declare_parameter<double>(
+                "goal_timeout",
+                180.0);
+        // -------------------------------------------------
         // READINESS + NAVIGATION METRICS TIMER
         // -------------------------------------------------
 
@@ -144,7 +163,6 @@ private:
     // ---------------------------------------------------------
     // NAVIGATION METRICS
     // ---------------------------------------------------------
-
     void navigation_metrics()
     {
         if (state_ != MissionState::NAVIGATING)
@@ -165,6 +183,22 @@ private:
             navigation_time_,
             moving_ ? "MOVING" : "STATIONARY",
             recovery_count_);
+
+        if (
+            navigation_time_ >= goal_timeout_ &&
+            !goal_timed_out_ &&
+            active_goal_handle_)
+        {
+            goal_timed_out_ = true;
+
+            RCLCPP_WARN(
+                this->get_logger(),
+                "Goal timeout reached (%.1f s). Cancelling navigation.",
+                goal_timeout_);
+
+            nav_client_->async_cancel_goal(
+                active_goal_handle_);
+        }
     }
 
     // ---------------------------------------------------------
@@ -341,9 +375,9 @@ private:
         navigation_time_ = 0.0;
         recovery_count_ = 0;
         moving_ = false;
+        goal_timed_out_ = false;
 
-        auto send_goal_options =
-            rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
+        auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
 
         // -------------------------------------------------
         // GOAL ACCEPT / REJECT
@@ -363,13 +397,14 @@ private:
                 return;
             }
 
+            active_goal_handle_ = goal_handle;
+
             RCLCPP_INFO(
                 this->get_logger(),
                 "Navigation goal accepted.");
 
             set_state(MissionState::NAVIGATING);
         };
-
         // -------------------------------------------------
         // FINAL RESULT
         // -------------------------------------------------
@@ -434,14 +469,58 @@ private:
 
         case rclcpp_action::ResultCode::CANCELED:
 
-            set_state(MissionState::CANCELLED);
-            break;
+            if (goal_timed_out_)
+            {
+                RCLCPP_ERROR(
+                    this->get_logger(),
+                    "Mission failed: GOAL_TIMEOUT");
 
+                set_state(MissionState::FAILED);
+            }
+            else
+            {
+                set_state(MissionState::CANCELLED);
+            }
+
+            break;
         default:
 
             set_state(MissionState::FAILED);
             break;
         }
+
+        active_goal_handle_.reset();
+    }
+
+    // ---------------------------------------------------------
+    // CANCELATION  CALLBACK
+    // ---------------------------------------------------------
+
+    void cancel_callback(
+        const std::shared_ptr<std_srvs::srv::Trigger::Request>,
+        std::shared_ptr<std_srvs::srv::Trigger::Response> response)
+    {
+        if (
+            state_ != MissionState::NAVIGATING ||
+            !active_goal_handle_)
+        {
+            response->success = false;
+            response->message =
+                "No active navigation goal to cancel.";
+
+            return;
+        }
+
+        RCLCPP_INFO(
+            this->get_logger(),
+            "Cancellation requested.");
+
+        nav_client_->async_cancel_goal(
+            active_goal_handle_);
+
+        response->success = true;
+        response->message =
+            "Cancellation request sent to Nav2.";
     }
 
     // ---------------------------------------------------------
@@ -628,8 +707,15 @@ private:
 
     bool moving_{false};
 
-    geometry_msgs::msg::PoseStamped
-        current_goal_;
+    geometry_msgs::msg::PoseStamped current_goal_;
+
+    GoalHandleNavigateToPose::SharedPtr active_goal_handle_;
+
+    rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr
+        cancel_service_;
+
+    double goal_timeout_{180.0};
+    bool goal_timed_out_{false};
 };
 
 // ---------------------------------------------------------

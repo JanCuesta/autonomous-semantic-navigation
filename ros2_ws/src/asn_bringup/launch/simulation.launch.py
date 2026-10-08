@@ -32,7 +32,7 @@ def generate_launch_description():
         parameters=[{
             "use_sim_time": True,
             "wheel_radius": 0.03575,
-            "wheel_separation": 0.23993,
+            "wheel_separation": 0.23822,
             "publish_tf": True,
         }],
     )
