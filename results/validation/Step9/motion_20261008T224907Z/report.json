@@ -1,0 +1,532 @@
+{
+  "phase": "motion",
+  "recorded_at_utc": "2026-10-08T22:50:45.456660+00:00",
+  "simulation_duration_requested_s": 40.0,
+  "wall_budget_s": 180.0,
+  "power": {
+    "power_profile": "performance",
+    "ac_online": {
+      "ucsi-source-psy-USBC000:002": "0",
+      "ucsi-source-psy-USBC000:001": "0",
+      "ACAD": "1"
+    },
+    "cpu_boost": "0",
+    "hostname": "RoboticsSofware"
+  },
+  "publishers": {
+    "/clock": [
+      "//_Graph_ROS_Clock_PublishClock"
+    ],
+    "/scan": [
+      "//_Render_PostProcess_SDGPipeline_Replicator_NodeWriterWriter"
+    ],
+    "/joint_states": [
+      "//joint_state_broadcaster"
+    ],
+    "/odom": [
+      "//asn_wheel_odom_unwrapped"
+    ],
+    "/tf": [
+      "//asn_wheel_odom_unwrapped",
+      "//diff_drive_controller",
+      "//robot_state_publisher"
+    ],
+    "/tf_static": [
+      "//robot_state_publisher"
+    ]
+  },
+  "resources": [
+    {
+      "wall_monotonic_s": 11306.841452215,
+      "load_average": [
+        7.81494140625,
+        8.75390625,
+        7.72509765625
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 62.0
+      },
+      "gpu": [
+        "50, 32, 1526, 23.44"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11316.872209594,
+      "load_average": [
+        7.08056640625,
+        8.564453125,
+        7.67431640625
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 62.0
+      },
+      "gpu": [
+        "50, 31, 1522, 23.22"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11326.903429696,
+      "load_average": [
+        6.5263671875,
+        8.39697265625,
+        7.62890625
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 62.0
+      },
+      "gpu": [
+        "50, 29, 1526, 23.30"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11336.931964973,
+      "load_average": [
+        5.91015625,
+        8.20263671875,
+        7.57373046875
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 63.0
+      },
+      "gpu": [
+        "50, 31, 1522, 23.48"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11346.9638658,
+      "load_average": [
+        5.62255859375,
+        8.064453125,
+        7.53466796875
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 63.0
+      },
+      "gpu": [
+        "50, 32, 1526, 23.07"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11356.994043062,
+      "load_average": [
+        8.23681640625,
+        8.55419921875,
+        7.70068359375
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 62.0
+      },
+      "gpu": [
+        "50, 32, 1526, 23.43"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11367.024111699,
+      "load_average": [
+        9.2734375,
+        8.75341796875,
+        7.77392578125
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 61.0
+      },
+      "gpu": [
+        "49, 32, 1526, 23.29"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11377.054438699,
+      "load_average": [
+        9.583984375,
+        8.82958984375,
+        7.80859375
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 62.0
+      },
+      "gpu": [
+        "50, 25, 1526, 22.99"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11387.084302226,
+      "load_average": [
+        9.744140625,
+        8.8984375,
+        7.8427734375
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 62.0
+      },
+      "gpu": [
+        "50, 28, 1526, 23.24"
+      ]
+    },
+    {
+      "wall_monotonic_s": 11397.113626342,
+      "load_average": [
+        9.99462890625,
+        8.97021484375,
+        7.876953125
+      ],
+      "thermal_zones": {
+        "thermal_zone0:acpitz": 62.0
+      },
+      "gpu": [
+        "49, 33, 1526, 23.48"
+      ]
+    }
+  ],
+  "timing": {
+    "mean": 0.41096348741929056,
+    "windows": [
+      {
+        "wall_start_s": 0.10424440999850049,
+        "wall_end_s": 5.136551164998309,
+        "sim_start_s": 709.25,
+        "sim_end_s": 711.25,
+        "rtf": 0.397432052013307
+      },
+      {
+        "wall_start_s": 5.136551164998309,
+        "wall_end_s": 10.18833442399955,
+        "sim_start_s": 711.25,
+        "sim_end_s": 713.316666666,
+        "rtf": 0.40909646357404006
+      },
+      {
+        "wall_start_s": 10.18833442399955,
+        "wall_end_s": 15.200577126999633,
+        "sim_start_s": 713.316666666,
+        "sim_end_s": 715.383333333,
+        "rtf": 0.4123237419774274
+      },
+      {
+        "wall_start_s": 15.200577126999633,
+        "wall_end_s": 20.23047363799924,
+        "sim_start_s": 715.383333333,
+        "sim_end_s": 717.466666666,
+        "rtf": 0.4141900988308832
+      },
+      {
+        "wall_start_s": 20.23047363799924,
+        "wall_end_s": 25.24872251999841,
+        "sim_start_s": 717.466666666,
+        "sim_end_s": 719.55,
+        "rtf": 0.41515145681055954
+      },
+      {
+        "wall_start_s": 25.24872251999841,
+        "wall_end_s": 30.279480767998393,
+        "sim_start_s": 719.55,
+        "sim_end_s": 721.633333333,
+        "rtf": 0.414119150692301
+      },
+      {
+        "wall_start_s": 30.279480767998393,
+        "wall_end_s": 35.30453875999956,
+        "sim_start_s": 721.633333333,
+        "sim_end_s": 723.7,
+        "rtf": 0.41127220228895817
+      },
+      {
+        "wall_start_s": 35.30453875999956,
+        "wall_end_s": 40.31614095199984,
+        "sim_start_s": 723.7,
+        "sim_end_s": 725.75,
+        "rtf": 0.4090508227632763
+      },
+      {
+        "wall_start_s": 40.31614095199984,
+        "wall_end_s": 45.31658390499979,
+        "sim_start_s": 725.75,
+        "sim_end_s": 727.85,
+        "rtf": 0.41996279524400065
+      },
+      {
+        "wall_start_s": 45.31658390499979,
+        "wall_end_s": 50.330909725998936,
+        "sim_start_s": 727.85,
+        "sim_end_s": 729.916666666,
+        "rtf": 0.41215244875893314
+      },
+      {
+        "wall_start_s": 50.330909725998936,
+        "wall_end_s": 55.35744088199863,
+        "sim_start_s": 729.916666666,
+        "sim_end_s": 731.966666666,
+        "rtf": 0.4078359282729559
+      },
+      {
+        "wall_start_s": 55.35744088199863,
+        "wall_end_s": 60.40367263400003,
+        "sim_start_s": 731.966666666,
+        "sim_end_s": 734.016666666,
+        "rtf": 0.40624372814167653
+      },
+      {
+        "wall_start_s": 60.40367263400003,
+        "wall_end_s": 65.43834522299949,
+        "sim_start_s": 734.016666666,
+        "sim_end_s": 736.083333333,
+        "rtf": 0.4104868053417471
+      },
+      {
+        "wall_start_s": 65.43834522299949,
+        "wall_end_s": 70.4406657749987,
+        "sim_start_s": 736.083333333,
+        "sim_end_s": 738.116666666,
+        "rtf": 0.40647801592549576
+      },
+      {
+        "wall_start_s": 70.4406657749987,
+        "wall_end_s": 75.46184255599837,
+        "sim_start_s": 738.116666666,
+        "sim_end_s": 740.2,
+        "rtf": 0.41490937779435433
+      },
+      {
+        "wall_start_s": 75.46184255599837,
+        "wall_end_s": 80.48677594899891,
+        "sim_start_s": 740.2,
+        "sim_end_s": 742.283333333,
+        "rtf": 0.4145991936732732
+      },
+      {
+        "wall_start_s": 80.48677594899891,
+        "wall_end_s": 85.48783427599847,
+        "sim_start_s": 742.283333333,
+        "sim_end_s": 744.366666666,
+        "rtf": 0.416578491347043
+      },
+      {
+        "wall_start_s": 85.48783427599847,
+        "wall_end_s": 90.51825533699957,
+        "sim_start_s": 744.366666666,
+        "sim_end_s": 746.483333333,
+        "rtf": 0.42077325960041306
+      },
+      {
+        "wall_start_s": 90.51825533699957,
+        "wall_end_s": 95.54098768299991,
+        "sim_start_s": 746.483333333,
+        "sim_end_s": 748.483333333,
+        "rtf": 0.3981896430520777
+      }
+    ],
+    "window_rtf_stats": {
+      "count": 19,
+      "min": 0.397432052013307,
+      "median": 0.41215244875893314,
+      "p95": 0.42077325960041306,
+      "max": 0.42077325960041306,
+      "mean": 0.41109714084751176
+    },
+    "windows_under_0_40": 2,
+    "clock_backwards": 0,
+    "clock_zero_advance_arrivals": 0,
+    "largest_clock_arrival_gap_wall_s": 0.10844329300016398
+  },
+  "rates_sim_time": {
+    "/clock": {
+      "sim_hz": 60.0,
+      "count": 2401,
+      "unique_timestamp_transitions": 2400,
+      "duplicate_stamps": 0,
+      "backwards_stamps": 0,
+      "largest_gap_sim_s": 0.016666667000095003,
+      "positive_period_sim_s": {
+        "count": 2400,
+        "min": 0.016666665999991892,
+        "median": 0.016666666999981317,
+        "p95": 0.016666667000095003,
+        "max": 0.016666667000095003,
+        "mean": 0.016666666666666666
+      },
+      "age_at_arrival_sim_s": {
+        "count": 2401,
+        "min": 0.0,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "mean": 0.0
+      }
+    },
+    "/scan": {
+      "sim_hz": 10.0,
+      "count": 396,
+      "unique_timestamp_transitions": 395,
+      "duplicate_stamps": 0,
+      "backwards_stamps": 0,
+      "largest_gap_sim_s": 0.10000000000002274,
+      "positive_period_sim_s": {
+        "count": 395,
+        "min": 0.09999999999990905,
+        "median": 0.10000000000002274,
+        "p95": 0.10000000000002274,
+        "max": 0.10000000000002274,
+        "mean": 0.1
+      },
+      "age_at_arrival_sim_s": {
+        "count": 396,
+        "min": 0.0,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "mean": 0.0
+      }
+    },
+    "/joint_states": {
+      "sim_hz": 50.004206983172026,
+      "count": 1982,
+      "unique_timestamp_transitions": 1981,
+      "duplicate_stamps": 0,
+      "backwards_stamps": 0,
+      "largest_gap_sim_s": 0.03333333400007632,
+      "positive_period_sim_s": {
+        "count": 1981,
+        "min": 0.016666665999991892,
+        "median": 0.016666666999981317,
+        "p95": 0.03333333400007632,
+        "max": 0.03333333400007632,
+        "mean": 0.019998317348308935
+      },
+      "age_at_arrival_sim_s": {
+        "count": 1982,
+        "min": 0.0,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "mean": 0.0
+      }
+    },
+    "/odom": {
+      "sim_hz": 49.99583159691532,
+      "count": 2000,
+      "unique_timestamp_transitions": 1999,
+      "duplicate_stamps": 0,
+      "backwards_stamps": 0,
+      "largest_gap_sim_s": 0.03333333400007632,
+      "positive_period_sim_s": {
+        "count": 1999,
+        "min": 0.016666665999991892,
+        "median": 0.016666666999981317,
+        "p95": 0.03333333400007632,
+        "max": 0.03333333400007632,
+        "mean": 0.020001667500250134
+      },
+      "age_at_arrival_sim_s": {
+        "count": 2000,
+        "min": 0.0,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "mean": 0.0
+      }
+    },
+    "/tf": {
+      "sim_hz": 49.99583159691532,
+      "count": 5200,
+      "unique_timestamp_transitions": 1999,
+      "duplicate_stamps": 3200,
+      "backwards_stamps": 0,
+      "largest_gap_sim_s": 0.03333333400007632,
+      "positive_period_sim_s": {
+        "count": 1999,
+        "min": 0.016666665999991892,
+        "median": 0.016666666999981317,
+        "p95": 0.03333333400007632,
+        "max": 0.03333333400007632,
+        "mean": 0.020001667500250134
+      },
+      "age_at_arrival_sim_s": {
+        "count": 5200,
+        "min": 0.0,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "mean": 0.0
+      }
+    },
+    "/tf_static": {
+      "sim_hz": null,
+      "count": 0,
+      "note": "insufficient samples"
+    }
+  },
+  "scan": {
+    "frames": {
+      "laser_frame": 396
+    },
+    "beam_counts": [
+      3600
+    ],
+    "range_min_m": [
+      0.1
+    ],
+    "range_max_m": [
+      200.0
+    ],
+    "closest_valid_m": {
+      "count": 396,
+      "min": 0.8425325155258179,
+      "median": 0.8451300859451294,
+      "p95": 0.9359925985336304,
+      "max": 0.9554259181022644,
+      "mean": 0.8611527606092318
+    }
+  },
+  "odom": {
+    "frame_pairs": [
+      [
+        "odom",
+        "base_link"
+      ]
+    ],
+    "start_to_end": {
+      "displacement_m": 0.14463364406892237,
+      "delta_yaw_rad_wrapped": 0.7375265431212943
+    }
+  },
+  "tf_observed_pairs": [
+    {
+      "topic": "/tf",
+      "parent": "base_link",
+      "child": "wheel_drop_left",
+      "sample_count": 800
+    },
+    {
+      "topic": "/tf",
+      "parent": "base_link",
+      "child": "wheel_drop_right",
+      "sample_count": 800
+    },
+    {
+      "topic": "/tf",
+      "parent": "odom",
+      "child": "base_link",
+      "sample_count": 2000
+    },
+    {
+      "topic": "/tf",
+      "parent": "wheel_drop_left",
+      "child": "left_wheel",
+      "sample_count": 800
+    },
+    {
+      "topic": "/tf",
+      "parent": "wheel_drop_right",
+      "child": "right_wheel",
+      "sample_count": 800
+    },
+    {
+      "topic": "/tf_static",
+      "parent": "base_link",
+      "child": "laser_frame",
+      "sample_count": 1
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "interpretation_note": "Observed TF pairs identify the frame edges on /tf, not the exact publishing process. Publisher endpoint names are listed separately. Frequencies use simulation stamps; RTF uses wall and simulation time. No independent Isaac ground truth is captured."
+}

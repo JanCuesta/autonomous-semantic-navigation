@@ -1,0 +1,40 @@
+{
+  "status": "completed",
+  "error": null,
+  "phases": [
+    {
+      "phase": "baseline",
+      "start_sim_s": 712.816666666,
+      "end_sim_s": 714.816666666
+    },
+    {
+      "phase": "short_forward",
+      "start_sim_s": 714.816666666,
+      "end_sim_s": 716.316666666
+    },
+    {
+      "phase": "straight_settle",
+      "start_sim_s": 716.316666666,
+      "end_sim_s": 719.316666666
+    },
+    {
+      "phase": "left_turn",
+      "start_sim_s": 719.316666666,
+      "end_sim_s": 721.316666666
+    },
+    {
+      "phase": "turn_settle",
+      "start_sim_s": 721.316666666,
+      "end_sim_s": 724.316666666
+    },
+    {
+      "phase": "final_idle",
+      "start_sim_s": 724.316666666,
+      "end_sim_s": 726.316666666
+    }
+  ],
+  "commands": 1590,
+  "last_scan_clearance_m": 0.8444841504096985,
+  "calibrated_odometry_parameters_unchanged": true,
+  "note": "No independent Isaac ground truth recorded; evaluate alongside passive recorder."
+}

@@ -1,0 +1,198 @@
+[
+  {
+    "wall_monotonic_s": 10792.743084911,
+    "load_average": [
+      11.33984375,
+      10.57080078125,
+      7.1640625
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 65.0
+    },
+    "gpu": [
+      "53, 43, 1500, 28.95"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10802.775420028,
+    "load_average": [
+      11.18505859375,
+      10.55419921875,
+      7.19482421875
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 65.0
+    },
+    "gpu": [
+      "53, 45, 1500, 30.17"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10812.805769712,
+    "load_average": [
+      12.28369140625,
+      10.828125,
+      7.32080078125
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 64.0
+    },
+    "gpu": [
+      "53, 45, 1500, 29.12"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10822.838183062,
+    "load_average": [
+      10.7822265625,
+      10.55322265625,
+      7.2685546875
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 65.0
+    },
+    "gpu": [
+      "52, 40, 1500, 29.44"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10832.869857434,
+    "load_average": [
+      11.9404296875,
+      10.814453125,
+      7.3896484375
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 64.0
+    },
+    "gpu": [
+      "52, 27, 1526, 24.87"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10842.899033057,
+    "load_average": [
+      10.4853515625,
+      10.5400390625,
+      7.33642578125
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 64.0
+    },
+    "gpu": [
+      "51, 28, 1526, 23.16"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10852.931147374,
+    "load_average": [
+      10.359375,
+      10.52001953125,
+      7.36474609375
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 63.0
+    },
+    "gpu": [
+      "50, 31, 1526, 23.31"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10862.961831588,
+    "load_average": [
+      9.3076171875,
+      10.28857421875,
+      7.32275390625
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 63.0
+    },
+    "gpu": [
+      "51, 31, 1526, 23.53"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10872.992125362,
+    "load_average": [
+      8.34375,
+      10.04833984375,
+      7.27587890625
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 63.0
+    },
+    "gpu": [
+      "50, 33, 1526, 23.72"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10883.024031009,
+    "load_average": [
+      7.36767578125,
+      9.78271484375,
+      7.21875
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 63.0
+    },
+    "gpu": [
+      "50, 32, 1526, 23.50"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10893.055807725,
+    "load_average": [
+      8.400390625,
+      9.9228515625,
+      7.2919921875
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 62.0
+    },
+    "gpu": [
+      "50, 35, 1526, 23.68"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10903.085409665,
+    "load_average": [
+      8.59521484375,
+      9.92333984375,
+      7.32080078125
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 62.0
+    },
+    "gpu": [
+      "50, 34, 1526, 23.17"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10913.115274672,
+    "load_average": [
+      7.5810546875,
+      9.662109375,
+      7.26318359375
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 62.0
+    },
+    "gpu": [
+      "50, 34, 1526, 23.50"
+    ]
+  },
+  {
+    "wall_monotonic_s": 10923.147263854,
+    "load_average": [
+      9.0966796875,
+      9.92041015625,
+      7.37353515625
+    ],
+    "thermal_zones": {
+      "thermal_zone0:acpitz": 62.0
+    },
+    "gpu": [
+      "50, 33, 1526, 23.26"
+    ]
+  }
+]
