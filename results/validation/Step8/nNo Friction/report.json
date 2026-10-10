@@ -1,0 +1,57 @@
+
+source /opt/ros/jazzy/setup.bash && python3 - <<'PY'
+import time
+import rclpy
+from geometry_msgs.msg import Twist
+
+rclpy.init()
+node = rclpy.create_node("asn_motion_check")
+pub = node.create_publisher(Twist,
+"/cmd_vel",
+10)
+
+def command(v, w, duration):
+    msg = Twist()
+    msg.linear.x = v
+    msg.angular.z = w
+    end = time.monotonic() + duration
+    while time.monotonic() < end:
+        pub.publish(msg)
+        rclpy.spin_once(node, timeout_sec=0.05)
+
+try:
+    deadline = time.monotonic() + 5
+    while pub.get_subscription_count() == 0:
+        if time.monotonic() > deadline:
+            raise RuntimeError("No /cmd_vel subscriber")
+        rclpy.spin_once(node, timeout_sec=0.1)
+
+    
+    if node.count_publishers("/cmd_vel") > 1:
+        raise RuntimeError("Another command publisher is active")
+
+    print("1. ZERO VELOCITY")
+    command(0.0,
+0.0,
+1.0)
+
+    print("2. FORWARD: 0.04 m/s")
+    command(0.04,
+0.0,
+1.5)
+
+    print("3. STOP")
+    command(0.0,
+0.0,
+3.0)
+
+finally:
+    print("Sending final ZERO commands")
+    command(0.0,
+0.0,
+2.0)
+    node.destroy_node()
+    rclpy.shutdown()
+
+print("TEST COMPLETE")
+PY
