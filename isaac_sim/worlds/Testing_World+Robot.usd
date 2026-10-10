@@ -29,7 +29,16 @@
         }
         int refinementOverrideImplVersion = 0
         dictionary renderSettings = {
-            bool "rtx:ecoMode:enabled" = 0
+            double "rtx:directLighting:sampledLighting:maxRayUnexposedIntensity" = 6399.9990234375
+            double "rtx:indirectDiffuse:maxRayUnexposedIntensity" = 6399.9990234375
+            double "rtx:pathtracing:fireflyFilter:maxPerEmissiveUnexposedIntensity" = 3199.99951171875
+            double "rtx:pathtracing:fireflyFilter:maxUnexposedIntensityPerSample" = 3199.99951171875
+            double "rtx:pathtracing:fireflyFilter:maxUnexposedIntensityPerSampleDiffuse" = 3199.99951171875
+            double "rtx:raytracing:inscattering:maxRTSampleUnexposedIntensity" = 204799.96875
+            double "rtx:rtpt:fireflyFilter:maxPerEmissiveUnexposedIntensity" = 3199.99951171875
+            double "rtx:rtpt:fireflyFilter:maxUnexposedIntensityPerSample" = 3199.99951171875
+            double "rtx:rtpt:fireflyFilter:maxUnexposedIntensityPerSampleDiffuse" = 3199.99951171875
+            double "rtx:translucency:maxRayUnexposedIntensity" = 19199.998046875
         }
     }
     defaultPrim = "World"
@@ -47,7 +56,9 @@ def Xform "World" (
     prepend rel isaac:physics:robotJoints = </World/V1_Robot>
     prepend rel isaac:physics:robotLinks = </World/V1_Robot>
 
-    def Xform "GroundPlane"
+    def Xform "GroundPlane" (
+        displayName = "GroundPlane"
+    )
     {
         quatf xformOp:orient = (1, 0, 0, 0)
         float3 xformOp:scale = (1, 1, 1)
@@ -479,9 +490,9 @@ def Xform "World" (
         prepend payload = @../robots/V1_Robot.usd@
     )
     {
-        quatd xformOp:orient = (0.2288240011076134, 0.023027658307444344, -0.10177004066960363, -0.9678595777756638)
+        quatd xformOp:orient = (0.7070798567270163, 0.006170592427165337, -0.006170592427165335, 0.7070798567270161)
         double3 xformOp:scale = (1, 1, 1)
-        double3 xformOp:translate = (3.722511581389596, 1.5070142614891953, 0)
+        double3 xformOp:translate = (0.4999999999999996, 0.500000007450581, 0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
         over "base_link"
@@ -491,8 +502,8 @@ def Xform "World" (
             )
             vector3f physics:angularVelocity = (-0.5187904, -39.03851, 0.81671154)
             vector3f physics:velocity = (-0.0028525451, -0.009975344, -0.0029231806)
-            quatd xformOp:orient = (0.9999037965128107, -0.0000658384525331854, -0.013870236485882167, -0.0000996212403825044)
-            double3 xformOp:translate = (0.00015783309936523438, 0.000006794929504394531, -0.004426901007359874)
+            quatd xformOp:orient = (1, 0, 0, 0)
+            double3 xformOp:translate = (0, 0, 0)
 
             over "wheel_drop_left_joint"
             {
@@ -758,6 +769,9 @@ def "Render" (
                 bool omni:rtx:pt:adaptiveSampling:filterError = 0
                 uint omni:rtx:pt:adaptiveSampling:fixedSppIterations = 2
                 float omni:rtx:pt:cached:retrace = 0.1
+                float omni:rtx:pt:fireflyFilter:maxPerEmissiveUnexposedIntensity = 3199.9995
+                float omni:rtx:pt:fireflyFilter:maxUnexposedIntensityPerSample = 3199.9995
+                float omni:rtx:pt:fireflyFilter:maxUnexposedIntensityPerSampleDiffuse = 3199.9995
                 bool omni:rtx:pt:fractionalCutoutOpacity = 0
                 uint omni:rtx:pt:maxSamplesPerLaunch = 2073600
                 uint omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
@@ -765,9 +779,16 @@ def "Render" (
                 token omni:rtx:rendermode = "RealTimePathTracing"
                 color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
                 bool omni:rtx:rt:demoire = 0
-                bool omni:rtx:rt:ecoMode:enabled = 0
+                float omni:rtx:rt:directLighting:maxRayUnexposedIntensity = 6399.999
+                bool omni:rtx:rt:ecoMode:enabled
+                float omni:rtx:rt:indirectdiffuse:maxRayUnexposedIntensity = 6399.999
+                float omni:rtx:rt:inscattering:maxRTSampleUnexposedIntensity = 204799.97
                 bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                float omni:rtx:rt:refractions:maxRayUnexposedIntensity = 19199.998
                 int omni:rtx:rt:sss:samples = 1
+                float omni:rtx:rtpt:fireflyFilter:maxPerEmissiveUnexposedIntensity = 3199.9995
+                float omni:rtx:rtpt:fireflyFilter:maxUnexposedIntensityPerSample = 3199.9995
+                float omni:rtx:rtpt:fireflyFilter:maxUnexposedIntensityPerSampleDiffuse = 3199.9995
                 uint omni:rtx:rtpt:maxBounces = 2
                 uint omni:rtx:rtpt:maxVolumeBounces = 15
                 float omni:rtx:rtpt:modulatingRoughnessThreshold = 0.08
@@ -787,7 +808,7 @@ def "Render" (
             {
                 rel camera = </World/V1_Robot/base_link/rplidar_link/Example_Rotary_2D>
                 bool omni:rtx:material:db:syncLoads = 1
-                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:rt:ecoMode:enabled
                 bool omni:rtx:scene:hydra:materialSyncLoads = 1
                 rel orderedVars = </Render/Vars/LdrColor>
                 custom bool overrideClipRange = 0
@@ -875,10 +896,10 @@ def Camera "Camera" (
     float focalLength = 18.147562
     float focusDistance = 400
     bool omni:kit:cameraLock = 0
-    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -7.496218275756975)
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -8.924776412656072)
     quatd xformOp:orient = (1, 0, 0, 0)
     double3 xformOp:scale = (1, 0.10000000149011612, 1)
-    double3 xformOp:translate = (2.500000037252903, 1.5749441684348986, 5.700000084936619)
+    double3 xformOp:translate = (0.7375686048334287, 0.7450484353090611, 2.6214284564607553)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 }
 
