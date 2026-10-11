@@ -28,7 +28,7 @@ def generate_launch_description():
     map_path = os.path.join(
         asn_navigation_share,
         "maps",
-        "v3_sim_map.yaml"
+        "v4_sim_map.yaml"
     )
 
     localization_launcher = IncludeLaunchDescription(
