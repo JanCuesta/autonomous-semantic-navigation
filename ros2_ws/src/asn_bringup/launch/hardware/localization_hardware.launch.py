@@ -21,7 +21,7 @@ def generate_launch_description():
         asn_navigation_share,
         "config",
         "hardware",
-        "amcl_localization.yaml"
+        "amcl_localization_hardware.yaml"
     )
 
     map_path = os.path.join(
