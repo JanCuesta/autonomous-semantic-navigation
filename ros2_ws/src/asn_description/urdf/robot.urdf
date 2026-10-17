@@ -3,8 +3,8 @@
 
   <link name="base_link"/>
   <link name="laser_frame"/>
- 
-
+  <link name="camera_link"/>
+  <link name="camera_optical_frame"/>
   <link name="wheel_drop_left">
     <inertial>
       <mass value="0.0500000007"/>
@@ -55,6 +55,8 @@
   </link>
 
 
+
+
   <joint name="wheel_drop_left_joint" type="prismatic">
     <origin xyz="0 0.116499998 0.0401999988" rpy="0 -1.57079624 1.57079627"/>
     <parent link="base_link"/>
@@ -92,6 +94,17 @@
     <child link="laser_frame"/>
     <origin xyz="-0.04 0 0.193" rpy="0 0 0"/>
   </joint>
+  <joint name="base_to_camera_link" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+  </joint>
+  <joint name="camera_link_to_camera_frame" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_optical_frame"/>
+    <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796"/>
+  </joint>
+
 
   
 </robot>
