@@ -1,2 +1,0 @@
-[console_scripts]
-coverage_node = asn_semantical_navigation.coverage_node:main

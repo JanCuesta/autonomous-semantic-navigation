@@ -1,9 +1,0 @@
-source;share/asn_semantical_navigation/hook/pythonpath.ps1
-source;share/asn_semantical_navigation/hook/pythonpath.dsv
-source;share/asn_semantical_navigation/hook/pythonpath.sh
-source;share/asn_semantical_navigation/hook/ament_prefix_path.ps1
-source;share/asn_semantical_navigation/hook/ament_prefix_path.dsv
-source;share/asn_semantical_navigation/hook/ament_prefix_path.sh
-source;../../build/asn_semantical_navigation/share/asn_semantical_navigation/hook/pythonpath_develop.ps1
-source;../../build/asn_semantical_navigation/share/asn_semantical_navigation/hook/pythonpath_develop.dsv
-source;../../build/asn_semantical_navigation/share/asn_semantical_navigation/hook/pythonpath_develop.sh

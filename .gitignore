@@ -1,24 +1,36 @@
-# ROS 2 generated directories
-ros2_ws/build/
-ros2_ws/install/
-ros2_ws/log/
+# ROS 2 / colcon generated directories anywhere in this repository
+**/build/
+**/install/
+**/log/
 
-# Python
-__pycache__/
-*.pyc
+# Python and test caches
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
 
-# C/C++
+# Compiled objects
 *.o
 *.so
+*.a
 
-# Editors
+# Editors and OS
 .vscode/
 .idea/
-
-# OS
 .DS_Store
+Thumbs.db
 
-# Temporary files
+# Temporary/local files
 *.tmp
 *.swp
 *~
+.env
+.env.*
+!.env.example
+
+# Intentionally preserve tracked simulation assets, maps, original
+# specifications, test outputs and historical debugging evidence.
