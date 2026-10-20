@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='master-jan',
     maintainer_email='jan.cuesta@icloud.com',
-    description='TODO: Package description',
+    description='Coverage mapping and confidence-guided object search',
     license='Apache-2.0',
     extras_require={
         'test': [
@@ -25,6 +25,15 @@ setup(
     entry_points={
         'console_scripts': [
             'coverage_node = asn_semantical_navigation.coverage_node:main',
+            'nbv_preview_node = '
+            'asn_semantical_navigation.nbv_preview_node:main',
+            'nbv_execute_once_node = '
+            'asn_semantical_navigation.nbv_execute_once_node:main',
+            'nbv_auto_node = asn_semantical_navigation.nbv_auto_node:main',
+            'search_command_node = '
+            'asn_semantical_navigation.search_command_node:main',
+            'yolo_detector_node = '
+            'asn_semantical_navigation.yolo_detector_node:main',
         ],
     },
 )

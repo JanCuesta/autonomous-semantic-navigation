@@ -3,7 +3,7 @@
 <package format="3">
   <name>asn_semantical_navigation</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Coverage mapping and confidence-guided object search</description>
   <maintainer email="jan.cuesta@icloud.com">master-jan</maintainer>
   <license>Apache-2.0</license>
 
@@ -12,6 +12,14 @@
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>tf2_ros</depend>
+  <depend>std_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>nav2_msgs</depend>
+  <depend>action_msgs</depend>
+  <depend>cv_bridge</depend>
+  <!-- ultralytics (YOLO) is an optional Python dependency, see documentation. -->
+  <exec_depend>python3-numpy</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
