@@ -34,3 +34,9 @@ Thumbs.db
 
 # Intentionally preserve tracked simulation assets, maps, original
 # specifications, test outputs and historical debugging evidence.
+
+# Local Python virtual environment
+.venv-perception/
+
+# Automatically downloaded YOLO weights
+yolo11n.pt

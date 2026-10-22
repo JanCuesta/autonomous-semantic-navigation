@@ -25,6 +25,9 @@ setup(
     entry_points={
         'console_scripts': [
             'coverage_node = asn_semantical_navigation.coverage_node:main',
+            'approach_goal_node = asn_semantical_navigation.approach_goal_node:main',
+            'object_localizer_node = '
+            'asn_semantical_navigation.object_localizer_node:main',
             'nbv_preview_node = '
             'asn_semantical_navigation.nbv_preview_node:main',
             'nbv_execute_once_node = '

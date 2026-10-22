@@ -6,6 +6,7 @@ no target approach is sent. No hallucinated 'black/color' attribute checks.
 
 import json
 import time
+import cv2
 
 import rclpy
 from rclpy.node import Node
@@ -46,15 +47,32 @@ class YoloDetectorNode(Node):
         self.target_valid = False
         qos = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL,
                          reliability=ReliabilityPolicy.RELIABLE)
-        self.found_pub = self.create_publisher(Bool,
-                                               '/semantic/nbv/target_found', 10)
+        
+        self.found_pub = self.create_publisher(
+            Bool,
+            '/semantic/nbv/target_found', 
+            10
+        )
+        
         self.detections_pub = self.create_publisher(
-            String, '/semantic/search/detections_json', 10)
+            String, 
+            '/semantic/search/detections_json', 
+            10
+            )
+
+        self.annotated_pub = self.create_publisher(
+            Image,
+            '/semantic/perception/annotated_image',
+            qos_profile_sensor_data
+        )
+        
         self.create_subscription(String, '/semantic/search/target_class',
                                  self.on_target, qos)
+        
         self.create_subscription(Image,
                                  str(self.get_parameter('image_topic').value),
                                  self.on_image, qos_profile_sensor_data)
+        
         self.get_logger().info(
             f'YOLO ready on {self.get_parameter("image_topic").value}. '
             'Select target via search_command_node.')
@@ -81,6 +99,7 @@ class YoloDetectorNode(Node):
         self.last_processed = now
         try:
             image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+            annotated = image.copy()
             results = self.model.predict(
                 source=image, verbose=False,
                 device=self.get_parameter('device').value,
@@ -100,12 +119,59 @@ class YoloDetectorNode(Node):
                     'class': label, 'confidence': round(score, 3),
                     'bbox_xyxy': [round(float(v), 1)
                                   for v in box.xyxy[0].tolist()]})
+        #Create the BoundignBox for Rviz
+        for detection in matches:
+            x1, y1, x2, y2 = detection['bbox_xyxy']
+
+            #Find corresponding pixels:
+            x1 = int(round(x1))
+            x2 = int(round(x2))
+            y1 = int(round(y1))
+            y2 = int(round(y2))
+
+            #Draw the rectangle:
+            cv2.rectangle(
+                annotated,
+                (x1, y1),
+                (x2, y2),
+                (0, 255, 0), # box color (green)
+                2 #line thickness
+            )
+            # Class + confidence
+            label = f"{detection['class']} {detection['confidence']:.2f}"
+
+            # Add the text to the BB
+            if y1 >= 25:
+                label_y = y1 - 5
+            else:
+                label_y = y2 + 20
+
+            cv2.putText(
+                annotated,
+                label,
+                (x1, label_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 0),
+                2
+            )
+
+        annotated_msg = self.bridge.cv2_to_imgmsg(
+            annotated,
+            encoding='bgr8'
+        )
+        annotated_msg.header = msg.header
+        self.annotated_pub.publish(annotated_msg)
+
         just_confirmed = not self.filter.confirmed and bool(matches)
         found = self.filter.update(confidence)
         self.detections_pub.publish(String(data=json.dumps({
             'target': self.filter.target,
             'frame_id': msg.header.frame_id,
             'timestamp_sec': msg.header.stamp.sec,
+            'timestamp_nanosec': msg.header.stamp.nanosec,
+            'image_width': msg.width,
+            'image_height': msg.height,
             'detections': matches,
             'confirmation_count': self.filter.count,
             'confirmed': found,
