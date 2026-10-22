@@ -1,23 +1,29 @@
-"""Operator-armed continuous NBV + confidence-frontier planner.
+"""Operator-armed continuous NBV and confidence-frontier navigation.
 
-Run only in a supervised simulator during initial validation. A command
-selecting a YOLO class does not arm movement; a SetBool service does.
-Never issues a second goal while the previous goal is active. Stops after
-Nav2 failures, pose-check failures, budget exhaustion or target detection.
+Only one NBV Nav2 action may execute at a time. In addition to the existing
+/semantic/nbv/auto_enable service, exposes:
+
+* /semantic/nbv/idle_check (Trigger): true only when this NBV executor is
+  disarmed and its previous Nav2 action has reached a terminal result.
+* /semantic/nbv/reset_search (Trigger): clears the latched YOLO-found flag
+  while disarmed and idle, allowing a new mission for the same target class.
+
+These services do not prove that OTHER Nav2 clients are idle. A coordinating
+mission manager must also check Nav2's action status and enforce ownership.
 """
 
-import time
 import json
+import time
 
 import rclpy
 from rclpy.clock import Clock, ClockType
 from rclpy.parameter import Parameter
-from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from std_msgs.msg import Bool, String
 from std_srvs.srv import SetBool, Trigger
 
-from .nbv_execute_once_node import NBVExecuteOnceNode
 from .auto_policy import parse_navigation_summary
+from .nbv_execute_once_node import NBVExecuteOnceNode
 from .nbv_execution_math import best_executable_candidate
 from .nbv_frontier import global_frontier_view
 
@@ -25,7 +31,6 @@ from .nbv_frontier import global_frontier_view
 class NBVAutoNode(NBVExecuteOnceNode):
     def __init__(self):
         super().__init__(node_name='nbv_auto_node')
-        # Keep the Step 2 one-action safety limits and Nav2 logic.
         self.declare_parameters('', [
             ('auto_dwell_s', 2.0),
             ('auto_max_goals', 25),
@@ -43,12 +48,17 @@ class NBVAutoNode(NBVExecuteOnceNode):
         self._auto_request = False
         self._target_class = ''
         self._target_found = False
+        self._confirmed_frame = False
         self._last_detector_frame = 0.0
         self.auto_goals = 0
         self.no_gain_actions = 0
         self.next_action_at = float('inf')
         self.auto_enable_srv = self.create_service(
             SetBool, '/semantic/nbv/auto_enable', self.on_auto_enable)
+        self.idle_check_srv = self.create_service(
+            Trigger, '/semantic/nbv/idle_check', self.on_idle_check)
+        self.reset_search_srv = self.create_service(
+            Trigger, '/semantic/nbv/reset_search', self.on_reset_search)
         qos_target = QoSProfile(
             depth=1, reliability=ReliabilityPolicy.RELIABLE,
             durability=DurabilityPolicy.TRANSIENT_LOCAL)
@@ -64,6 +74,34 @@ class NBVAutoNode(NBVExecuteOnceNode):
         self.execution_status('AUTO_DISARMED: send target, then '
                               'call /semantic/nbv/auto_enable SetBool true')
 
+    def truly_idle(self):
+        """After Nav2 settles, the base executor sets busy=False."""
+        return (not self.auto_enabled and not self.busy and
+                not self.response_pending and self.settle_until is None)
+
+    def on_idle_check(self, request, response):
+        response.success = self.truly_idle()
+        response.message = ('NBV_IDLE: no active NBV Nav2 goal'
+                            if response.success else
+                            'NBV_BUSY: stop/cancellation/result not complete')
+        return response
+
+    def on_reset_search(self, request, response):
+        if not self.truly_idle():
+            response.success = False
+            response.message = 'Cannot reset target during active NBV execution'
+            return response
+        self._target_found = False
+        self._confirmed_frame = False
+        self._last_detector_frame = 0.0
+        self.auto_goals = 0
+        self.no_gain_actions = 0
+        self.next_action_at = float('inf')
+        response.success = True
+        response.message = 'NBV_SEARCH_RESET: ready for a new target observation'
+        self.execution_status(response.message)
+        return response
+
     def on_target(self, msg):
         target = msg.data.strip()
         if target != self._target_class:
@@ -71,6 +109,7 @@ class NBVAutoNode(NBVExecuteOnceNode):
                 self.disarm('TARGET_CHANGED: stopping previous search', True)
             self._target_class = target
             self._target_found = False
+            self._confirmed_frame = False
             self._last_detector_frame = 0.0
             self.execution_status(f'TARGET_SELECTED: {target!r}')
 
@@ -79,33 +118,44 @@ class NBVAutoNode(NBVExecuteOnceNode):
             payload = json.loads(msg.data)
         except (ValueError, TypeError):
             return
-        if payload.get('target') == self._target_class:
+        if (isinstance(payload, dict) and
+                payload.get('target') == self._target_class):
             self._last_detector_frame = time.monotonic()
+            self._confirmed_frame = payload.get('confirmed') is True
+            if self._confirmed_frame:
+                self.mark_target_found()
+
+    def mark_target_found(self):
+        self._target_found = True
+        if self.auto_enabled:
+            self.disarm('TARGET_DETECTED: halt search and cancel Nav2', True)
 
     def on_target_found(self, msg):
-        if bool(msg.data) and self._target_class:
-            self._target_found = True
-            if self.auto_enabled:
-                self.disarm('TARGET_DETECTED: halt search and cancel Nav2',
-                            True)
+        # Bool is classless: accept only after matching confirmed JSON.
+        if (bool(msg.data) and self._target_class and self._confirmed_frame
+                and self.detector_recent()):
+            self.mark_target_found()
 
     def on_auto_enable(self, request, response):
         if not request.data:
             self.disarm('AUTO_STOP_REQUESTED', True)
             response.success = True
-            response.message = 'Autonomy disarmed; cancellation requested'
+            # IMPORTANT: successful response != completed Nav2 cancellation.
+            response.message = ('Autonomy disarmed; cancellation requested. '
+                                'Poll /semantic/nbv/idle_check for completion.')
             return response
         if self.auto_enabled:
             response.success = False
             response.message = 'Autonomy is already armed'
             return response
-        if self.busy:
+        if not self.truly_idle():
             response.success = False
             response.message = 'Nav2 goal is already active'
             return response
         if self._target_found:
             response.success = False
-            response.message = 'Target already reported found; choose new target'
+            response.message = ('Target already reported found; call '
+                                '/semantic/nbv/reset_search when idle')
             return response
         if self.get_parameter('require_target').value and not self._target_class:
             response.success = False
@@ -208,7 +258,6 @@ class NBVAutoNode(NBVExecuteOnceNode):
         if self.auto_goals >= maximum:
             self.disarm(f'AUTO_BUDGET_REACHED: {maximum} goals', False)
             return
-        # Uses the same one-action implementation and Nav2 safety boundary.
         self._auto_request = True
         try:
             response = self.on_execute_once(Trigger.Request(),
@@ -247,7 +296,6 @@ class NBVAutoNode(NBVExecuteOnceNode):
                     float(self.get_parameter('auto_dwell_s').value)))
 
     def on_cancel(self, request, response):
-        # Emergency cancellation also prevents the next automatic command.
         if self.auto_enabled:
             self.disarm('AUTO_CANCEL_REQUESTED', False)
         return super().on_cancel(request, response)

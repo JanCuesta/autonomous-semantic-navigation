@@ -18,9 +18,7 @@ setup(
     description='Coverage mapping and confidence-guided object search',
     license='Apache-2.0',
     extras_require={
-        'test': [
-            'pytest',
-        ],
+        'test': ['pytest'],
     },
     entry_points={
         'console_scripts': [
@@ -37,6 +35,8 @@ setup(
             'asn_semantical_navigation.search_command_node:main',
             'yolo_detector_node = '
             'asn_semantical_navigation.yolo_detector_node:main',
+            'semantical_mission_manager_node = '
+            'asn_semantical_navigation.semantical_mission_manager_node:main',
         ],
     },
 )

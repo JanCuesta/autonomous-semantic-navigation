@@ -1,8 +1,8 @@
-"""Preview-only approach-goal generator for a localized semantic target.
+"""Approach-goal preview for live or mission-locked map-frame targets.
 
 Generates candidate poses around a target in map coordinates, checks robot
 clearance and a straight-line path against /map, then publishes an RViz preview.
-Does NOT send Nav2 goals or /cmd_vel commands.
+Never publishes /cmd_vel. Direct Nav2 goal submission is disabled by default and may be enabled only for supervised standalone testing.
 """
 
 import math
@@ -55,6 +55,8 @@ class ApproachGoalNode(Node):
             ('clearance_m', 0.22),
             ('target_path_clearance_m', 0.30),
             ('target_timeout_s', 2.5),
+            ('locked_target_max_age_s', 15.0),
+            ('allow_direct_nav_goal', False),
             ('robot_frame', 'base_link'),
         ])
         map_qos = QoSProfile(
@@ -65,6 +67,11 @@ class ApproachGoalNode(Node):
         self.target = None
         self.target_valid = False
         self.target_received_at = 0.0
+        # The mission manager can freeze a validated target while NBV
+        # cancels and live detections briefly disappear.
+        self.locked_target = None
+        self.locked_target_at = 0.0
+        self.locked_target_active = False
         self.last_status = None
         self.nav_client = ActionClient(
             self, NavigateToPose, '/navigate_to_pose'
@@ -88,8 +95,17 @@ class ApproachGoalNode(Node):
                                  self.on_target, 10)
         self.create_subscription(Bool, '/semantic/perception/target_valid',
                                  self.on_valid, 10)
+        self.create_subscription(
+            PoseStamped, '/semantic/mission/locked_target_pose',
+            self.on_locked_target, map_qos)
+        self.create_subscription(
+            Bool, '/semantic/mission/locked_target_valid',
+            self.on_locked_valid, map_qos)
         self.goal_pub = self.create_publisher(
             PoseStamped, '/semantic/approach/goal', 10)
+        # Only emitted from the mission-locked target, never live YOLO.
+        self.locked_goal_pub = self.create_publisher(
+            PoseStamped, '/semantic/approach/locked_goal', 10)
         self.valid_pub = self.create_publisher(
             Bool, '/semantic/approach/goal_valid', 10)
         self.markers_pub = self.create_publisher(
@@ -121,6 +137,19 @@ class ApproachGoalNode(Node):
         if not self.target_valid:
             self.target = None
 
+    def on_locked_target(self, msg):
+        # The lock is activated only by locked_target_valid=True.
+        self.locked_target = msg
+        self.locked_target_at = time.monotonic()
+
+    def on_locked_valid(self, msg):
+        self.locked_target_active = bool(msg.data)
+        if not self.locked_target_active:
+            self.locked_target = None
+            self.locked_target_at = 0.0
+            self.latest_goal = None
+            self.valid_pub.publish(Bool(data=False))
+
     def clear_markers(self):
         marker = Marker()
         marker.action = Marker.DELETEALL
@@ -136,14 +165,23 @@ class ApproachGoalNode(Node):
         if self.map_msg is None or self.map_grid is None:
             self.no_goal('WAITING: /map')
             return
-        if (not self.target_valid or self.target is None or
-                time.monotonic() - self.target_received_at >
-                float(self.get_parameter('target_timeout_s').value)):
-            self.latest_goal = None
-            self.no_goal('WAITING: recent valid target pose')
+        if self.locked_target_active:
+            target = self.locked_target
+            received_at = self.locked_target_at
+            max_age = float(self.get_parameter(
+                'locked_target_max_age_s').value)
+            target_valid = target is not None
+        else:
+            target = self.target
+            received_at = self.target_received_at
+            max_age = float(self.get_parameter('target_timeout_s').value)
+            target_valid = self.target_valid
+        if (not target_valid or target is None or
+                time.monotonic() - received_at > max_age):
+            self.no_goal('WAITING: recent valid or mission-locked target')
             return
         frame = self.map_msg.header.frame_id
-        if self.target.header.frame_id != frame:
+        if target.header.frame_id != frame:
             self.no_goal('REJECTED: target is not in the map frame')
             return
         try:
@@ -156,8 +194,8 @@ class ApproachGoalNode(Node):
 
         rx = robot_tf.transform.translation.x
         ry = robot_tf.transform.translation.y
-        tx = self.target.pose.position.x
-        ty = self.target.pose.position.y
+        tx = target.pose.position.x
+        ty = target.pose.position.y
         if not all(math.isfinite(x) for x in (rx, ry, tx, ty)):
             self.no_goal('REJECTED: non-finite map coordinates')
             return
@@ -208,6 +246,9 @@ class ApproachGoalNode(Node):
         self.latest_goal = goal
         self.goal_at = time.monotonic()
         self.goal_pub.publish(goal)
+        if self.locked_target_active:
+            # The supervisor only accepts this lock-specific topic.
+            self.locked_goal_pub.publish(goal)
         self.valid_pub.publish(Bool(data=True))
         self.status(
             f'PREVIEW: goal=({best[0]:.2f},{best[1]:.2f}), '
@@ -216,6 +257,12 @@ class ApproachGoalNode(Node):
 
     def send_best_goal(self, request, response):
         response.success = False
+
+        if not self.get_parameter('allow_direct_nav_goal').value:
+            response.message = (
+                'Direct approach execution is disabled; mission manager '
+                'owns approach Nav2 goals')
+            return response
 
         if (self.nav_busy or self.latest_goal is None
                 or not self.target_valid

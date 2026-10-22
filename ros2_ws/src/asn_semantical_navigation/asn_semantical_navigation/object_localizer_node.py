@@ -152,6 +152,15 @@ class ObjectLocalizer(Node):
                    if isinstance(d, dict) and d.get('class') == target]
         if not data.get('confirmed') or not matches:
             self.pending_detections.clear()
+            # One missed YOLO frame must not immediately destroy a
+            # previously confirmed 3D map position during NBV braking.
+            # This is a bounded hold, NOT a new object observation.
+            if (self.valid and self.last_valid_wall_time > 0 and
+                    time.monotonic() - self.last_valid_wall_time <
+                    float(self.get_parameter('target_timeout_s').value)):
+                self.report('HOLDING: last validated map target; waiting '
+                            'for fresh RGB-D confirmation')
+                return
             self.invalidate('WAITING: no confirmed YOLO detection')
             return
 
