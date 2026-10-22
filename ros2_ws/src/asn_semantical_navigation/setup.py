@@ -35,6 +35,8 @@ setup(
             'asn_semantical_navigation.search_command_node:main',
             'yolo_detector_node = '
             'asn_semantical_navigation.yolo_detector_node:main',
+            'semantic_user_interface_node = '
+            'asn_semantical_navigation.semantic_user_interface_node:main',
             'semantical_mission_manager_node = '
             'asn_semantical_navigation.semantical_mission_manager_node:main',
         ],
