@@ -139,6 +139,9 @@ def generate_launch_description():
             "use_sim_time": True,
             "require_target": True,
             "require_live_detector": True,
+            # For integrated missions, only a validated RGB-D map pose
+            # should stop NBV; 2D YOLO confirms visibility, not position.
+            "stop_on_2d_confirmation": False,
             "auto_max_goals": ParameterValue(
                 LaunchConfiguration("auto_max_goals"),
                 value_type=int
@@ -161,7 +164,7 @@ def generate_launch_description():
             "prepare_timeout_s": 30.0,
             "detector_stale_s": 5.0,
             "stop_timeout_s": 25.0,
-            "localization_timeout_s": 12.0,
+            "localization_timeout_s": 20.0,
             "approach_timeout_s": 120.0,
         }]
     )

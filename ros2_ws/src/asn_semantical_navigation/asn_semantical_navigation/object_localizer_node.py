@@ -13,7 +13,9 @@ from cv_bridge import CvBridge
 from geometry_msgs.msg import PointStamped, PoseStamped
 from rclpy.duration import Duration
 from rclpy.node import Node
+from action_msgs.msg import GoalStatus, GoalStatusArray
 from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from rclpy.time import Time
 from sensor_msgs.msg import CameraInfo, Image
 from std_msgs.msg import Bool, String
@@ -186,6 +188,12 @@ class ObjectLocalizer(Node):
         self.last_valid_wall_time = 0.0
         self.last_status = None
         self.last_status_log_time = 0.0
+        # Visualization cache independent of perception validity.
+        self.mission_state = None
+        self.locked_marker_pose = None
+        self.last_marker_pose = None
+        self.nav2_active = False
+        self.clear_when_nav_quiet = False
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.pose_pub = self.create_publisher(
@@ -205,6 +213,18 @@ class ObjectLocalizer(Node):
         self.detection_sub = self.create_subscription(
             String, self.get_parameter('detections_topic').value,
             self.detection_callback, 10)
+        mission_qos = QoSProfile(
+            depth=1, reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        self.create_subscription(
+            String, '/semantic/mission/state',
+            self.on_mission_state, mission_qos)
+        self.create_subscription(
+            PoseStamped, '/semantic/mission/locked_target_pose',
+            self.on_locked_marker_pose, mission_qos)
+        self.create_subscription(
+            GoalStatusArray, '/navigate_to_pose/_action/status',
+            self.on_nav_status, mission_qos)
         self.timer = self.create_timer(0.2, self.watchdog_callback)
         self.report('WAITING: depth, camera calibration, and YOLO detections')
 
@@ -227,6 +247,7 @@ class ObjectLocalizer(Node):
         marker = Marker()
         marker.action = Marker.DELETEALL
         self.marker_pub.publish(MarkerArray(markers=[marker]))
+        self.last_marker_pose = None
 
 
     def invalidate(self, reason):
@@ -234,10 +255,64 @@ class ObjectLocalizer(Node):
         self.valid = False
         self.position_history.clear()
         self.valid_pub.publish(Bool(data=False))
-        if was_valid:
+        if was_valid and not self._hold_marker():
             self.clear_marker()
         self.report(reason)
 
+
+    def _hold_marker(self):
+        # A marker is only a display of a previously measured position.
+        return self.mission_state in ('APPROACHING', 'VERIFYING', 'CANCELLING')
+
+    def _finish_marker(self):
+        self.clear_when_nav_quiet = False
+        self.clear_marker()
+        self.locked_marker_pose = None
+
+    def on_mission_state(self, msg):
+        previous = self.mission_state
+        state = msg.data.strip()
+        if state == previous:
+            return
+        self.mission_state = state
+
+        if state == 'APPROACHING':
+            self.clear_when_nav_quiet = False
+            # The mission's frozen map-frame target is authoritative when
+            # beginning approach, even if live RGB-D localization expired.
+            if self.locked_marker_pose is not None:
+                self.publish_marker(self.locked_marker_pose)
+            elif self.last_marker_pose is not None:
+                self.publish_marker(self.last_marker_pose)
+        elif state in ('SUCCEEDED', 'FAILED', 'CANCELLED', 'IDLE'):
+            # Do not erase an active Nav2 navigation marker prematurely.
+            if self.nav2_active:
+                self.clear_when_nav_quiet = True
+            else:
+                self._finish_marker()
+        elif state == 'PREPARING':
+            # A new mission cannot reuse the previous mission's object pose.
+            self.clear_when_nav_quiet = False
+            self.locked_marker_pose = None
+            self.clear_marker()
+
+    def on_locked_marker_pose(self, msg):
+        self.locked_marker_pose = msg
+        # Guard against cross-topic subscription ordering: the locked pose
+        # may arrive after the APPROACHING state event.
+        if self._hold_marker() and self.last_marker_pose is None:
+            self.publish_marker(msg)
+
+    def on_nav_status(self, msg):
+        active_states = {
+            GoalStatus.STATUS_UNKNOWN,
+            GoalStatus.STATUS_ACCEPTED,
+            GoalStatus.STATUS_EXECUTING,
+            GoalStatus.STATUS_CANCELING,
+        }
+        self.nav2_active = any(s.status in active_states for s in msg.status_list)
+        if self.clear_when_nav_quiet and not self.nav2_active:
+            self._finish_marker()
 
     def camera_info_callback(self, msg):
         self.camera_info = msg
@@ -447,7 +522,7 @@ class ObjectLocalizer(Node):
             np.linalg.norm(xyz - previous) > tolerance
             for previous in self.position_history
         ):
-            if self.valid:
+            if self.valid and not self._hold_marker():
                 self.clear_marker()
             self.valid = False
             self.position_history.clear()
@@ -482,6 +557,11 @@ class ObjectLocalizer(Node):
 
 
     def publish_marker(self, pose):
+        # After a completed mission, wait for another mission before
+        # displaying new detections; preserve live validity messages.
+        if self.mission_state in ('IDLE', 'SUCCEEDED', 'FAILED', 'CANCELLED'):
+            return
+        self.last_marker_pose = pose
         marker = Marker()
         marker.header = pose.header
         marker.ns = 'localized_target'
@@ -496,7 +576,7 @@ class ObjectLocalizer(Node):
         marker.color.g = 1.0
         marker.color.b = 0.2
         marker.color.a = 1.0
-        marker.lifetime = Duration(seconds=2.0).to_msg()
+        marker.lifetime = Duration(seconds=0.0).to_msg()
         self.marker_pub.publish(MarkerArray(markers=[marker]))
 
 
