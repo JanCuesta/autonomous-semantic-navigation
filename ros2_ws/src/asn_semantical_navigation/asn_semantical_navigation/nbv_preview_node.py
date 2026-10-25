@@ -8,6 +8,7 @@ import math
 
 import numpy as np
 import rclpy
+from action_msgs.msg import GoalStatus, GoalStatusArray
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import OccupancyGrid
 from rclpy.duration import Duration
@@ -58,6 +59,15 @@ class NBVPreviewNode(Node):
         self.create_subscription(OccupancyGrid, '/map', self.on_map, qos_map)
         self.create_subscription(OccupancyGrid, '/semantic/coverage_map',
                                  self.on_coverage, qos_map)
+        # Freeze candidate previews while any Nav2 action is in progress.
+        self.nav_goal_active = False
+        self.mission_state = ''
+        self.create_subscription(
+            GoalStatusArray, '/navigate_to_pose/_action/status',
+            self.on_nav_status, qos_map)
+        self.create_subscription(
+            String, '/semantic/mission/state',
+            self.on_mission_state, qos_map)
         self.marker_pub = self.create_publisher(
             MarkerArray, '/semantic/nbv/candidates', 10)
         self.best_pub = self.create_publisher(
@@ -86,6 +96,15 @@ class NBVPreviewNode(Node):
         self.coverage = np.asarray(msg.data, dtype=np.int16).reshape(
             msg.info.height, msg.info.width)
 
+    def on_nav_status(self, msg):
+        active = (GoalStatus.STATUS_UNKNOWN, GoalStatus.STATUS_ACCEPTED,
+                  GoalStatus.STATUS_EXECUTING, GoalStatus.STATUS_CANCELING)
+        self.nav_goal_active = any(
+            item.status in active for item in msg.status_list)
+
+    def on_mission_state(self, msg):
+        self.mission_state = msg.data
+
     def get_spec(self):
         origin = self.map_msg.info.origin
         return GridSpec(
@@ -100,6 +119,13 @@ class NBVPreviewNode(Node):
             self._previous_status = text
 
     def run_preview(self):
+        # Keep the LAST map-frame markers and best pose unchanged
+        # during navigation, including pauses and Nav2 recovery.
+        mission_navigating = self.mission_state in (
+            'APPROACHING', 'VERIFYING', 'CANCELLING')
+        if (self.nav_goal_active or getattr(self, 'busy', False) or
+                mission_navigating):
+            return
         if self.occupancy is None or self.coverage is None:
             return
         if self.occupancy.shape != self.coverage.shape:

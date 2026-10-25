@@ -15,6 +15,7 @@ Panels:
         - /Depth1/Topic1
         - /Image1/Topic1
         - /Image2/Topic1
+        - /Axes1
       Splitter Ratio: 0.5
     Tree Height: 707
   - Class: rviz_common/Selection
@@ -267,7 +268,7 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        approach_candidates: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -279,7 +280,7 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        localized_target: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -327,6 +328,13 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /semantic/approach/candidates
       Value: true
+    - Class: rviz_default_plugins/Axes
+      Enabled: true
+      Length: 0.5
+      Name: Axes
+      Radius: 0.05000000074505806
+      Reference Frame: map
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -373,25 +381,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3.365640640258789
+      Distance: 5.2350239753723145
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.25656625628471375
-        Y: -2.610811948776245
-        Z: 0.2945801317691803
+        X: 0.25985801219940186
+        Y: -2.0538527965545654
+        Z: 0.27977266907691956
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7452032566070557
+      Pitch: 0.7602033615112305
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.07039737701416
+      Yaw: 3.110400915145874
     Saved: ~
 Window Geometry:
   Displays:

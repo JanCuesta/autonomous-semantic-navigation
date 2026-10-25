@@ -20,6 +20,7 @@ from rclpy.clock import Clock, ClockType
 from rclpy.parameter import Parameter
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from std_msgs.msg import Bool, String
+from nav2_msgs.msg import SpeedLimit
 from std_srvs.srv import SetBool, Trigger
 
 from .auto_policy import parse_navigation_summary
@@ -40,6 +41,10 @@ class NBVAutoNode(NBVExecuteOnceNode):
             ('require_target', True),
             ('require_live_detector', True),
             ('detector_stale_s', 20.0),
+            ('inspection_slowdown_percent', 50.0),
+            # Default preserves standalone NBV behavior. Integrated launch
+            # overrides to False so stopping requires confirmed RGB-D.
+            ('stop_on_2d_confirmation', True),
             ('frontier_enabled', True),
             ('frontier_threshold', 30),
             ('frontier_max_positions', 70),
@@ -49,10 +54,17 @@ class NBVAutoNode(NBVExecuteOnceNode):
         self._target_class = ''
         self._target_found = False
         self._confirmed_frame = False
+        self._localization_valid = False
         self._last_detector_frame = 0.0
         self.auto_goals = 0
         self.no_gain_actions = 0
         self.next_action_at = float('inf')
+        # The mission manager decides WHEN to inspect; this node only
+        # translates its request into a Nav2 controller speed limit.
+        self._inspection_slowdown_active = False
+        self._inspection_slowdown_seen = False
+        self.speed_limit_pub = self.create_publisher(
+            SpeedLimit, '/speed_limit', 10)
         self.auto_enable_srv = self.create_service(
             SetBool, '/semantic/nbv/auto_enable', self.on_auto_enable)
         self.idle_check_srv = self.create_service(
@@ -68,6 +80,15 @@ class NBVAutoNode(NBVExecuteOnceNode):
                                  self.on_target_found, 10)
         self.create_subscription(String, '/semantic/search/detections_json',
                                  self.on_detector_frame, 10)
+        self.create_subscription(Bool, '/semantic/perception/target_valid',
+                                 self.on_localization_valid, 10)
+        # Latched mission request is available after node startup.
+        inspection_qos = QoSProfile(
+            depth=1, reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        self.create_subscription(
+            Bool, '/semantic/mission/inspection_slowdown',
+            self.on_inspection_slowdown, inspection_qos)
         self.auto_timer = self.create_timer(
             0.5, self.auto_tick,
             clock=Clock(clock_type=ClockType.STEADY_TIME))
@@ -93,6 +114,7 @@ class NBVAutoNode(NBVExecuteOnceNode):
             return response
         self._target_found = False
         self._confirmed_frame = False
+        self._localization_valid = False
         self._last_detector_frame = 0.0
         self.auto_goals = 0
         self.no_gain_actions = 0
@@ -110,6 +132,7 @@ class NBVAutoNode(NBVExecuteOnceNode):
             self._target_class = target
             self._target_found = False
             self._confirmed_frame = False
+            self._localization_valid = False
             self._last_detector_frame = 0.0
             self.execution_status(f'TARGET_SELECTED: {target!r}')
 
@@ -122,8 +145,18 @@ class NBVAutoNode(NBVExecuteOnceNode):
                 payload.get('target') == self._target_class):
             self._last_detector_frame = time.monotonic()
             self._confirmed_frame = payload.get('confirmed') is True
-            if self._confirmed_frame:
+            if self._confirmed_frame and (
+                    self.get_parameter('stop_on_2d_confirmation').value or
+                    self._localization_valid):
                 self.mark_target_found()
+
+    def on_localization_valid(self, msg):
+        # The localizer validates three consistent 3D poses for the selected
+        # target, using corresponding YOLO and depth frames.
+        self._localization_valid = bool(msg.data)
+        if (self._localization_valid and self._target_class and
+                self.detector_recent()):
+            self.mark_target_found()
 
     def mark_target_found(self):
         self._target_found = True
@@ -133,8 +166,37 @@ class NBVAutoNode(NBVExecuteOnceNode):
     def on_target_found(self, msg):
         # Bool is classless: accept only after matching confirmed JSON.
         if (bool(msg.data) and self._target_class and self._confirmed_frame
-                and self.detector_recent()):
+                and self.detector_recent() and
+                (self.get_parameter('stop_on_2d_confirmation').value or
+                 self._localization_valid)):
             self.mark_target_found()
+
+    def on_inspection_slowdown(self, msg):
+        """Apply or clear a Nav2 speed limit; no /cmd_vel publishing."""
+        active = bool(msg.data)
+        if (self._inspection_slowdown_seen and
+                active == self._inspection_slowdown_active):
+            return
+        self._inspection_slowdown_seen = True
+        self._inspection_slowdown_active = active
+
+        raw_percent = float(
+            self.get_parameter('inspection_slowdown_percent').value)
+        if not 0.0 < raw_percent <= 100.0:
+            self.get_logger().error(
+                "Invalid inspection_slowdown_percent; using 50%%")
+            raw_percent = 50.0
+
+        limit = SpeedLimit()
+        limit.header.stamp = self.get_clock().now().to_msg()
+        limit.percentage = True
+        # In Nav2, speed_limit=0 means NO restriction, not stop.
+        limit.speed_limit = raw_percent if active else 0.0
+        self.speed_limit_pub.publish(limit)
+        self.execution_status(
+            f"INSPECTION_SPEED_LIMIT: "
+            f"{raw_percent:.0f}%" if active else
+            "INSPECTION_SPEED_LIMIT: cleared")
 
     def on_auto_enable(self, request, response):
         if not request.data:

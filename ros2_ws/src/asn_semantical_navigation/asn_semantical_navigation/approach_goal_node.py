@@ -20,11 +20,12 @@ from std_msgs.msg import Bool, String
 from tf2_ros import Buffer, TransformException, TransformListener
 from visualization_msgs.msg import Marker, MarkerArray
 
-from .nbv_core import GridSpec, candidate_poses, safe_footprint, safe_straight_segment
+from .nbv_core import GridSpec, candidate_poses, safe_footprint
 from rclpy.action import ActionClient
 from nav2_msgs.action import NavigateToPose
 from std_srvs.srv import Trigger
 from action_msgs.msg import GoalStatus
+from action_msgs.msg import GoalStatusArray
 
 
 def yaw_from_quaternion(q):
@@ -53,7 +54,6 @@ class ApproachGoalNode(Node):
         self.declare_parameters('', [
             ('stand_off_m', 0.60),
             ('clearance_m', 0.22),
-            ('target_path_clearance_m', 0.30),
             ('target_timeout_s', 2.5),
             ('locked_target_max_age_s', 15.0),
             ('allow_direct_nav_goal', False),
@@ -73,18 +73,22 @@ class ApproachGoalNode(Node):
         self.locked_target_at = 0.0
         self.locked_target_active = False
         self.last_status = None
-        self.nav_client = ActionClient(
-            self, NavigateToPose, '/navigate_to_pose'
-        )
 
         self.latest_goal = None
         self.goal_at = 0.0
         self.nav_busy = False
+        self.mission_state = None
+        self.nav2_active = False
+        self.clear_markers_when_idle = False
 
         self.create_service(
             Trigger,
             '/semantic/approach/send_goal',
             self.send_best_goal
+        )
+
+        self.nav_client = ActionClient(
+           self, NavigateToPose, '/navigate_to_pose'
         )
 
         self.tf_buffer = Buffer()
@@ -101,6 +105,14 @@ class ApproachGoalNode(Node):
         self.create_subscription(
             Bool, '/semantic/mission/locked_target_valid',
             self.on_locked_valid, map_qos)
+        self.create_subscription(
+            String, '/semantic/mission/state',
+            self.on_mission_state, map_qos)
+        self.create_subscription(
+            GoalStatusArray, '/navigate_to_pose/_action/status',
+            self.on_nav_status, map_qos)
+        
+        
         self.goal_pub = self.create_publisher(
             PoseStamped, '/semantic/approach/goal', 10)
         # Only emitted from the mission-locked target, never live YOLO.
@@ -112,6 +124,8 @@ class ApproachGoalNode(Node):
             MarkerArray, '/semantic/approach/candidates', 10)
         self.status_pub = self.create_publisher(
             String, '/semantic/approach/status', 10)
+        
+        
         self.create_timer(1.0, self.plan)
         self.status('WAITING: map and valid target localization')
 
@@ -120,6 +134,43 @@ class ApproachGoalNode(Node):
         if message != self.last_status:
             self.get_logger().info(message)
             self.last_status = message
+
+    def on_mission_state(self, msg):
+        state = msg.data.strip()
+        if state == self.mission_state:
+            return
+        self.mission_state = state
+
+        if state in ('SUCCEEDED', 'FAILED', 'CANCELLED'):
+            # Mission terminated; defer deletion if Nav2 is still active.
+            if self.nav2_active or self.nav_busy:
+                self.clear_markers_when_idle = True
+            else:
+                self.finish_approach_visualization()
+        elif state in ('PREPARING', 'WAITING_APPROACH'):
+            # New approach cycle (the mission manager owns action execution).
+            self.clear_markers_when_idle = False
+
+    def on_nav_status(self, msg):
+        # Includes pauses and recovery phases, not just nonzero /cmd_vel.
+        active = {
+            GoalStatus.STATUS_UNKNOWN,
+            GoalStatus.STATUS_ACCEPTED,
+            GoalStatus.STATUS_EXECUTING,
+            GoalStatus.STATUS_CANCELING,
+        }
+        self.nav2_active = any(
+            item.status in active for item in msg.status_list
+        )
+        if (self.clear_markers_when_idle and
+                not self.nav2_active and not self.nav_busy):
+            self.finish_approach_visualization()
+
+    def finish_approach_visualization(self):
+        self.clear_markers_when_idle = False
+        self.clear_markers()
+        self.latest_goal = None
+        self.valid_pub.publish(Bool(data=False))
 
     def on_map(self, msg):
         if msg.info.width == 0 or msg.info.height == 0 or msg.info.resolution <= 0:
@@ -162,6 +213,15 @@ class ApproachGoalNode(Node):
         self.latest_goal = None
 
     def plan(self):
+        # Preserve the last map-frame markers during a Nav2 action.
+        # The Mission Manager, not base velocity, defines when an
+        # approach has completed (including cancellation and verification).
+        if self.nav2_active or self.nav_busy:
+            return
+        if (self.mission_state is not None and
+                self.mission_state not in ('IDLE', 'WAITING_APPROACH')):
+            return
+
         if self.map_msg is None or self.map_grid is None:
             self.no_goal('WAITING: /map')
             return
@@ -205,10 +265,8 @@ class ApproachGoalNode(Node):
             origin.position.x, origin.position.y,
             yaw_from_quaternion(origin.orientation))
         clearance = float(self.get_parameter('clearance_m').value)
-        target_clearance = float(
-            self.get_parameter('target_path_clearance_m').value)
         spacing = float(self.get_parameter('stand_off_m').value)
-        if min(clearance, target_clearance, spacing) <= 0:
+        if min(clearance, spacing) <= 0:
             self.no_goal('REJECTED: spacing and clearances must be positive')
             return
 
@@ -217,12 +275,11 @@ class ApproachGoalNode(Node):
         for x, y, _, name in candidate_poses((tx, ty, 0.0), step_m=spacing):
             if math.hypot(x - tx, y - ty) < 0.01:
                 continue
-            free = safe_footprint(self.map_grid, spec, x, y, clearance)
-            straight = free and safe_straight_segment(
-                self.map_grid, spec, (rx, ry), (x, y), clearance)
-            avoids_object = segment_distance(
-                tx, ty, rx, ry, x, y) >= target_clearance
-            valid = free and straight and avoids_object
+            free = safe_footprint(
+                self.map_grid, spec, x, y, clearance
+            )
+            standoff_ok = math.hypot(x - tx, y - ty) >= 0.35
+            valid = free and standoff_ok
             heading = math.atan2(ty - y, tx - x)
             candidates.append((x, y, heading, name, valid))
 
@@ -346,7 +403,7 @@ class ApproachGoalNode(Node):
                 marker.color.b = 1.0  # blue: valid alternative
             else:
                 marker.color.r = marker.color.g = marker.color.b = 0.5
-            marker.lifetime = Duration(seconds=2.0).to_msg()
+            marker.lifetime = Duration(seconds=0.0).to_msg()
             markers.append(marker)
         self.markers_pub.publish(MarkerArray(markers=markers))
 

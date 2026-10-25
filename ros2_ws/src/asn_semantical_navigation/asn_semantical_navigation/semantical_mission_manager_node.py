@@ -1,23 +1,18 @@
 """Explicit-start semantic search -> RGB-D localization -> Nav2 approach.
-
 This supervisor coordinates existing ROS nodes; it never publishes /cmd_vel.
 A user must select a target class and call /semantic/mission/start.
-
 Search motion belongs to nbv_auto_node. Approach motion belongs to THIS node,
 which submits NavigateToPose after NBV confirms its action is terminal, and
 after global Nav2 action status is quiescent. No external Nav2 goal client
 (including the old /mission/goal manager, RViz and approach/send_goal service)
 may run concurrently. This is supervised simulation code, not a hardware E-stop.
-
 Requires nbv_auto_node's /semantic/nbv/reset_search and /idle_check services.
 Integration via setup.py and launch files is intentionally deferred.
 """
-
 import json
 import math
 import time
 from enum import Enum
-
 import rclpy
 from action_msgs.msg import GoalStatus, GoalStatusArray
 from geometry_msgs.msg import PoseStamped
@@ -30,13 +25,17 @@ from std_msgs.msg import Bool, String
 from std_srvs.srv import SetBool, Trigger
 from tf2_ros import Buffer, TransformException, TransformListener
 
-
 class State(str, Enum):
     IDLE = 'IDLE'
     PREPARING = 'PREPARING'
     SEARCHING = 'SEARCHING'
+    SLOWING_FOR_INSPECTION = 'SLOWING_FOR_INSPECTION'
     STOPPING_SEARCH = 'STOPPING_SEARCH'
     LOCALIZING = 'LOCALIZING'
+    ADVANCING_FOR_INSPECTION = 'ADVANCING_FOR_INSPECTION'
+    CHECKING_TARGET = 'CHECKING_TARGET'
+    SCANNING_FOR_TARGET = 'SCANNING_FOR_TARGET'
+    RESUMING_SEARCH = 'RESUMING_SEARCH'
     WAITING_APPROACH = 'WAITING_APPROACH'
     APPROACHING = 'APPROACHING'
     VERIFYING = 'VERIFYING'
@@ -44,17 +43,13 @@ class State(str, Enum):
     SUCCEEDED = 'SUCCEEDED'
     FAILED = 'FAILED'
     CANCELLED = 'CANCELLED'
-
-
 TERMINAL = {State.IDLE, State.SUCCEEDED, State.FAILED, State.CANCELLED}
 NAV_ACTIVE = {GoalStatus.STATUS_ACCEPTED, GoalStatus.STATUS_EXECUTING,
               GoalStatus.STATUS_CANCELING, GoalStatus.STATUS_UNKNOWN}
 
-
 def yaw(q):
     return math.atan2(2.0 * (q.w * q.z + q.x * q.y),
                       1.0 - 2.0 * (q.y * q.y + q.z * q.z))
-
 
 def valid_pose(msg):
     if msg is None or msg.header.frame_id != 'map':
@@ -63,7 +58,6 @@ def valid_pose(msg):
     values = (p.x, p.y, p.z, q.x, q.y, q.z, q.w)
     norm = sum(v * v for v in (q.x, q.y, q.z, q.w))
     return all(math.isfinite(v) for v in values) and 0.95 < norm < 1.05
-
 
 class SemanticMissionManager(Node):
     """ROS mission state machine; one active semantic mission at a time."""
@@ -74,7 +68,16 @@ class SemanticMissionManager(Node):
             ('prepare_timeout_s', 30.0),
             ('detector_stale_s', 5.0),
             ('stop_timeout_s', 25.0),
-            ('localization_timeout_s', 12.0),
+            ('localization_timeout_s', 20.0),
+            # Inspection timings use steady-clock (wall) seconds.
+            ('inspection_slowdown_s', 1.5),
+            ('inspection_cooldown_s', 12.0),
+            # Recovery uses Nav2 NavigateToPose, not direct wheel commands.
+            ('inspection_forward_m', 0.60),
+            ('inspection_scan_deg', 45.0),
+            ('inspection_observe_s', 6.0),
+            ('inspection_goal_timeout_s', 120.0),
+            ('inspection_max_cycles', 3),
             ('target_pose_stale_s', 2.5),
             ('target_snapshot_max_age_s', 12.0),
             ('approach_preview_timeout_s', 8.0),
@@ -88,7 +91,6 @@ class SemanticMissionManager(Node):
             ('quiet_period_s', 1.0),
         ]:
             self.declare_parameter(name, default)
-
         self.state = State.IDLE
         self.reason = 'Awaiting target and explicit mission start'
         self.since = time.monotonic()
@@ -97,6 +99,7 @@ class SemanticMissionManager(Node):
         self.mission_started = 0.0
         self.last_detection = 0.0
         self.detected = False
+        self.inspection_cooldown_until = 0.0
         self.pose = None
         self.pose_at = 0.0
         self.pose_valid = False
@@ -128,7 +131,29 @@ class SemanticMissionManager(Node):
         self.final_state = State.CANCELLED
         self.final_reason = ''
         self.unsafe_stop = False
-
+        # Recovery Nav2 action is separate from the final approach action.
+        self.recovery_pending = False
+        self.recovery_handle = None
+        self.recovery_kind = None           # 'forward' | 'scan'
+        self.recovery_started_at = 0.0
+        self.recovery_motion_id = 0
+        self.recovery_cancel_requested = False
+        self.recovery_cancel_sent = False
+        self.recovery_cancel_at = 0.0
+        self.recovery_forward_sent = False
+        self.recovery_scan_offsets = (1.0, -1.0, 0.0)
+        self.recovery_scan_index = 0
+        self.recovery_scan_origin_yaw = None
+        self.recovery_view_since = 0.0
+        self.recovery_observe_since = 0.0
+        self.recovery_scan_detection = False
+        self.inspection_cycles = 0
+        self.last_yolo_confirmed = False
+        self.last_yolo_confirmed_at = 0.0
+        # True only when LOCALIZING was entered from a stationary recovery check.
+        # A timeout then advances the scan instead of repeating the forward move.
+        self.recovery_localizing = False
+        self.recovery_check_detection_seen = False
         latch = QoSProfile(
             depth=10, reliability=ReliabilityPolicy.RELIABLE,
             durability=DurabilityPolicy.TRANSIENT_LOCAL)
@@ -136,6 +161,11 @@ class SemanticMissionManager(Node):
             String, '/semantic/mission/state', latch)
         self.status = self.create_publisher(
             String, '/semantic/mission/status_json', latch)
+        # Mission-manager DECISION signal, not a velocity command.
+        # NBV/Nav2 consumes this to enforce the inspection speed limit.
+        self.inspection_slowdown_pub = self.create_publisher(
+            Bool, '/semantic/mission/inspection_slowdown', latch)
+        self.inspection_slowdown_pub.publish(Bool(data=False))
         self.locked_pose_pub = self.create_publisher(
             PoseStamped, '/semantic/mission/locked_target_pose', latch)
         self.locked_valid_pub = self.create_publisher(
@@ -189,6 +219,10 @@ class SemanticMissionManager(Node):
         if self.state != state or self.reason != reason:
             self.state, self.reason = state, reason
             self.since = time.monotonic()
+            # Maintain slowdown through braking; clear once idle or resumed.
+            self.inspection_slowdown_pub.publish(Bool(
+                data=(state in (State.SLOWING_FOR_INSPECTION,
+                                State.STOPPING_SEARCH))))
             if state in TERMINAL or state == State.CANCELLING:
                 # Immediately invalidate the locked waypoint if mission ends.
                 self.locked_valid_pub.publish(Bool(data=False))
@@ -220,7 +254,24 @@ class SemanticMissionManager(Node):
         if (record.get('confirmed') is True and
                 self.state in (State.PREPARING, State.SEARCHING)):
             self.detected = True
-            self.stop_search()
+            # A validated 3D pose takes priority over inspecting again.
+            self.stop_if_localized()
+            if (self.state in (State.PREPARING, State.SEARCHING) and
+                    time.monotonic() >= self.inspection_cooldown_until and
+                    self.inspection_cycles < int(self.param('inspection_max_cycles'))):
+                self.inspection_cycles += 1
+                self.set_state(State.SLOWING_FOR_INSPECTION,
+                               'YOLO confirmed; slowing before stationary inspection')
+        elif (record.get('confirmed') is True and
+              self.state == State.SCANNING_FOR_TARGET and
+              not self.last_yolo_confirmed):
+            # Interrupt only on a NEW detection: persistent YOLO boxes must
+            # not cancel every scan before the robot changes viewpoint.
+            self.recovery_scan_detection = True
+            self.request_recovery_cancel('New YOLO confirmation during scan')
+        self.last_yolo_confirmed = record.get('confirmed') is True
+        if self.last_yolo_confirmed:
+            self.last_yolo_confirmed_at = time.monotonic()
 
     def on_nbv(self, msg):
         line = msg.data
@@ -247,24 +298,39 @@ class SemanticMissionManager(Node):
     def on_pose(self, msg):
         self.pose, self.pose_at = msg, time.monotonic()
         self.cache_valid_localization()
+        self.stop_if_localized()
 
     def on_pose_valid(self, msg):
         self.pose_valid = bool(msg.data)
         if self.pose_valid:
             self.cache_valid_localization()
+            self.stop_if_localized()
+            if self.state == State.SCANNING_FOR_TARGET:
+                self.recovery_scan_detection = True
+                self.request_recovery_cancel('RGB-D localized during inspection scan')
         else:
-            # The live detector can flicker or lose the object while NBV
-            # cancels. Preserve the last VALID pose for a bounded interval.
+            # Preserve a previously validated pose for a bounded interval.
             self.pose = None
 
     def cache_valid_localization(self):
         if (self.state in (State.PREPARING, State.SEARCHING,
-                           State.STOPPING_SEARCH, State.LOCALIZING) and
+                           State.SLOWING_FOR_INSPECTION,
+                          State.STOPPING_SEARCH, State.LOCALIZING,
+                          State.RESUMING_SEARCH, State.CHECKING_TARGET,
+                          State.SCANNING_FOR_TARGET) and
                 self.pose_valid and valid_pose(self.pose) and
                 self.pose_at >= self.mission_started and
                 self.mission_started > 0):
             self.last_valid_pose = self.pose
             self.last_valid_pose_at = self.pose_at
+
+    def stop_if_localized(self):
+        """A valid RGB-D map pose supersedes the observation pause."""
+        if (self.state in (State.PREPARING, State.SEARCHING,
+                           State.SLOWING_FOR_INSPECTION,
+                           State.RESUMING_SEARCH) and
+                self.localized_target_snapshot() is not None):
+            self.stop_search()
 
     def on_preview(self, msg):
         self.preview, self.preview_at = msg, time.monotonic()
@@ -277,7 +343,8 @@ class SemanticMissionManager(Node):
     def start(self, request, response):
         if (self.state not in TERMINAL or self.nbv_request is not None or
                 self.nbv_idle_pending or self.nbv_reset_pending or
-                self.goal_pending or self.goal_handle is not None):
+                self.goal_pending or self.goal_handle is not None or
+                self.recovery_pending or self.recovery_handle is not None):
             response.success = False
             response.message = 'Previous mission/goal/cancellation is still active'
             return response
@@ -290,9 +357,9 @@ class SemanticMissionManager(Node):
             response.success = False
             response.message = 'Select /semantic/search/target_class first'
             return response
-        # Nav2's action status may be silent until the first goal exists.
-        # Do not mistake 'no status received yet' for 'an active goal'.
-        # An actually observed active goal still blocks mission start.
+            # Nav2's action status may be silent until the first goal exists.
+            # Do not mistake 'no status received yet' for 'an active goal'.
+            # An actually observed active goal still blocks mission start.
         # NBV reset/idle and TF/Nav2 checks guard the subsequent motion.
         if self.nav_active:
             response.success = False
@@ -302,6 +369,22 @@ class SemanticMissionManager(Node):
         self.mission_started = time.monotonic()
         self.last_detection = 0.0
         self.detected = False
+        self.inspection_cooldown_until = 0.0
+        self.inspection_cycles = 0
+        self.recovery_forward_sent = False
+        self.recovery_scan_index = 0
+        self.recovery_scan_origin_yaw = None
+        self.recovery_view_since = 0.0
+        self.recovery_observe_since = 0.0
+        self.recovery_scan_detection = False
+        self.last_yolo_confirmed = False
+        self.last_yolo_confirmed_at = 0.0
+        self.recovery_localizing = False
+        self.recovery_check_detection_seen = False
+        self.recovery_cancel_requested = False
+        self.recovery_cancel_sent = False
+        self.recovery_cancel_at = 0.0
+        self.recovery_kind = None
         self.pose = self.preview = self.goal = self.target_snapshot = None
         self.last_valid_pose = None
         self.last_valid_pose_at = 0.0
@@ -363,7 +446,7 @@ class SemanticMissionManager(Node):
             ok, message = result.success, result.message
         except Exception as exc:
             ok, message = False, str(exc)
-        if self.state != State.PREPARING:
+        if self.state not in (State.PREPARING, State.RESUMING_SEARCH):
             return
         if ok:
             self.nbv_reset_done = True
@@ -400,7 +483,9 @@ class SemanticMissionManager(Node):
                 self.nbv_call(False)
             elif not ok:
                 self.abort(State.FAILED, 'NBV refused to arm: ' + message)
-            elif self.state == State.PREPARING:
+            elif self.state in (State.PREPARING, State.RESUMING_SEARCH):
+                self.stop_requested = False
+                self.stop_ack = False
                 self.set_state(State.SEARCHING, 'NBV searching for ' + self.target)
         else:
             self.stop_ack = bool(ok)
@@ -415,7 +500,7 @@ class SemanticMissionManager(Node):
         self.stop_requested = True
         self.nbv_idle_verified = False
         self.set_state(State.STOPPING_SEARCH,
-                       'YOLO confirmed; disarm NBV and await settled Nav2 result')
+                       'Pause requested; disarm NBV and await settled Nav2 result')
         if self.nbv_request is None:
             self.nbv_call(False)
 
@@ -445,10 +530,10 @@ class SemanticMissionManager(Node):
             self.nbv_idle_at = time.monotonic()
 
     def nav_quiet(self):
-        # The Nav2 status topic is often silent until the first action.
-        # If status has been received, require an explicit inactive status.
-        # Otherwise rely on the NBV action-owner's affirmative idle service
-        # and a full quiet period following that response. External clients
+    # The Nav2 status topic is often silent until the first action.
+    # If status has been received, require an explicit inactive status.
+    # Otherwise rely on the NBV action-owner's affirmative idle service
+    # and a full quiet period following that response. External clients
         # must NOT submit goals during an integrated semantic mission.
         if self.nav_status_seen:
             status_clear = not self.nav_active and self.nav_quiet_since > 0
@@ -458,6 +543,7 @@ class SemanticMissionManager(Node):
             quiet_start = self.nbv_idle_at
         return (status_clear and self.nbv_idle_verified and
                 not self.nbv_busy and self.stop_ack and
+                not self.recovery_pending and self.recovery_handle is None and
                 time.monotonic() - quiet_start >=
                 self.param('quiet_period_s'))
 
@@ -467,6 +553,8 @@ class SemanticMissionManager(Node):
         previous = self.state
         self.final_state, self.final_reason = terminal_state, reason
         self.set_state(State.CANCELLING, reason)
+        if self.recovery_pending or self.recovery_handle is not None:
+            self.request_recovery_cancel('Mission aborted during recovery')
         if previous == State.APPROACHING or self.goal_pending or self.goal_handle:
             self.cancel_goal_on_accept = True
             self.request_approach_cancel()
@@ -498,10 +586,219 @@ class SemanticMissionManager(Node):
                     'Nav2 cancellation not acknowledged; awaiting action result')
         except Exception as exc:
             self.get_logger().error(f'Nav2 cancellation response error: {exc}')
+    # ------------------ bounded inspection recovery ------------------
+
+    def robot_map_pose(self):
+        tf = self.tf.lookup_transform('map', 'base_link', Time())
+        p = tf.transform.translation
+        return p.x, p.y, yaw(tf.transform.rotation)
+
+
+    @staticmethod
+
+    def make_map_goal(x, y, heading, stamp):
+        goal = PoseStamped()
+        goal.header.frame_id = 'map'
+        goal.header.stamp = stamp
+        goal.pose.position.x = float(x)
+        goal.pose.position.y = float(y)
+        goal.pose.orientation.z = math.sin(heading / 2.0)
+        goal.pose.orientation.w = math.cos(heading / 2.0)
+        return goal
+
+
+    def recovery_active(self):
+        return self.recovery_pending or self.recovery_handle is not None
+
+
+    def send_recovery_goal(self, kind, x, y, heading):
+        # The supervisor owns recovery ONLY after NBV and Nav2 are idle.
+        if self.recovery_active() or not self.nav_quiet():
+            return False
+        if not self.nav.server_is_ready():
+            return False
+        request = NavigateToPose.Goal()
+        request.pose = self.make_map_goal(
+            x, y, heading, self.get_clock().now().to_msg())
+        self.recovery_motion_id += 1
+        motion_id = self.recovery_motion_id
+        mission_id = self.mission_id
+        self.recovery_pending = True
+        self.recovery_kind = kind
+        self.recovery_started_at = time.monotonic()
+        self.recovery_cancel_requested = False
+        self.recovery_cancel_sent = False
+        self.recovery_cancel_at = 0.0
+        try:
+            future = self.nav.send_goal_async(request)
+            future.add_done_callback(
+                lambda f: self.on_recovery_accept(f, mission_id, motion_id))
+        except Exception as exc:
+            self.recovery_pending = False
+            self.recovery_kind = None
+            self.get_logger().error(f'Inspection goal submission failed: {exc}')
+            return False
+        self.get_logger().info(
+            f'INSPECTION_GOAL {kind}: map=({x:.2f},{y:.2f},'
+            f'{math.degrees(heading):.1f}deg)')
+        return True
+
+
+    def on_recovery_accept(self, future, mission_id, motion_id):
+        try:
+            handle = future.result()
+        except Exception as exc:
+            if mission_id == self.mission_id and motion_id == self.recovery_motion_id:
+                self.recovery_pending = False
+                self.recovery_kind = None
+                if self.state == State.CANCELLING:
+                    return
+                self.abort(State.FAILED,
+                           f'Inspection Nav2 goal acceptance unavailable: {exc}')
+            return
+        if mission_id != self.mission_id or motion_id != self.recovery_motion_id:
+            # Late acceptance must never start a goal owned by an old mission.
+            if handle.accepted:
+                handle.cancel_goal_async()
+            return
+        self.recovery_pending = False
+        if not handle.accepted:
+            self.on_recovery_terminal(GoalStatus.STATUS_ABORTED,
+                                      'goal rejected by Nav2')
+            return
+        self.recovery_handle = handle
+        try:
+            future = handle.get_result_async()
+            future.add_done_callback(
+                lambda f: self.on_recovery_result(f, mission_id, motion_id))
+        except Exception as exc:
+            self.get_logger().error(f'Inspection Nav2 result tracking failed: {exc}')
+            self.unsafe_stop = True
+            self.request_recovery_cancel('Inspection result tracking failed')
+            self.abort(State.FAILED, 'Inspection result tracking unavailable')
+            return
+        if self.recovery_cancel_requested or self.state == State.CANCELLING:
+            self.request_recovery_cancel('Late inspection acceptance: cancel')
+
+
+    def request_recovery_cancel(self, reason):
+        if not self.recovery_active() or self.recovery_cancel_sent:
+            return
+        if not self.recovery_cancel_requested:
+            self.recovery_cancel_requested = True
+            self.recovery_cancel_at = time.monotonic()
+            self.get_logger().warning(reason)
+        if self.recovery_handle is None:
+            return  # Cancel immediately upon late acceptance.
+        try:
+            future = self.recovery_handle.cancel_goal_async()
+            future.add_done_callback(self.on_recovery_cancel_ack)
+            self.recovery_cancel_sent = True
+        except Exception as exc:
+            self.get_logger().error(f'Inspection cancellation request failed: {exc}')
+
+
+    def on_recovery_cancel_ack(self, future):
+        try:
+            if not future.result().goals_canceling:
+                self.get_logger().warning(
+                    'Inspection cancellation not acknowledged; awaiting terminal result')
+        except Exception as exc:
+            self.get_logger().error(f'Inspection cancellation acknowledgment error: {exc}')
+
+
+    def on_recovery_result(self, future, mission_id, motion_id):
+        if mission_id != self.mission_id or motion_id != self.recovery_motion_id:
+            return
+        try:
+            status = future.result().status
+        except Exception as exc:
+            self.unsafe_stop = True
+            self.abort(State.FAILED, f'Inspection goal result unavailable: {exc}')
+            return
+        self.recovery_handle = None
+        self.recovery_pending = False
+        self.on_recovery_terminal(status, f'Nav2 status={status}')
+
+
+    def on_recovery_terminal(self, status, detail):
+        kind = self.recovery_kind
+        self.recovery_kind = None
+        self.recovery_cancel_requested = False
+        self.recovery_cancel_sent = False
+        self.recovery_cancel_at = 0.0
+        if self.state == State.CANCELLING or self.state in TERMINAL:
+            return
+        if kind == 'forward' and self.state == State.ADVANCING_FOR_INSPECTION:
+            if status == GoalStatus.STATUS_SUCCEEDED:
+                self.begin_inspection_check('Forward inspection move completed')
+            else:
+                self.set_state(
+                    State.SCANNING_FOR_TARGET,
+                    f'Forward move could not finish ({detail}); scanning in place')
+        elif kind == 'scan' and self.state == State.SCANNING_FOR_TARGET:
+            self.begin_inspection_check(f'Inspection scan turn finished ({detail})')
+
+
+    def recovery_watchdog(self):
+        if not self.recovery_active():
+            return
+        now = time.monotonic()
+        if (not self.recovery_cancel_requested and
+                now - self.recovery_started_at >
+                self.param('inspection_goal_timeout_s')):
+            self.request_recovery_cancel('Inspection Nav2 goal timed out')
+        if (self.recovery_cancel_requested and self.recovery_cancel_at and
+                now - self.recovery_cancel_at > self.param('cancel_timeout_s')):
+            # Never hand motion back to NBV without a terminal action result.
+            self.unsafe_stop = True
+            self.set_state(State.FAILED,
+                           'Inspection cancellation unconfirmed: inspect Nav2/controller')
+
+
+    def begin_inspection_check(self, reason):
+        # Preserve a detection that stopped a turning maneuver. Start the
+        # observation clock only once the preceding Nav2 action is fully idle.
+        self.recovery_check_detection_seen = self.recovery_scan_detection
+        self.recovery_observe_since = 0.0
+        self.recovery_view_since = float('inf')
+        self.recovery_scan_detection = False
+        self.recovery_localizing = False
+        self.set_state(State.CHECKING_TARGET, reason)
+
+
+    def stationary_recovery_target(self):
+        # Do not use a localization captured during the forward translation.
+        target = self.localized_target_snapshot()
+        if target is None:
+            return None
+        observed_at = max(
+            self.pose_at if self.pose_valid and self.pose is not None else 0.0,
+            self.last_valid_pose_at)
+        if observed_at < self.recovery_view_since:
+            return None
+        return target
+
+
+    def finish_inspection_recovery(self):
+        # Use an observed goal result AND Nav2 idle before returning control.
+        self.detected = False
+        self.nbv_reset_done = False
+        self.last_valid_pose = None
+        self.last_valid_pose_at = 0.0
+        self.pose = None
+        self.pose_valid = False
+        self.recovery_localizing = False
+        self.recovery_check_detection_seen = False
+        self.inspection_cooldown_until = (
+            time.monotonic() + self.param('inspection_cooldown_s'))
+        self.set_state(State.RESUMING_SEARCH,
+                       'Inspection viewpoints exhausted; resuming NBV exploration')
+
 
     def localized_target_snapshot(self):
-        # A recently confirmed RGB-D localization is allowed to survive
-        # temporary loss of detection during the Nav2 stop handshake. The
+    # A recently confirmed RGB-D localization is allowed to survive
+    # temporary loss of detection during the Nav2 stop handshake. The
         # sample must belong to THIS mission, have a map frame, and be recent.
         if (self.pose_valid and valid_pose(self.pose) and
                 self.pose_at >= self.mission_started and
@@ -634,7 +931,7 @@ class SemanticMissionManager(Node):
     def tick(self):
         elapsed = time.monotonic() - self.since
         if self.state == State.PREPARING:
-            if self.detected:
+            if self.localized_target_snapshot() is not None:
                 self.stop_search()
             elif self.ready():
                 if not self.nbv_reset_done and not self.nbv_reset_pending:
@@ -644,11 +941,17 @@ class SemanticMissionManager(Node):
             if (self.state == State.PREPARING and
                     elapsed > self.param('prepare_timeout_s')):
                 self.abort(State.FAILED, 'Preparation timed out')
-
         elif self.state == State.SEARCHING:
-            if not self.age_ok(self.last_detection, 'detector_stale_s'):
+            if self.localized_target_snapshot() is not None:
+                self.stop_search()
+            elif not self.age_ok(self.last_detection, 'detector_stale_s'):
                 self.abort(State.FAILED, 'YOLO detector stream became stale')
-
+        elif self.state == State.SLOWING_FOR_INSPECTION:
+        # This node requests a speed limit; actual limiting is owned by
+            # the NBV/Nav2 integration, which we will edit next.
+            if (self.localized_target_snapshot() is not None or
+                    elapsed >= self.param('inspection_slowdown_s')):
+                self.stop_search()
         elif self.state == State.STOPPING_SEARCH:
             if self.nbv_request is None and not self.stop_ack:
                 self.nbv_call(False)
@@ -661,33 +964,149 @@ class SemanticMissionManager(Node):
                 self.unsafe_stop = True
                 self.set_state(State.FAILED,
                                'Search stop unconfirmed; do not send another goal')
-
         elif self.state == State.LOCALIZING:
-            target = self.localized_target_snapshot()
+            # The first localization follows the NBV stop. Later attempts come
+            # from CHECKING_TARGET, where a fresh confirmed YOLO frame was seen
+            # at a stationary recovery viewpoint.
+            target = (self.stationary_recovery_target()
+                      if self.recovery_localizing
+                      else self.localized_target_snapshot())
             if target is not None:
+                self.recovery_localizing = False
                 self.lock_target(target)
                 self.set_state(State.WAITING_APPROACH,
                                'RGB-D target locked; requesting safe approach preview')
-            elif elapsed > self.param('localization_timeout_s'):
-                self.set_state(State.FAILED,
-                               'No recent confirmed RGB-D target after search stopped')
-
+            elif elapsed >= self.param('localization_timeout_s'):
+                if self.recovery_localizing:
+                    # This viewpoint has already been tried. Move to the NEXT
+                    # scan angle; never restart the forward move here.
+                    self.recovery_localizing = False
+                    if self.recovery_scan_index < len(self.recovery_scan_offsets):
+                        self.set_state(State.SCANNING_FOR_TARGET,
+                                       'RGB-D not validated; trying next scan viewpoint')
+                    else:
+                        self.finish_inspection_recovery()
+                else:
+                    # Initial stationary inspection failed; try one forward
+                    # recovery move before the bounded angular scan.
+                    self.recovery_forward_sent = False
+                    self.recovery_scan_index = 0
+                    self.recovery_scan_origin_yaw = None
+                    self.recovery_scan_detection = False
+                    self.recovery_view_since = 0.0
+                    self.last_valid_pose = None
+                    self.last_valid_pose_at = 0.0
+                    self.set_state(State.ADVANCING_FOR_INSPECTION,
+                                   'RGB-D inconclusive; move 0.6m ahead to improve view')
+        elif self.state == State.ADVANCING_FOR_INSPECTION:
+            if self.recovery_active():
+                self.recovery_watchdog()
+            elif not self.recovery_forward_sent and self.nav_quiet():
+                try:
+                    x, y, heading = self.robot_map_pose()
+                except TransformException as exc:
+                    if elapsed > self.param('stop_timeout_s'):
+                        self.abort(State.FAILED, f'Cannot obtain map TF for recovery: {exc}')
+                else:
+                    distance = float(self.param('inspection_forward_m'))
+                    gx = x + distance * math.cos(heading)
+                    gy = y + distance * math.sin(heading)
+                    if self.send_recovery_goal('forward', gx, gy, heading):
+                        self.recovery_forward_sent = True
+                        # Fresh localization must be acquired after the move.
+                        self.recovery_view_since = float('inf')
+            elif not self.recovery_forward_sent and elapsed > self.param('stop_timeout_s'):
+                self.abort(State.FAILED, 'No idle Nav2 available for inspection move')
+        elif self.state == State.CHECKING_TARGET:
+            if self.recovery_active():
+                self.recovery_watchdog()
+            elif self.nav_quiet():
+                if self.recovery_observe_since == 0.0:
+                    self.recovery_observe_since = time.monotonic()
+                    # Ignore poses captured while the robot was translating or
+                    # rotating. Only use localizations at this stopped viewpoint.
+                    self.recovery_view_since = self.recovery_observe_since
+                confirmed_at_view = (
+                    self.recovery_check_detection_seen or
+                    (self.last_yolo_confirmed_at >= self.recovery_observe_since and
+                     self.age_ok(self.last_yolo_confirmed_at, 'detector_stale_s')))
+                if confirmed_at_view or self.stationary_recovery_target() is not None:
+                    # YOLO confirmation means "attempt RGB-D localization", NOT
+                    # "target 3D pose ready". The LOCALIZING branch enforces it.
+                    self.recovery_check_detection_seen = False
+                    self.recovery_localizing = True
+                    self.set_state(State.LOCALIZING,
+                                   'Chair detected at inspection viewpoint; validating RGB-D')
+                elif (time.monotonic() - self.recovery_observe_since >=
+                      self.param('inspection_observe_s')):
+                    if self.recovery_scan_index < len(self.recovery_scan_offsets):
+                        self.set_state(State.SCANNING_FOR_TARGET,
+                                       'No confirmed detection; trying next ±45 degree view')
+                    else:
+                        self.finish_inspection_recovery()
+            elif elapsed > self.param('stop_timeout_s'):
+                self.unsafe_stop = True
+                self.abort(State.FAILED,
+                           'Inspection motion terminal but Nav2 is not quiet')
+        elif self.state == State.SCANNING_FOR_TARGET:
+            if self.recovery_active():
+                if self.recovery_scan_detection:
+                    self.request_recovery_cancel('Target detected during scan')
+                self.recovery_watchdog()
+            elif self.nav_quiet():
+                if self.recovery_scan_detection:
+                    self.begin_inspection_check(
+                        'Detected during scan; stationary RGB-D verification')
+                elif self.recovery_scan_index >= len(self.recovery_scan_offsets):
+                    self.finish_inspection_recovery()
+                else:
+                    try:
+                        x, y, heading = self.robot_map_pose()
+                    except TransformException as exc:
+                        if elapsed > self.param('stop_timeout_s'):
+                            self.abort(State.FAILED, f'Cannot obtain scan TF: {exc}')
+                    else:
+                        if self.recovery_scan_origin_yaw is None:
+                            self.recovery_scan_origin_yaw = heading
+                        index = self.recovery_scan_index
+                        offset_deg = (self.recovery_scan_offsets[index] *
+                                      self.param('inspection_scan_deg'))
+                        requested_yaw = (self.recovery_scan_origin_yaw +
+                                         math.radians(offset_deg))
+                        if self.send_recovery_goal('scan', x, y, requested_yaw):
+                            self.recovery_scan_index += 1
+                            self.recovery_scan_detection = False
+            elif elapsed > self.param('stop_timeout_s'):
+                self.unsafe_stop = True
+                self.abort(State.FAILED, 'Nav2 not idle before inspection scan')
+        elif self.state == State.RESUMING_SEARCH:
+            # Entered only after NBV/Nav2 is confirmed idle from inspection.
+            if self.localized_target_snapshot() is not None:
+                self.stop_search()
+            elif self.nav_quiet():
+                if not self.nbv_reset_done and not self.nbv_reset_pending:
+                    self.reset_nbv()
+                elif self.nbv_reset_done and self.nbv_request is None:
+                    self.nbv_call(True)
+            if (self.state == State.RESUMING_SEARCH and
+                    elapsed > self.param('prepare_timeout_s')):
+                self.abort(State.FAILED, 'Unable to resume NBV after inspection')
         elif self.state == State.WAITING_APPROACH:
             if self.has_approach() and self.nav.server_is_ready() and self.nav_quiet():
                 self.send_approach()
             elif elapsed > self.param('approach_preview_timeout_s'):
                 self.set_state(State.FAILED, 'No fresh valid approach preview')
-
         elif self.state == State.APPROACHING:
             if time.monotonic() - self.approach_at > self.param('approach_timeout_s'):
                 self.abort(State.FAILED, 'Approach action timed out')
-
         elif self.state == State.VERIFYING:
             if not self.verify() and elapsed > self.param('verify_timeout_s'):
                 self.set_state(State.FAILED, 'Final map-frame pose check failed')
-
         elif self.state == State.CANCELLING:
-            if self.goal_pending:
+            if self.recovery_active():
+                self.request_recovery_cancel('Cancel active inspection recovery')
+                self.recovery_watchdog()
+            elif self.goal_pending:
                 self.cancel_goal_on_accept = True
             elif self.goal_handle is not None:
                 self.request_approach_cancel()
@@ -697,14 +1116,14 @@ class SemanticMissionManager(Node):
                 if (self.stop_requested and self.stop_ack and
                         not self.nbv_idle_pending and not self.nbv_idle_verified):
                     self.check_nbv_idle()
-                if not self.stop_requested or self.nav_quiet():
+                if not self.recovery_active() and (
+                        not self.stop_requested or self.nav_quiet()):
                     self.set_state(self.final_state, self.final_reason)
             if (self.state == State.CANCELLING and
                     elapsed > self.param('cancel_timeout_s')):
                 self.unsafe_stop = True
                 self.set_state(State.FAILED,
                                'Cancellation unconfirmed; inspect Nav2/controller')
-
 
 def main(args=None):
     rclpy.init(args=args)
@@ -718,7 +1137,6 @@ def main(args=None):
         node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

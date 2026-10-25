@@ -175,6 +175,10 @@ class NBVExecuteOnceNode(NBVPreviewNode):
         stamped.pose.position.x = float(x)
         stamped.pose.position.y = float(y)
         set_quaternion(stamped.pose, yaw)
+        # One final snapshot: this is the precise viewpoint sent to Nav2.
+        # Inherited preview timer is gated while busy/nav-active.
+        self.publish_markers(ranked, best, stamped.header.frame_id)
+        self.best_pub.publish(stamped)
         action_goal = NavigateToPose.Goal()
         action_goal.pose = stamped
         try:

@@ -1,15 +1,12 @@
 """RGB-D localization of a YOLO-selected object in the ROS map frame.
-
 Input: detections_json, depth image, and registered depth camera CameraInfo.
 Output: validated target pose, validity flag, status, and RViz marker.
 This node NEVER commands navigation or /cmd_vel.
 """
-
 import json
 import math
 import time
 from collections import deque
-
 import numpy as np
 import rclpy
 from cv_bridge import CvBridge
@@ -25,10 +22,134 @@ from tf2_ros import Buffer, TransformException, TransformListener
 from visualization_msgs.msg import Marker, MarkerArray
 
 
+def select_foreground_depth(region, *, min_depth_m=0.15, max_depth_m=5.0,
+                            min_valid_pixels=20, min_valid_fraction=0.30,
+                            max_depth_spread_m=1.0,
+                            histogram_bin_m=0.10,
+                            histogram_min_peak_separation_m=0.35,
+                            histogram_valley_ratio=0.50,
+                            foreground_min_fraction=0.15,
+                            foreground_max_spread_m=0.60):
+    """Find a foreground depth mode inside a YOLO ROI (NumPy only).
+    The nearest *prominent, separated* mode is chosen, never the most numerous
+    mode, because a background wall often occupies more pixels than a chair.
+    If a strong foreground mode cannot be distinguished from the background,
+    reject rather than returning a potentially incorrect wall position.
+    Returns (selection, reason). selection has depth, pixel_x/y (ROI-local),
+    raw_spread, selected_spread, support_fraction and mode. Pixel coordinates
+    are taken from the selected foreground mask, NOT the original box center.
+    """
+    roi = np.asarray(region, dtype=np.float32)
+    if roi.ndim != 2 or not roi.size:
+        return None, 'empty or malformed depth ROI'
+    valid = np.isfinite(roi) & (roi >= min_depth_m) & (roi <= max_depth_m)
+    values = roi[valid]
+    if (values.size < int(min_valid_pixels) or
+            values.size / roi.size < float(min_valid_fraction)):
+        return None, (f'insufficient valid depth pixels: '
+                      f'{values.size}/{roi.size}')
+    raw_spread = float(np.quantile(values, .90) - np.quantile(values, .10))
+    bin_width = max(0.02, float(histogram_bin_m))
+    edges = np.arange(float(min_depth_m), float(max_depth_m) + bin_width * 1.01,
+                      bin_width)
+    if edges.size < 3:
+        return None, 'invalid histogram bin configuration'
+    counts, _ = np.histogram(values, bins=edges)
+    smoothed = np.convolve(counts.astype(float), [0.25, 0.50, 0.25], 'same')
+    highest = float(np.max(smoothed))
+    peak_cutoff = max(3.0, highest * 0.12)
+    # Detect local peaks, suppressing duplicates within the same depth mode.
+    maxima = []
+    for i in range(len(smoothed)):
+        left = smoothed[i-1] if i > 0 else -1.0
+        right = smoothed[i+1] if i+1 < len(smoothed) else -1.0
+        if (smoothed[i] >= peak_cutoff and smoothed[i] >= left and
+                smoothed[i] >= right and
+                (smoothed[i] > left or smoothed[i] > right)):
+            maxima.append(i)
+    min_bins = max(1, int(math.ceil(
+        histogram_min_peak_separation_m / bin_width)))
+    peaks = []
+    for candidate in sorted(maxima, key=lambda i: smoothed[i], reverse=True):
+        if all(abs(candidate - chosen) >= min_bins for chosen in peaks):
+            peaks.append(candidate)
+    peaks.sort()
+    # A sharp valley between two prominent peaks indicates two separate
+    # surfaces. Split at the center of a valley, not at the background peak.
+    separators = []
+    for front, rear in zip(peaks, peaks[1:]):
+        between = smoothed[front + 1:rear]
+        if between.size == 0:
+            continue
+        valley_value = float(np.min(between))
+        if valley_value > float(histogram_valley_ratio) * min(
+                smoothed[front], smoothed[rear]):
+            continue
+        # Use the middle of the flattest valley run, not its first bin.
+        valley_bins = np.where(between <= valley_value + 1e-8)[0]
+        valley = front + 1 + int(np.median(valley_bins))
+        separators.append(valley)
+    if separators:
+        # A tiny near-field outlier must not cause us to select a farther wall.
+        # Choose the NEAREST cluster only if it has meaningful support.
+        boundary_m = float(edges[separators[0] + 1])
+        chosen = valid & (roi < boundary_m)
+        chosen_values = roi[chosen]
+        fraction = float(chosen_values.size / values.size)
+        if (chosen_values.size < int(min_valid_pixels) or
+                fraction < float(foreground_min_fraction)):
+            return None, (f'foreground too sparse: {chosen_values.size} pixels, '
+                          f'{fraction:.0%} of valid ROI; raw spread={raw_spread:.2f}m')
+        mode = 'histogram_foreground'
+    else:
+        if raw_spread > float(max_depth_spread_m):
+            return None, (f'mixed depth {raw_spread:.2f}m, '
+                          'no separable foreground histogram peak')
+        # A small near-field mode may be too weak to form a histogram peak.
+        # Do not silently return the background median if such a group exists.
+        central_depth = float(np.median(values))
+        small_near_group = int(np.count_nonzero(
+            values < central_depth - histogram_min_peak_separation_m))
+        if small_near_group >= max(int(min_valid_pixels),
+                                   int(math.ceil(0.01 * values.size))):
+            return None, (f'near-field pixels insufficient for confident mode: '
+                          f'{small_near_group}/{values.size}; '
+                          f'raw spread={raw_spread:.2f}m')
+        # A single coherent mode: preserve the original median-depth method.
+        chosen = valid
+        chosen_values = values
+        fraction = 1.0
+        mode = 'single_depth_mode'
+    selected_spread = float(np.quantile(chosen_values, .90) -
+                            np.quantile(chosen_values, .10))
+    if mode == 'histogram_foreground' and selected_spread > float(
+            foreground_max_spread_m):
+        return None, (f'foreground itself has mixed depth '
+                      f'({selected_spread:.2f}m)')
+    if mode == 'histogram_foreground':
+        rows, cols = np.nonzero(chosen)
+        pixel_u = float(np.median(cols) + 0.5)
+        pixel_v = float(np.median(rows) + 0.5)
+    else:
+        pixel_u = float(roi.shape[1] / 2.0)
+        pixel_v = float(roi.shape[0] / 2.0)
+    return {
+        'depth_m': float(np.median(chosen_values)),
+        'u_roi': pixel_u,
+        'v_roi': pixel_v,
+        'raw_spread_m': raw_spread,
+        'selected_spread_m': selected_spread,
+        'support_fraction': fraction,
+        'selected_pixels': int(chosen_values.size),
+        'mode': mode,
+    }, ''
+
+
 class ObjectLocalizer(Node):
+
+
     def __init__(self):
         super().__init__('object_localizer_node')
-
         self.declare_parameters('', [
             ('depth_topic', '/camera/depth/image_raw'),
             ('camera_info_topic', '/camera_info'),
@@ -41,11 +162,16 @@ class ObjectLocalizer(Node):
             ('min_valid_pixels', 20),
             ('min_valid_fraction', 0.30),
             ('max_depth_spread_m', 1.0),
+            # Conservative 1-D depth histogram splitting (meters).
+            ('histogram_bin_m', 0.10),
+            ('histogram_min_peak_separation_m', 0.35),
+            ('histogram_valley_ratio', 0.50),
+            ('foreground_min_fraction', 0.15),
+            ('foreground_max_spread_m', 0.60),
             ('confirmation_positions', 3),
             ('max_position_jitter_m', 0.45),
             ('target_timeout_s', 2.0),
         ])
-
         self.bridge = CvBridge()
         self.camera_info = None
         # A bounded buffer is needed because CPU YOLO inference may be delayed.
@@ -60,10 +186,8 @@ class ObjectLocalizer(Node):
         self.last_valid_wall_time = 0.0
         self.last_status = None
         self.last_status_log_time = 0.0
-
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
-
         self.pose_pub = self.create_publisher(
             PoseStamped, '/semantic/perception/target_pose', 10)
         self.valid_pub = self.create_publisher(
@@ -72,7 +196,6 @@ class ObjectLocalizer(Node):
             String, '/semantic/perception/status', 10)
         self.marker_pub = self.create_publisher(
             MarkerArray, '/semantic/perception/target_markers', 10)
-
         self.depth_sub = self.create_subscription(
             Image, self.get_parameter('depth_topic').value,
             self.depth_callback, qos_profile_sensor_data)
@@ -85,9 +208,11 @@ class ObjectLocalizer(Node):
         self.timer = self.create_timer(0.2, self.watchdog_callback)
         self.report('WAITING: depth, camera calibration, and YOLO detections')
 
+
     @staticmethod
     def timestamp_ns(stamp):
         return int(stamp.sec) * 1_000_000_000 + int(stamp.nanosec)
+
 
     def report(self, message):
         self.status_pub.publish(String(data=message))
@@ -97,10 +222,12 @@ class ObjectLocalizer(Node):
             self.last_status = message
             self.last_status_log_time = now
 
+
     def clear_marker(self):
         marker = Marker()
         marker.action = Marker.DELETEALL
         self.marker_pub.publish(MarkerArray(markers=[marker]))
+
 
     def invalidate(self, reason):
         was_valid = self.valid
@@ -111,8 +238,10 @@ class ObjectLocalizer(Node):
             self.clear_marker()
         self.report(reason)
 
+
     def camera_info_callback(self, msg):
         self.camera_info = msg
+
 
     def depth_callback(self, msg):
         stamp = self.timestamp_ns(msg.header.stamp)
@@ -126,6 +255,7 @@ class ObjectLocalizer(Node):
         self.depth_buffer.append(msg)
         self.process_pending()
 
+
     def detection_callback(self, msg):
         try:
             data = json.loads(msg.data)
@@ -138,7 +268,6 @@ class ObjectLocalizer(Node):
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
             self.invalidate(f'REJECTED: bad detection JSON: {exc}')
             return
-
         if target != self.current_target:
             self.current_target = target
             self.last_detection_ns = -1
@@ -147,7 +276,6 @@ class ObjectLocalizer(Node):
         if stamp_ns <= self.last_detection_ns:
             return  # Ignore duplicate or out-of-order detections.
         self.last_detection_ns = stamp_ns
-
         matches = [d for d in detections
                    if isinstance(d, dict) and d.get('class') == target]
         if not data.get('confirmed') or not matches:
@@ -163,9 +291,9 @@ class ObjectLocalizer(Node):
                 return
             self.invalidate('WAITING: no confirmed YOLO detection')
             return
-
         self.pending_detections.append((data, stamp_ns, time.monotonic()))
         self.process_pending()
+
 
     def process_pending(self):
         if not self.depth_buffer:
@@ -187,6 +315,7 @@ class ObjectLocalizer(Node):
                 continue
             self.localize(data, depth_msg, dt)
 
+
     def localize(self, data, depth_msg, dt):
         info = self.camera_info
         if info is None:
@@ -205,7 +334,6 @@ class ObjectLocalizer(Node):
                 data.get('image_height', depth_msg.height) != depth_msg.height):
             self.invalidate('REJECTED: RGB/depth image resolutions differ')
             return
-
         matches = [d for d in data['detections'] if d.get('class') == data['target']]
         try:
             best = max(matches, key=lambda d: float(d['confidence']))
@@ -217,7 +345,6 @@ class ObjectLocalizer(Node):
         except (KeyError, TypeError, ValueError) as exc:
             self.invalidate(f'REJECTED: invalid bounding box: {exc}')
             return
-
         try:
             depth = self.bridge.imgmsg_to_cv2(
                 depth_msg, desired_encoding='passthrough')
@@ -239,7 +366,6 @@ class ObjectLocalizer(Node):
         if not (0 <= u < width and 0 <= v < height):
             self.invalidate('REJECTED: bounding-box center outside depth image')
             return
-
         # Sample a central crop; exclude box edges that commonly include background.
         fraction = float(self.get_parameter('roi_fraction').value)
         fraction = max(0.05, min(1.0, fraction))
@@ -262,12 +388,35 @@ class ObjectLocalizer(Node):
                     self.get_parameter('min_valid_fraction').value)):
             self.invalidate('REJECTED: insufficient valid depth pixels')
             return
-        spread = float(np.quantile(values, 0.90) - np.quantile(values, 0.10))
-        if spread > float(self.get_parameter('max_depth_spread_m').value):
-            self.invalidate(f'REJECTED: mixed foreground/background depth ({spread:.2f}m)')
+        selection, error = select_foreground_depth(
+            region,
+            min_depth_m=min_depth,
+            max_depth_m=max_depth,
+            min_valid_pixels=int(self.get_parameter('min_valid_pixels').value),
+            min_valid_fraction=float(self.get_parameter('min_valid_fraction').value),
+            max_depth_spread_m=float(self.get_parameter('max_depth_spread_m').value),
+            histogram_bin_m=float(self.get_parameter('histogram_bin_m').value),
+            histogram_min_peak_separation_m=float(
+                self.get_parameter('histogram_min_peak_separation_m').value),
+            histogram_valley_ratio=float(
+                self.get_parameter('histogram_valley_ratio').value),
+            foreground_min_fraction=float(
+                self.get_parameter('foreground_min_fraction').value),
+            foreground_max_spread_m=float(
+                self.get_parameter('foreground_max_spread_m').value),
+        )
+        if selection is None:
+            self.invalidate('REJECTED: ' + error)
             return
-        z = float(np.median(values))
-
+        z = selection['depth_m']
+        # The median foreground pixel may lie away from the box center,
+        # especially for chairs with gaps between the seat and backrest.
+        u = left + selection['u_roi']
+        v = top + selection['v_roi']
+        depth_note = (f"method={selection['mode']}, "
+                      f"support={selection['support_fraction']:.0%}, "
+                      f"raw_spread={selection['raw_spread_m']:.2f}m, "
+                      f"selected_spread={selection['selected_spread_m']:.2f}m")
         k = info.k
         fx, fy, cx, cy = float(k[0]), float(k[4]), float(k[2]), float(k[5])
         if not all(math.isfinite(val) for val in (fx, fy, cx, cy)) or fx <= 0 or fy <= 0:
@@ -278,7 +427,6 @@ class ObjectLocalizer(Node):
         point.point.x = (u - cx) * z / fx
         point.point.y = (v - cy) * z / fy
         point.point.z = z
-
         try:
             tf = self.tf_buffer.lookup_transform(
                 self.get_parameter('map_frame').value,
@@ -290,12 +438,10 @@ class ObjectLocalizer(Node):
         except TransformException as exc:
             self.invalidate(f'WAITING: map TF at camera timestamp: {exc}')
             return
-
         xyz = np.array([map_point.point.x, map_point.point.y, map_point.point.z])
         if not np.all(np.isfinite(xyz)):
             self.invalidate('REJECTED: invalid map coordinates')
             return
-
         tolerance = float(self.get_parameter('max_position_jitter_m').value)
         if self.position_history and any(
             np.linalg.norm(xyz - previous) > tolerance
@@ -312,10 +458,9 @@ class ObjectLocalizer(Node):
             self.valid_pub.publish(Bool(data=False))
             self.report(
                 f'OBSERVING: {len(self.position_history)}/{required} map poses; '
-                f'camera depth={z:.2f}m, dt={dt:.3f}s'
+                f'camera depth={z:.2f}m, dt={dt:.3f}s; {depth_note}'
             )
             return
-
         stable_xyz = np.median(np.stack(self.position_history), axis=0)
         pose = PoseStamped()
         pose.header.frame_id = self.get_parameter('map_frame').value
@@ -324,7 +469,6 @@ class ObjectLocalizer(Node):
         pose.pose.position.y = float(stable_xyz[1])
         pose.pose.position.z = float(stable_xyz[2])
         pose.pose.orientation.w = 1.0  # orientation NOT estimated
-
         self.pose_pub.publish(pose)
         self.valid_pub.publish(Bool(data=True))
         self.publish_marker(pose)
@@ -333,8 +477,9 @@ class ObjectLocalizer(Node):
         self.report(
             f'LOCALIZED {data["target"]}: map=({pose.pose.position.x:.2f}, '
             f'{pose.pose.position.y:.2f}, {pose.pose.position.z:.2f})m; '
-            f'depth={z:.2f}m; dt={dt:.3f}s'
+            f'depth={z:.2f}m; dt={dt:.3f}s; {depth_note}'
         )
+
 
     def publish_marker(self, pose):
         marker = Marker()
@@ -353,6 +498,7 @@ class ObjectLocalizer(Node):
         marker.color.a = 1.0
         marker.lifetime = Duration(seconds=2.0).to_msg()
         self.marker_pub.publish(MarkerArray(markers=[marker]))
+
 
     def watchdog_callback(self):
         now = time.monotonic()
@@ -376,7 +522,5 @@ def main(args=None):
         node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
-
-
 if __name__ == '__main__':
     main()
