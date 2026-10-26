@@ -78,8 +78,8 @@ controller_server:
     general_goal_checker:
       stateful: true
       plugin: nav2_controller::SimpleGoalChecker
-      xy_goal_tolerance: 0.05
-      yaw_goal_tolerance: 0.10
+      xy_goal_tolerance: 0.1
+      yaw_goal_tolerance: 0.15
     FollowPath:
       plugin: nav2_mppi_controller::MPPIController
       time_steps: 56
@@ -345,7 +345,7 @@ route_server:
 velocity_smoother:
   ros__parameters:
     smoothing_frequency: 20.0
-    stamp_smoothed_velocity_with_smoothing_time: false
+    stamp_smoothed_velocity_with_smoothing_time: true
     scale_velocities: false
     feedback: OPEN_LOOP
     max_velocity:

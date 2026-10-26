@@ -34,17 +34,27 @@ def wrap_angle(angle):
 
 
 def candidate_poses(pose, step_m=0.6):
-    """Eight adjacent map-aligned translations and four in-place turns."""
+    """Eight map-aligned translations and four in-place turns."""
     x, y, yaw = pose
     candidates = []
+
     for dx in (-step_m, 0.0, step_m):
         for dy in (-step_m, 0.0, step_m):
             if dx != 0.0 or dy != 0.0:
-                candidates.append((x + dx, y + dy, yaw,
-                                   f'move({dx:+.1f},{dy:+.1f})'))
+                goal_yaw = math.atan2(dy, dx)
+                candidates.append((
+                    x + dx,
+                    y + dy,
+                    goal_yaw,
+                    f'move({dx:+.1f},{dy:+.1f})'
+                ))
     for degrees in (-90, -45, 45, 90):
-        candidates.append((x, y, wrap_angle(yaw + math.radians(degrees)),
-                           f'turn({degrees:+d})'))
+        candidates.append((
+            x,
+            y,
+            wrap_angle(yaw + math.radians(degrees)),
+            f'turn({degrees:+d})'
+        ))
     return candidates
 
 
@@ -65,18 +75,6 @@ def safe_footprint(occupancy, spec, x, y, clearance_m=0.22):
                         y + clearance_m * math.sin(a)):
             return False
     return True
-
-
-def safe_straight_segment(occupancy, spec, start, goal, clearance_m=0.22):
-    """Conservative path filter; final feasibility still belongs to Nav2."""
-    x0, y0 = start[:2]
-    x1, y1 = goal[:2]
-    dist = math.hypot(x1 - x0, y1 - y0)
-    n = max(1, math.ceil(dist / (spec.resolution / 2)))
-    return all(safe_footprint(occupancy, spec,
-                              x0 + (x1 - x0) * j / n,
-                              y0 + (y1 - y0) * j / n,
-                              clearance_m) for j in range(n + 1))
 
 
 def predict_observation(occupancy, spec, pose, fov_deg=70.0,
@@ -140,7 +138,7 @@ def estimated_time(start, target, linear_speed=0.20, angular_speed=1.0):
     if dist < 1e-9:
         return abs(wrap_angle(target[2] - start[2])) / angular_speed
     travel_heading = math.atan2(dy, dx)
-    options = (travel_heading, wrap_angle(travel_heading + math.pi))
+    options = (travel_heading,)
     turns = [abs(wrap_angle(h - start[2])) +
              abs(wrap_angle(target[2] - h)) for h in options]
     return dist / linear_speed + min(turns) / angular_speed
@@ -157,13 +155,9 @@ def evaluate_candidates(occupancy, coverage, spec, current_pose,
     results = []
     for x, y, yaw, name in candidate_poses(current_pose, step_m):
         pose = (x, y, yaw)
-        safe = safe_straight_segment(occupancy, spec, current_pose,
-                                     pose, clearance_m)
-        if not safe:
-            results.append({'pose': pose, 'action': name, 'safe': False,
-                            'gain': 0.0, 'seconds': 0.0,
-                            'score': float('-inf'), 'visibility': {}})
+        if not safe_footprint(occupancy, spec, x, y, clearance_m):
             continue
+        
         vis = predict_observation(occupancy, spec, pose, fov_deg,
                                   max_range_m, ray_count, decay_length_m)
         gain = coverage_gain(coverage, vis, spec.resolution)

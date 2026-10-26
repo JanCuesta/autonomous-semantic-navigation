@@ -183,15 +183,15 @@ def generate_launch_description():
         DeclareLaunchArgument(
                 'start_mission_manager',
                 default_value='true'
-         ),
+        ),
         simulation_launcher,
         navigation_launcher,
         coverage_node,
         autonomous_node,
-        semantic_mission_manager_node,
+        #semantic_mission_manager_node,
         rviz_node,
-        search_command_node,
-        yolo_detector_node,
-        object_localization_node,
-        approach_goal_node,
+        #search_command_node,
+        #yolo_detector_node,
+        #object_localization_node,
+        #approach_goal_node,
     ])
