@@ -7,12 +7,13 @@ no target approach is sent. No hallucinated 'black/color' attribute checks.
 import json
 import time
 import cv2
+import numpy as np
 
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage, Image
 from std_msgs.msg import Bool, String
 
 from .target_filter import TargetFilter
@@ -23,6 +24,7 @@ class YoloDetectorNode(Node):
         super().__init__('yolo_detector_node')
         self.declare_parameters('', [
             ('image_topic', '/rgb'),
+            ('compressed_image', False),
             ('model', 'yolo11n.pt'),
             ('device', 'cpu'),
             ('confidence_threshold', 0.55),
@@ -69,7 +71,9 @@ class YoloDetectorNode(Node):
         self.create_subscription(String, '/semantic/search/target_class',
                                  self.on_target, qos)
         
-        self.create_subscription(Image,
+        image_type = (CompressedImage if self.get_parameter('compressed_image').value
+                      else Image)
+        self.create_subscription(image_type,
                                  str(self.get_parameter('image_topic').value),
                                  self.on_image, qos_profile_sensor_data)
         
@@ -98,7 +102,13 @@ class YoloDetectorNode(Node):
             return
         self.last_processed = now
         try:
-            image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+            if isinstance(msg, CompressedImage):
+                image = cv2.imdecode(np.frombuffer(msg.data, dtype=np.uint8),
+                                     cv2.IMREAD_COLOR)
+                if image is None:
+                    raise ValueError('Could not decode compressed RGB image')
+            else:
+                image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
             annotated = image.copy()
             results = self.model.predict(
                 source=image, verbose=False,
@@ -170,8 +180,8 @@ class YoloDetectorNode(Node):
             'frame_id': msg.header.frame_id,
             'timestamp_sec': msg.header.stamp.sec,
             'timestamp_nanosec': msg.header.stamp.nanosec,
-            'image_width': msg.width,
-            'image_height': msg.height,
+            'image_width': image.shape[1],
+            'image_height': image.shape[0],
             'detections': matches,
             'confirmation_count': self.filter.count,
             'confirmed': found,
