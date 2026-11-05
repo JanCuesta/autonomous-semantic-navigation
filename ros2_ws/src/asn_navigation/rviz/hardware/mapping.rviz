@@ -15,7 +15,6 @@ Panels:
     Name: Selection
   - Class: rviz_common/Tool Properties
     Expanded:
-      - /2D Goal Pose1
       - /Publish Point1
     Name: Tool Properties
     Splitter Ratio: 0.5886790156364441
@@ -88,9 +87,9 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 0
+      Max Intensity: 47
       Min Color: 0; 0; 0
-      Min Intensity: 0
+      Min Intensity: 47
       Name: LaserScan
       Position Transformer: XYZ
       Selectable: true
@@ -114,17 +113,85 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        base_footprint:
+          Value: true
         base_link:
           Value: true
-        laser_frame:
+        bump_front_center:
+          Value: true
+        bump_front_left:
+          Value: true
+        bump_front_right:
+          Value: true
+        bump_left:
+          Value: true
+        bump_right:
+          Value: true
+        bumper:
+          Value: true
+        button_1:
+          Value: true
+        button_2:
+          Value: true
+        button_power:
+          Value: true
+        cliff_front_left:
+          Value: true
+        cliff_front_right:
+          Value: true
+        cliff_side_left:
+          Value: true
+        cliff_side_right:
+          Value: true
+        front_caster_link:
+          Value: true
+        imu_link:
+          Value: true
+        ir_intensity_front_center_left:
+          Value: true
+        ir_intensity_front_center_right:
+          Value: true
+        ir_intensity_front_left:
+          Value: true
+        ir_intensity_front_right:
+          Value: true
+        ir_intensity_left:
+          Value: true
+        ir_intensity_right:
+          Value: true
+        ir_intensity_side_left:
+          Value: true
+        ir_omni:
           Value: true
         left_wheel:
           Value: true
         map:
           Value: true
+        mouse:
+          Value: true
+        oakd_camera_bracket:
+          Value: true
+        oakd_imu_frame:
+          Value: true
+        oakd_left_camera_frame:
+          Value: true
+        oakd_left_camera_optical_frame:
+          Value: true
+        oakd_link:
+          Value: true
+        oakd_rgb_camera_frame:
+          Value: true
+        oakd_rgb_camera_optical_frame:
+          Value: true
+        oakd_right_camera_frame:
+          Value: true
+        oakd_right_camera_optical_frame:
+          Value: true
         odom:
           Value: true
         right_wheel:
+          Value: true
+        rplidar_link:
           Value: true
         wheel_drop_left:
           Value: true
@@ -138,8 +205,71 @@ Visualization Manager:
       Tree:
         map:
           odom:
+            base_footprint:
+              {}
             base_link:
-              laser_frame:
+              bump_front_center:
+                {}
+              bump_front_left:
+                {}
+              bump_front_right:
+                {}
+              bump_left:
+                {}
+              bump_right:
+                {}
+              bumper:
+                {}
+              button_1:
+                {}
+              button_2:
+                {}
+              button_power:
+                {}
+              cliff_front_left:
+                {}
+              cliff_front_right:
+                {}
+              cliff_side_left:
+                {}
+              cliff_side_right:
+                {}
+              front_caster_link:
+                {}
+              imu_link:
+                {}
+              ir_intensity_front_center_left:
+                {}
+              ir_intensity_front_center_right:
+                {}
+              ir_intensity_front_left:
+                {}
+              ir_intensity_front_right:
+                {}
+              ir_intensity_left:
+                {}
+              ir_intensity_right:
+                {}
+              ir_intensity_side_left:
+                {}
+              ir_omni:
+                {}
+              mouse:
+                {}
+              oakd_camera_bracket:
+                oakd_link:
+                  oakd_imu_frame:
+                    {}
+                  oakd_left_camera_frame:
+                    oakd_left_camera_optical_frame:
+                      {}
+                  oakd_rgb_camera_frame:
+                    oakd_rgb_camera_optical_frame:
+                      {}
+                  oakd_right_camera_frame:
+                    oakd_right_camera_optical_frame:
+                      {}
+              rplidar_link:
                 {}
               wheel_drop_left:
                 left_wheel:
@@ -206,11 +336,106 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        laser_frame:
+          Value: true
+        bump_front_center:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        bump_front_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        bump_front_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        bump_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        bump_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        bumper:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        button_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        button_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        button_power:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cliff_front_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cliff_front_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cliff_side_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cliff_side_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        front_caster_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_intensity_front_center_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_intensity_front_center_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_intensity_front_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_intensity_front_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_intensity_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_intensity_right:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_intensity_side_left:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ir_omni:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -219,7 +444,54 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        mouse:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        oakd_camera_bracket:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        oakd_imu_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        oakd_left_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        oakd_left_camera_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        oakd_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        oakd_rgb_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        oakd_rgb_camera_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        oakd_right_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        oakd_right_camera_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rplidar_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -264,13 +536,6 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /initialpose
-    - Class: rviz_default_plugins/SetGoal
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /goal_pose
     - Class: rviz_default_plugins/PublishPoint
       Single click: true
       Topic:
@@ -285,7 +550,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -1.5799994468688965
+      Angle: 1.254998803138733
       Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -295,7 +560,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 90.1030502319336
+      Scale: 76.11172485351562
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz_default_plugins)
       X: 3.079125165939331

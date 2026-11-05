@@ -1,4 +1,4 @@
-"""Semantic pipeline for an already running, namespaced TurtleBot 4/Nav2.
+"""Semantic pipeline for an already running TurtleBot 4/Nav2.
 
 Default mode starts only target selection and RGB detection. Full mode requires
 verified aligned RGB-D, CameraInfo, PointCloud2, map, TF, and Nav2 interfaces.
@@ -7,10 +7,11 @@ Even in full mode, movement requires an explicit semantic mission start call.
 
 import os
 
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, PythonExpression
 from launch_ros.actions import Node
 
 
@@ -51,7 +52,10 @@ def generate_launch_description():
         ('/speed_limit', PathJoinSubstitution([robot, 'speed_limit'])),
         ('/tf', tf_topic), ('/tf_static', tf_static_topic),
     ]
-    full = IfCondition(LaunchConfiguration('enable_full_stack'))
+    full = IfCondition(PythonExpression(["'", LaunchConfiguration('enable_full_stack'), "'.lower() in ('true', '1', 'yes')"]))
+    perception = IfCondition(PythonExpression([
+        "'", LaunchConfiguration('enable_full_stack'), "'.lower() in ('true', '1', 'yes') or '",
+        LaunchConfiguration('enable_perception'), "'.lower() in ('true', '1', 'yes')"]))
     actual_time = {'use_sim_time': False}
 
     yolo = ExecuteProcess(
@@ -68,7 +72,7 @@ def generate_launch_description():
 
     localizer = Node(
         package='asn_semantical_navigation', executable='object_localizer_node',
-        name='object_localizer_node', condition=full, output='screen',
+        name='object_localizer_node', condition=perception, output='screen',
         remappings=robot_remappings,
         parameters=[actual_time, {
             'depth_topic': LaunchConfiguration('depth_topic'),
@@ -78,7 +82,7 @@ def generate_launch_description():
 
     coverage = Node(
         package='asn_semantical_navigation', executable='coverage_node',
-        name='coverage_node', condition=full, output='screen',
+        name='coverage_node', condition=perception, output='screen',
         remappings=robot_remappings + [
             ('/depth_pcl', LaunchConfiguration('pointcloud_topic'))],
         parameters=[actual_time])
@@ -115,19 +119,31 @@ def generate_launch_description():
         parameters=[actual_time])
 
     return LaunchDescription([
-        DeclareLaunchArgument('robot_namespace', default_value='robot_09'),
+        DeclareLaunchArgument('enable_full_stack', default_value='false'),
+        DeclareLaunchArgument('use_rviz', default_value='true'),
+        DeclareLaunchArgument('software_rendering', default_value='true'),
+        Node(package='rviz2', executable='rviz2', name='hardware_semantic_rviz',
+             condition=IfCondition(LaunchConfiguration('use_rviz')),
+             arguments=['-d', PythonExpression([
+                 "'", os.path.join(get_package_share_directory('asn_bringup'), 'config', 'hardware_semantic.rviz'),
+                 "' if '", LaunchConfiguration('enable_full_stack'), "'.lower() in ('true', '1', 'yes') else '",
+                 os.path.join(get_package_share_directory('asn_bringup'), 'config', 'hardware_stationary.rviz'), "'"])],
+             additional_env={'LIBGL_ALWAYS_SOFTWARE': PythonExpression(["'1' if '",
+                 LaunchConfiguration('software_rendering'), "'.lower() in ('true', '1', 'yes') else '0'"])},
+             parameters=[actual_time], output='screen'),
+        DeclareLaunchArgument('robot_namespace', default_value=''),
         DeclareLaunchArgument('rgb_topic', default_value=PathJoinSubstitution(
             [robot, 'oakd', 'rgb', 'image_raw', 'compressed'])),
-        DeclareLaunchArgument('depth_topic', default_value=''),
-        DeclareLaunchArgument('camera_info_topic', default_value=''),
-        DeclareLaunchArgument('pointcloud_topic', default_value=''),
+        DeclareLaunchArgument('depth_topic', default_value='/hardware_depth/image_raw'),
+        DeclareLaunchArgument('camera_info_topic', default_value=PathJoinSubstitution([robot, 'oakd', 'stereo', 'camera_info'])),
+        DeclareLaunchArgument('pointcloud_topic', default_value='/depth_pcl'),
         DeclareLaunchArgument('tf_topic', default_value=PathJoinSubstitution(
             [robot, 'tf'])),
         DeclareLaunchArgument('tf_static_topic', default_value=PathJoinSubstitution(
             [robot, 'tf_static'])),
         DeclareLaunchArgument('map_frame', default_value='map'),
         DeclareLaunchArgument('robot_frame', default_value='base_link'),
-        DeclareLaunchArgument('enable_full_stack', default_value='false'),
+        DeclareLaunchArgument('enable_perception', default_value='false'),
         DeclareLaunchArgument('perception_python', default_value=os.path.expanduser(
             '~/projects/autonomous-semantic-navigation/.venv-perception/bin/python')),
         OpaqueFunction(function=_check_full_stack),

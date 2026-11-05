@@ -9,10 +9,17 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <exec_depend>image_proc</exec_depend>
+  <exec_depend>depth_image_proc</exec_depend>
+  <exec_depend>image_transport</exec_depend>
+  <exec_depend>compressed_depth_image_transport</exec_depend>
+  <exec_depend>asn_semantical_navigation</exec_depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>nav2_bringup</exec_depend>
+  <exec_depend>rclcpp_components</exec_depend>
+  <exec_depend>nav2_map_server</exec_depend>
 
   <exec_depend>asn_description</exec_depend>
   <exec_depend>asn_simulation</exec_depend>

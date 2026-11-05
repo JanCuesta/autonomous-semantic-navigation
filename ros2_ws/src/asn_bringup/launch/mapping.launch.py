@@ -9,7 +9,7 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 
-def generate_launch_description():
+def _simulation_launch_description():
 
     # -------------------------
     # Package locations
@@ -75,4 +75,19 @@ def generate_launch_description():
     return LaunchDescription([
         slam_launcher,
         rviz,
+    ])
+
+def _select_profile(context):
+    from launch.substitutions import LaunchConfiguration
+    if LaunchConfiguration('hardware').perform(context).lower() in ('true', '1', 'yes'):
+        return [IncludeLaunchDescription(PythonLaunchDescriptionSource(os.path.join(
+            get_package_share_directory('asn_bringup'), 'launch', 'hardware', 'mapping_hardware.launch.py')))]
+    return list(_simulation_launch_description().entities)
+
+
+def generate_launch_description():
+    from launch.actions import DeclareLaunchArgument, OpaqueFunction
+    return LaunchDescription([
+        DeclareLaunchArgument('hardware', default_value='false'),
+        OpaqueFunction(function=_select_profile),
     ])

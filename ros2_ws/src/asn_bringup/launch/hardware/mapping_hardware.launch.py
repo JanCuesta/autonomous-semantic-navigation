@@ -1,78 +1,29 @@
-from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-
-from launch_ros.actions import Node
-
-from ament_index_python.packages import get_package_share_directory
-
 import os
+from ament_index_python.packages import get_package_share_directory as share
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, GroupAction
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration as LC
+from launch_ros.actions import Node, SetRemap
 
+def include(package, filename, arguments):
+    return IncludeLaunchDescription(PythonLaunchDescriptionSource(os.path.join(share(package), 'launch', filename)), launch_arguments=arguments.items())
+
+def check_map(context):
+    path = LC('map').perform(context)
+    if not path or not os.path.isfile(os.path.expanduser(path)):
+        raise RuntimeError('Supply map:=/absolute/path/to/your_saved_map.yaml; map file does not exist: ' + path)
+    return []
 
 def generate_launch_description():
-
-    # -------------------------
-    # Package locations
-    # -------------------------
-
-    slam_share = get_package_share_directory("slam_toolbox")
-    navigation_share = get_package_share_directory("asn_navigation")
-
-    # -------------------------
-    # File paths
-    # -------------------------
-
-    slam_launch_path = os.path.join(
-        slam_share,
-        "launch",
-        "online_async_launch.py"
-    )
-
-    slam_params = os.path.join(
-        navigation_share,
-        "config",
-        "slam_toolbox_mapping.yaml"
-    )
-
-    rviz_path = os.path.join(
-        navigation_share,
-        "rviz",
-        "mapping.rviz"
-    )
-
-    # -------------------------
-    # SLAM Toolbox
-    # -------------------------
-
-    slam_launcher = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(slam_launch_path),
-        launch_arguments={
-            "use_sim_time": "false",
-            "slam_params_file": slam_params,
-            "autostart": "true",
-            "use_lifecycle_manager": "false",
-        }.items()
-    )
-
-    # -------------------------
-    # RViz
-    # -------------------------
-
-    rviz = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        arguments=[
-            "-d",
-            rviz_path
-        ],
-        parameters=[{
-            "use_sim_time": False
-        }],
-        output="screen"
-    )
-
     return LaunchDescription([
-        slam_launcher,
-        rviz,
+        DeclareLaunchArgument('use_rviz', default_value='true'),
+        include('slam_toolbox', 'online_async_launch.py', {
+            'use_sim_time': 'false', 'autostart': 'true', 'use_lifecycle_manager': 'false',
+            'slam_params_file': os.path.join(share('asn_navigation'), 'config', 'hardware', 'slam_toolbox_mapping.yaml')}),
+        Node(package='rviz2', executable='rviz2', name='mapping_rviz',
+             condition=IfCondition(LC('use_rviz')),
+             arguments=['-d', os.path.join(share('asn_navigation'), 'rviz', 'hardware', 'mapping.rviz')],
+             parameters=[{'use_sim_time': False}], output='screen'),
     ])
