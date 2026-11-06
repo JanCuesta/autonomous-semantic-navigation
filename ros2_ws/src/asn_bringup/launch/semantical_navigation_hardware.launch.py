@@ -63,6 +63,7 @@ def generate_launch_description():
              'asn_semantical_navigation.yolo_detector_node', '--ros-args',
              '-p', 'image_topic:=/semantic/rgb_input/compressed',
              '-p', 'compressed_image:=true',
+             '-p', 'confidence_threshold:=0.40',
              '-p', ['model:=', LaunchConfiguration('detector_model')],
              '-p', ['detect_all_classes:=', LaunchConfiguration('detect_all_classes')],
              '-p', 'use_sim_time:=false'],
