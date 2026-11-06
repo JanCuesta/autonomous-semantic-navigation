@@ -30,6 +30,8 @@ class YoloDetectorNode(Node):
             ('confidence_threshold', 0.55),
             ('confirmation_frames', 3),
             ('processing_hz', 2.0),
+            ('detect_all_classes', False),
+            ('visualization_confidence_threshold', 0.35),
         ])
         try:
             from ultralytics import YOLO
@@ -61,6 +63,9 @@ class YoloDetectorNode(Node):
             '/semantic/search/detections_json', 
             10
             )
+
+        self.all_detections_pub = self.create_publisher(
+            String, '/semantic/perception/all_detections_json', 10)
 
         self.annotated_pub = self.create_publisher(
             Image,
@@ -94,8 +99,13 @@ class YoloDetectorNode(Node):
         self.get_logger().info(f'Waiting for camera evidence of {msg.data!r}')
 
     def on_image(self, msg):
-        if not self.target_valid or not self.filter.target:
+        target_active = self.target_valid and bool(self.filter.target)
+        show_all = bool(self.get_parameter('detect_all_classes').value)
+        if not target_active and not show_all:
             return
+        target_threshold = float(self.get_parameter('confidence_threshold').value)
+        display_threshold = float(self.get_parameter('visualization_confidence_threshold').value)
+        inference_threshold = min(target_threshold, display_threshold) if show_all else target_threshold
         interval = 1 / max(0.1, self.get_parameter('processing_hz').value)
         now = time.monotonic()
         if now - self.last_processed < interval:
@@ -113,24 +123,36 @@ class YoloDetectorNode(Node):
             results = self.model.predict(
                 source=image, verbose=False,
                 device=self.get_parameter('device').value,
-                conf=self.get_parameter('confidence_threshold').value)
+                conf=inference_threshold)
             boxes = results[0].boxes
         except Exception as exc:
             self.get_logger().error(f'YOLO inference failed: {exc}')
             return
         confidence = {}
         matches = []
+        all_detections = []
         for box in boxes:
             label = self.model.names[int(box.cls[0])]
             score = float(box.conf[0])
             confidence[label] = max(confidence.get(label, 0.0), score)
-            if label == self.filter.target:
-                matches.append({
-                    'class': label, 'confidence': round(score, 3),
-                    'bbox_xyxy': [round(float(v), 1)
-                                  for v in box.xyxy[0].tolist()]})
-        #Create the BoundignBox for Rviz
-        for detection in matches:
+            detection = {
+                'class': label, 'confidence': round(score, 3),
+                'bbox_xyxy': [round(float(v), 1)
+                              for v in box.xyxy[0].tolist()]}
+            if score >= display_threshold:
+                all_detections.append(detection)
+            if target_active and label == self.filter.target and score >= target_threshold:
+                matches.append(detection)
+        if show_all:
+            self.all_detections_pub.publish(String(data=json.dumps({
+                'frame_id': msg.header.frame_id,
+                'timestamp_sec': msg.header.stamp.sec,
+                'timestamp_nanosec': msg.header.stamp.nanosec,
+                'image_width': image.shape[1], 'image_height': image.shape[0],
+                'detections': all_detections,
+            })))
+        # Show all classes until a search target is selected; then show only it.
+        for detection in matches if target_active else all_detections:
             x1, y1, x2, y2 = detection['bbox_xyxy']
 
             #Find corresponding pixels:
@@ -172,6 +194,9 @@ class YoloDetectorNode(Node):
         )
         annotated_msg.header = msg.header
         self.annotated_pub.publish(annotated_msg)
+
+        if not target_active:
+            return
 
         just_confirmed = not self.filter.confirmed and bool(matches)
         found = self.filter.update(confidence)

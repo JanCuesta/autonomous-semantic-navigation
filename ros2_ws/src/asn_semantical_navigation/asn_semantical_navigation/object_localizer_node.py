@@ -361,7 +361,7 @@ class ObjectLocalizer(Node):
             if (self.valid and self.last_valid_wall_time > 0 and
                     time.monotonic() - self.last_valid_wall_time <
                     float(self.get_parameter('target_timeout_s').value)):
-                self.report('HOLDING: last validated map target; waiting '
+                self.report('HOLDING: last validated target; waiting '
                             'for fresh RGB-D confirmation')
                 return
             self.invalidate('WAITING: no confirmed YOLO detection')
@@ -511,7 +511,7 @@ class ObjectLocalizer(Node):
             )
             map_point = do_transform_point(point, tf)
         except TransformException as exc:
-            self.invalidate(f'WAITING: map TF at camera timestamp: {exc}')
+            self.invalidate(f'WAITING: target-frame TF at camera timestamp: {exc}')
             return
         xyz = np.array([map_point.point.x, map_point.point.y, map_point.point.z])
         if not np.all(np.isfinite(xyz)):
@@ -532,7 +532,7 @@ class ObjectLocalizer(Node):
             self.valid = False
             self.valid_pub.publish(Bool(data=False))
             self.report(
-                f'OBSERVING: {len(self.position_history)}/{required} map poses; '
+                f'OBSERVING: {len(self.position_history)}/{required} target poses; '
                 f'camera depth={z:.2f}m, dt={dt:.3f}s; {depth_note}'
             )
             return
@@ -550,16 +550,16 @@ class ObjectLocalizer(Node):
         self.valid = True
         self.last_valid_wall_time = time.monotonic()
         self.report(
-            f'LOCALIZED {data["target"]}: map=({pose.pose.position.x:.2f}, '
+            f'LOCALIZED {data["target"]}: {pose.header.frame_id}=({pose.pose.position.x:.2f}, '
             f'{pose.pose.position.y:.2f}, {pose.pose.position.z:.2f})m; '
             f'depth={z:.2f}m; dt={dt:.3f}s; {depth_note}'
         )
 
 
     def publish_marker(self, pose):
-        # After a completed mission, wait for another mission before
-        # displaying new detections; preserve live validity messages.
-        if self.mission_state in ('IDLE', 'SUCCEEDED', 'FAILED', 'CANCELLED'):
+        # Show live validated detections while idle. After a completed mission,
+        # keep its cleanup behavior until the next mission is started.
+        if self.mission_state in ('SUCCEEDED', 'FAILED', 'CANCELLED'):
             return
         self.last_marker_pose = pose
         marker = Marker()

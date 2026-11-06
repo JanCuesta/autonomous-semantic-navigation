@@ -2,6 +2,8 @@
 # Read-only ROS 2 connectivity and interface check for the TurtleBot 4 laptop side.
 # Source ROS 2 and the project workspace before running this script.
 set -u
+asn_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$asn_root/ros2_ws/hardware_env.bash"
 
 stamp=$(date +%Y%m%d_%H%M%S)
 report="turtlebot4_hardware_check_${stamp}.txt"
@@ -52,7 +54,7 @@ report="turtlebot4_hardware_check_${stamp}.txt"
   echo
 
   echo "===== QUICK TF CHECKS ====="
-  for pair in "odom base_link" "map odom" "base_link laser_frame" "base_footprint base_link"; do
+  for pair in "odom base_link" "map odom" "base_link rplidar_link" "base_footprint base_link"; do
     read -r parent child <<< "$pair"
     echo "--- $parent -> $child (3 seconds) ---"
     timeout 3s ros2 run tf2_ros tf2_echo "$parent" "$child" 2>&1 || true

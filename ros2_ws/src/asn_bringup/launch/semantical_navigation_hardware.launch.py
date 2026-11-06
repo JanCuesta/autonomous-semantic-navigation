@@ -61,9 +61,18 @@ def generate_launch_description():
     yolo = ExecuteProcess(
         cmd=[LaunchConfiguration('perception_python'), '-m',
              'asn_semantical_navigation.yolo_detector_node', '--ros-args',
-             '-p', ['image_topic:=', LaunchConfiguration('rgb_topic')],
+             '-p', 'image_topic:=/semantic/rgb_input/compressed',
              '-p', 'compressed_image:=true',
+             '-p', ['model:=', LaunchConfiguration('detector_model')],
+             '-p', ['detect_all_classes:=', LaunchConfiguration('detect_all_classes')],
              '-p', 'use_sim_time:=false'],
+        output='screen')
+
+    # Decode compressed RGB locally without requiring the transport plugin.
+    rgb_preview = ExecuteProcess(
+        cmd=[LaunchConfiguration('perception_python'), '-m',
+             'asn_semantical_navigation.rgb_preview_node', '--ros-args',
+             '-p', ['image_topic:=', LaunchConfiguration('rgb_topic')]],
         output='screen')
 
     search = Node(
@@ -119,6 +128,11 @@ def generate_launch_description():
         parameters=[actual_time])
 
     return LaunchDescription([
+        DeclareLaunchArgument('detector_model', default_value=(
+            os.path.expanduser('~/.cache/asn/models/yolo11s.pt')
+            if os.path.isfile(os.path.expanduser('~/.cache/asn/models/yolo11s.pt'))
+            else 'yolo11n.pt')),
+        DeclareLaunchArgument('detect_all_classes', default_value='true'),
         DeclareLaunchArgument('enable_full_stack', default_value='false'),
         DeclareLaunchArgument('use_rviz', default_value='true'),
         DeclareLaunchArgument('software_rendering', default_value='true'),
@@ -147,5 +161,5 @@ def generate_launch_description():
         DeclareLaunchArgument('perception_python', default_value=os.path.expanduser(
             '~/projects/autonomous-semantic-navigation/.venv-perception/bin/python')),
         OpaqueFunction(function=_check_full_stack),
-        search, yolo, localizer, coverage, approach, nbv, mission,
+        rgb_preview, search, yolo, localizer, coverage, approach, nbv, mission,
     ])
