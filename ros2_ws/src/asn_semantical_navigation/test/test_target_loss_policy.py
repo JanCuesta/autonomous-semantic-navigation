@@ -4,10 +4,16 @@ from types import SimpleNamespace
 import pytest
 
 from asn_semantical_navigation import semantical_mission_manager_node as mapped
-from asn_semantical_navigation_mapless import semantical_mission_manager_node as mapless
+try:
+    from asn_semantical_navigation_mapless import semantical_mission_manager_node as mapless
+except ImportError:
+    mapless = None
+
+MODULES = [mapped] + ([mapless] if mapless is not None else [])
+CASES = [(mapped, 'map')] + ([(mapless, 'odom')] if mapless is not None else [])
 
 
-@pytest.mark.parametrize('module,frame', [(mapped, 'map'), (mapless, 'odom')])
+@pytest.mark.parametrize('module,frame', CASES)
 def test_freshness_rejects_delayed_future_and_invalid_observations(module, frame):
     from geometry_msgs.msg import PoseStamped
     pose = PoseStamped()
@@ -29,7 +35,7 @@ def test_freshness_rejects_delayed_future_and_invalid_observations(module, frame
     assert get(m) is None
 
 
-@pytest.mark.parametrize('module', [mapped, mapless])
+@pytest.mark.parametrize('module', MODULES)
 def test_lost_target_during_approach_requests_abort(module):
     calls = []
     m = SimpleNamespace(state=module.State.APPROACHING, since=time.monotonic(),
@@ -39,7 +45,7 @@ def test_lost_target_during_approach_requests_abort(module):
     assert calls and calls[0][0] == module.State.FAILED
 
 
-@pytest.mark.parametrize('module', [mapped, mapless])
+@pytest.mark.parametrize('module', MODULES)
 def test_loss_while_goal_pending_cancels_after_acceptance(module):
     class Future:
         def __init__(self, value): self.value = value
