@@ -831,6 +831,9 @@ class SemanticMissionManager(Node):
             'minimum_target_distance_m')
 
     def send_approach(self):
+        if self.localized_target_snapshot() is None:
+            self.abort(State.FAILED, 'Live target localization lost before submission')
+            return
         if not self.nav_quiet():
             return
         self.goal = PoseStamped()
@@ -874,6 +877,8 @@ class SemanticMissionManager(Node):
             return
         if self.state == State.CANCELLING or self.cancel_goal_on_accept:
             self.request_approach_cancel()
+        elif self.localized_target_snapshot() is None:
+            self.abort(State.FAILED, 'Live target localization lost before goal acceptance')
         else:
             self.set_state(State.APPROACHING, 'Nav2 accepted approach goal')
 
@@ -1096,7 +1101,9 @@ class SemanticMissionManager(Node):
             elif elapsed > self.param('approach_preview_timeout_s'):
                 self.set_state(State.FAILED, 'No fresh valid approach preview')
         elif self.state == State.APPROACHING:
-            if time.monotonic() - self.approach_at > self.param('approach_timeout_s'):
+            if self.localized_target_snapshot() is None:
+                self.abort(State.FAILED, 'Live target localization lost during approach')
+            elif time.monotonic() - self.approach_at > self.param('approach_timeout_s'):
                 self.abort(State.FAILED, 'Approach action timed out')
         elif self.state == State.VERIFYING:
             if not self.verify() and elapsed > self.param('verify_timeout_s'):
