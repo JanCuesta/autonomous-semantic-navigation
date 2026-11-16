@@ -90,3 +90,7 @@ No autonomous motion starts simply because the launch file was run: motion must 
 - Existing mission manager's Nav2 action references are compatibility interfaces to the **new** local action server, not claims that Nav2 is running.
 - RGB-D and LiDAR calibration, sensor QoS, clock synchronization, and the velocity interface must be validated in your specific sim/hardware setup.
 - No source or unit tests here prove collision-free real-world performance.
+
+### Target freshness and hardware restriction
+
+The mission manager requires a fresh original observation timestamp and cancels an approach if live localization is lost, including temporary occlusion. Goal acceptance and cancellation behavior still need isolated runtime validation. This experimental stack is not cleared for physical motion; its default isolated command topic and motion-disabled setting must remain in effect on hardware.

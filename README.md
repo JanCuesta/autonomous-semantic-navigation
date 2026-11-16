@@ -130,3 +130,7 @@ The checked-in AMCL launch currently selects **`v4_sim_map.yaml`**. In RViz, ini
 Code and project-authored documentation are presented under [Apache-2.0](LICENSE), consistent with the license declarations of the existing ROS 2 packages. Third-party robotics frameworks, robot assets and meshes retain any applicable upstream rights; verify their terms independently before redistribution or reuse.
 
 **Maintainer:** [Jan Cuesta](https://github.com/JanCuesta)
+
+## Architecture and safety status
+
+See [Architecture, safety and verification status](docs/ARCHITECTURE_AND_SAFETY.md) for package boundaries, target-loss behavior, static-map limitations, goal ownership restrictions and test classes. The mapless stack remains experimental and motion-disabled by default. Independent Nav2 clients are not globally arbitrated; no concurrent autonomous or manual goals are supported without an explicitly verified handoff.
