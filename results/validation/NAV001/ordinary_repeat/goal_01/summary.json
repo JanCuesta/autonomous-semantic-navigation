@@ -1,0 +1,95 @@
+{
+  "index": 1,
+  "mode": "auto",
+  "goal_uuid": "f05aeb34e03d4376b5ad4d2e5f75edb4",
+  "start": {
+    "x": 0.28151510990272266,
+    "y": 0.07668790081513399,
+    "yaw_deg": -79.21513218331445
+  },
+  "goal": {
+    "x": 0.10050128178115525,
+    "y": -0.44267131401480975,
+    "yaw_deg": -109.21513218331444,
+    "distance_m": 0.55,
+    "yaw_change_deg": -29.999999999999993
+  },
+  "goal_check": {
+    "segment_max_cost": 0,
+    "goal_cost": 0
+  },
+  "terminal_status": "SUCCEEDED",
+  "status_topic_final": "SUCCEEDED",
+  "cancel_reason": null,
+  "cancel_response": null,
+  "interrupted": false,
+  "final_pose": {
+    "x": 0.1836651196845315,
+    "y": -0.3887865759449396,
+    "yaw_deg": -109.53682144371432,
+    "tf_stamp_s": 1606.75
+  },
+  "settle": {
+    "stationary": true,
+    "odom_vx": -7.415413708206386e-05,
+    "odom_wz": -0.0006225685255819315,
+    "still_sim_s": 1.0
+  },
+  "active_goals_after": [],
+  "velocity_stats_during_goal": {
+    "/odom": {
+      "n": 561,
+      "max_abs_vx": 0.0548530937192075,
+      "max_abs_wz": 0.23278695886716116,
+      "last_vx": -5.4273160482796696e-05,
+      "last_wz": -0.00045565578442445385,
+      "last_phase": "settle"
+    },
+    "/cmd_vel_nav": {
+      "n": 968,
+      "max_abs_vx": 0.055623505264520645,
+      "max_abs_wz": 0.2377810776233673,
+      "last_vx": 0.0,
+      "last_wz": 0.0,
+      "last_phase": "goal"
+    },
+    "/cmd_vel_smoothed": {
+      "n": 967,
+      "max_abs_vx": 0.055623505264520645,
+      "max_abs_wz": 0.2377810776233673,
+      "last_vx": 0.0,
+      "last_wz": 0.0,
+      "last_phase": "settle"
+    },
+    "/diff_drive_controller/cmd_vel": {
+      "n": 709,
+      "max_abs_vx": 0.05543673038482666,
+      "max_abs_wz": 0.2377810776233673,
+      "last_vx": 0.0,
+      "last_wz": 0.0,
+      "last_phase": "settle"
+    }
+  },
+  "scan_min_during_goal_m": 0.5013847351074219,
+  "collision_monitor_actions": [],
+  "commanded_stall_sim_s": 0.0,
+  "duration_wall_s": 48.38063700899875,
+  "duration_sim_s": 11.233333333000019,
+  "last_feedback": {
+    "distance_remaining": 0.13157007098197937,
+    "navigation_time_s": 11.233333333,
+    "recoveries": 0
+  },
+  "error_xy_m": 0.09909484815911246,
+  "error_yaw_rad": 0.005614536762283295,
+  "collision_suspected": false,
+  "acceptance": {
+    "succeeded": true,
+    "xy_ok": true,
+    "yaw_ok": true,
+    "no_collision": true,
+    "stationary": true,
+    "no_active_goals_after": true
+  },
+  "pass": true
+}

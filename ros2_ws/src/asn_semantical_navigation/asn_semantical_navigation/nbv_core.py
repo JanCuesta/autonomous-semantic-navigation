@@ -77,6 +77,24 @@ def safe_footprint(occupancy, spec, x, y, clearance_m=0.22):
     return True
 
 
+def safe_straight_segment(occupancy, spec, start_pose, end_pose):
+    """Return whether every sampled cell along a straight segment is free.
+
+    This is deliberately a static-map guard only. Nav2's rolling local
+    costmap remains responsible for dynamic obstacles while travelling.
+    """
+    x0, y0 = start_pose[:2]
+    x1, y1 = end_pose[:2]
+    distance = math.hypot(x1 - x0, y1 - y0)
+    samples = max(2, math.ceil(distance / (spec.resolution / 2.0)) + 1)
+    for ratio in np.linspace(0.0, 1.0, samples):
+        if not _is_free(occupancy, spec,
+                        x0 + ratio * (x1 - x0),
+                        y0 + ratio * (y1 - y0)):
+            return False
+    return True
+
+
 def predict_observation(occupancy, spec, pose, fov_deg=70.0,
                         max_range_m=3.0, ray_count=71,
                         decay_length_m=1.5):

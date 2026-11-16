@@ -21,6 +21,14 @@ from rclpy.qos import (
     qos_profile_sensor_data
 )
 
+from .coverage_core import coverage_for_map, reproject_coverage
+from .nbv_core import GridSpec
+
+
+def yaw_from_quaternion(q):
+    return math.atan2(2.0 * (q.w * q.z + q.x * q.y),
+                      1.0 - 2.0 * (q.y * q.y + q.z * q.z))
+
 
 class CoverageNode(Node):
 
@@ -57,6 +65,7 @@ class CoverageNode(Node):
         self.coverage_grid = None
         self.map_info = None
         self.map_frame = None
+        self.map_spec = None
         self.last_processed_stamp = None
 
         self.tf_buffer = Buffer()
@@ -64,20 +73,29 @@ class CoverageNode(Node):
         self.declare_parameter('processing_hz', 2.0)
 
     def map_callback(self, msg):
-
-        # Convert the navigation map to a 2D matrix
-        self.map_grid = np.array(
+        """Synchronize RGB-D coverage with the evolving SLAM occupancy grid."""
+        new_map_grid = np.array(
             msg.data, dtype=np.int8
         ).reshape(msg.info.height, msg.info.width)
-
-        # Initialize our coverage map only once
+        origin = msg.info.origin
+        new_spec = GridSpec(
+            msg.info.resolution, origin.position.x, origin.position.y,
+            yaw_from_quaternion(origin.orientation))
         if self.coverage_grid is None:
-
-            # Free cells (0) -> not observed (0)
-            # Walls/unknown -> not eligible (-1)
-            self.coverage_grid = np.where(
-                self.map_grid == 0, 0, -1
-            ).astype(np.int8)
+            self.coverage_grid = coverage_for_map(new_map_grid)
+        elif (self.map_spec != new_spec or
+              self.coverage_grid.shape != new_map_grid.shape):
+            self.coverage_grid = reproject_coverage(
+                self.coverage_grid, self.map_spec, new_map_grid, new_spec)
+            self.get_logger().info(
+                'Coverage map reprojected after SLAM geometry update')
+        else:
+            # Retain confidence only in cells still free in the current map.
+            became_free = (new_map_grid == 0) & (self.coverage_grid < 0)
+            self.coverage_grid[new_map_grid != 0] = -1
+            self.coverage_grid[became_free] = 0
+        self.map_grid = new_map_grid
+        self.map_spec = new_spec
 
         # Create a ROS message for our coverage map
         coverage_msg = OccupancyGrid()
@@ -241,13 +259,7 @@ class CoverageNode(Node):
 
 
     def world_to_cell(self, x, y):
-        resolution = self.map_info.resolution
-        origin = self.map_info.origin.position
-
-        col = math.floor((x - origin.x) / resolution)
-        row = math.floor((y - origin.y) / resolution)
-
-        return row, col
+        return self.map_spec.world_to_cell(x, y)
 
     def paint_ray(self, start_x, start_y, end_x, end_y, ray_distance):
 
@@ -268,9 +280,6 @@ class CoverageNode(Node):
 
         height, width = self.map_grid.shape
 
-        resolution = self.map_info.resolution
-        origin = self.map_info.origin.position
-
         # Total horizontal length of the projected ray
         horizontal_distance = math.hypot(
             end_x - start_x,
@@ -287,9 +296,8 @@ class CoverageNode(Node):
             if self.map_grid[row, col] != 0:
                 break
 
-            # Position of current cell center in map coordinates
-            cell_x = origin.x + (col + 0.5) * resolution
-            cell_y = origin.y + (row + 0.5) * resolution
+            # Position of current cell center in map coordinates.
+            cell_x, cell_y = self.map_spec.cell_to_world(row, col)
 
             # Estimate progress along the 3D camera ray
             if horizontal_distance > 1e-6:

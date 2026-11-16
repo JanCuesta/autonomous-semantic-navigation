@@ -1,0 +1,540 @@
+{
+  "args": {
+    "output": "results/validation/NAV001/ordinary_repeat",
+    "goal": null,
+    "count": 3,
+    "dry_run": false,
+    "sim_timeout_s": 120.0,
+    "wall_guard_s": 600.0,
+    "clock_stale_s": 15.0,
+    "accept_timeout_s": 10.0,
+    "cancel_wait_s": 30.0,
+    "settle_wall_s": 30.0,
+    "stationary_s": 1.0,
+    "stationary_v": 0.01,
+    "stationary_w": 0.02,
+    "clearance_m": 0.3,
+    "max_occupancy": 0,
+    "max_segment_cost": 50,
+    "max_goal_cost": 20,
+    "min_yaw_change_deg": 20.0,
+    "extra_yaw_deg": 0.0,
+    "contact_range_m": 0.12,
+    "start_skip_m": 0.15
+  },
+  "runs": [
+    {
+      "index": 1,
+      "preflight": {
+        "clock_advancing": {
+          "ok": true,
+          "sim_s": 1594.216666666,
+          "rtf": 0.241
+        },
+        "action_server": {
+          "ok": true
+        },
+        "no_active_goals": {
+          "ok": true,
+          "active": []
+        },
+        "tf_map_base_link": {
+          "ok": true,
+          "pose": [
+            0.28151510990272266,
+            0.07668790081513399,
+            -1.3825648740013614
+          ],
+          "age_sim_s": -0.2333333340000081
+        },
+        "tf_odom_base_link": {
+          "ok": true
+        },
+        "odom_fresh_stationary": {
+          "ok": true,
+          "vx": -5.468867609802209e-05,
+          "wz": -0.00045914428761667443
+        },
+        "scan_fresh": {
+          "ok": true,
+          "min_range_m": 0.5832130908966064
+        },
+        "collision_protection": {
+          "ok": true,
+          "base_cmd_publishers": [
+            "collision_monitor"
+          ],
+          "base_cmd_subscribers": [
+            "diff_drive_controller",
+            "nav001_action_recorder"
+          ],
+          "cmd_vel_smoothed_subscribers": [
+            "collision_monitor",
+            "nav001_action_recorder"
+          ]
+        },
+        "online_slam_map": {
+          "ok": true,
+          "map_publishers": [
+            "slam_toolbox"
+          ]
+        },
+        "global_costmap": {
+          "ok": true
+        },
+        "ros_domain": {
+          "ok": true,
+          "ROS_DOMAIN_ID": "0",
+          "RMW_IMPLEMENTATION": ""
+        }
+      },
+      "selected_goal": {
+        "x": 0.10050128178115525,
+        "y": -0.44267131401480975,
+        "yaw_deg": -109.21513218331444,
+        "check": {
+          "segment_max_cost": 0,
+          "goal_cost": 0
+        },
+        "mode": "auto"
+      },
+      "summary": {
+        "index": 1,
+        "mode": "auto",
+        "goal_uuid": "f05aeb34e03d4376b5ad4d2e5f75edb4",
+        "start": {
+          "x": 0.28151510990272266,
+          "y": 0.07668790081513399,
+          "yaw_deg": -79.21513218331445
+        },
+        "goal": {
+          "x": 0.10050128178115525,
+          "y": -0.44267131401480975,
+          "yaw_deg": -109.21513218331444,
+          "distance_m": 0.55,
+          "yaw_change_deg": -29.999999999999993
+        },
+        "goal_check": {
+          "segment_max_cost": 0,
+          "goal_cost": 0
+        },
+        "terminal_status": "SUCCEEDED",
+        "status_topic_final": "SUCCEEDED",
+        "cancel_reason": null,
+        "cancel_response": null,
+        "interrupted": false,
+        "final_pose": {
+          "x": 0.1836651196845315,
+          "y": -0.3887865759449396,
+          "yaw_deg": -109.53682144371432,
+          "tf_stamp_s": 1606.75
+        },
+        "settle": {
+          "stationary": true,
+          "odom_vx": -7.415413708206386e-05,
+          "odom_wz": -0.0006225685255819315,
+          "still_sim_s": 1.0
+        },
+        "active_goals_after": [],
+        "velocity_stats_during_goal": {
+          "/odom": {
+            "n": 561,
+            "max_abs_vx": 0.0548530937192075,
+            "max_abs_wz": 0.23278695886716116,
+            "last_vx": -5.4273160482796696e-05,
+            "last_wz": -0.00045565578442445385,
+            "last_phase": "settle"
+          },
+          "/cmd_vel_nav": {
+            "n": 968,
+            "max_abs_vx": 0.055623505264520645,
+            "max_abs_wz": 0.2377810776233673,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "goal"
+          },
+          "/cmd_vel_smoothed": {
+            "n": 967,
+            "max_abs_vx": 0.055623505264520645,
+            "max_abs_wz": 0.2377810776233673,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "settle"
+          },
+          "/diff_drive_controller/cmd_vel": {
+            "n": 709,
+            "max_abs_vx": 0.05543673038482666,
+            "max_abs_wz": 0.2377810776233673,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "settle"
+          }
+        },
+        "scan_min_during_goal_m": 0.5013847351074219,
+        "collision_monitor_actions": [],
+        "commanded_stall_sim_s": 0.0,
+        "duration_wall_s": 48.38063700899875,
+        "duration_sim_s": 11.233333333000019,
+        "last_feedback": {
+          "distance_remaining": 0.13157007098197937,
+          "navigation_time_s": 11.233333333,
+          "recoveries": 0
+        },
+        "error_xy_m": 0.09909484815911246,
+        "error_yaw_rad": 0.005614536762283295,
+        "collision_suspected": false,
+        "acceptance": {
+          "succeeded": true,
+          "xy_ok": true,
+          "yaw_ok": true,
+          "no_collision": true,
+          "stationary": true,
+          "no_active_goals_after": true
+        },
+        "pass": true
+      }
+    },
+    {
+      "index": 2,
+      "preflight": {
+        "clock_advancing": {
+          "ok": true,
+          "sim_s": 1607.483333333,
+          "rtf": 0.232
+        },
+        "action_server": {
+          "ok": true
+        },
+        "no_active_goals": {
+          "ok": true,
+          "active": []
+        },
+        "tf_map_base_link": {
+          "ok": true,
+          "pose": [
+            0.1836826598729713,
+            -0.38873717945145514,
+            -1.9122182689697407
+          ],
+          "age_sim_s": -0.18333333300006416
+        },
+        "tf_odom_base_link": {
+          "ok": true
+        },
+        "odom_fresh_stationary": {
+          "ok": true,
+          "vx": -6.801724705971223e-05,
+          "wz": -0.0005710456473823544
+        },
+        "scan_fresh": {
+          "ok": true,
+          "min_range_m": 0.5018229484558105
+        },
+        "collision_protection": {
+          "ok": true,
+          "base_cmd_publishers": [
+            "collision_monitor"
+          ],
+          "base_cmd_subscribers": [
+            "diff_drive_controller",
+            "nav001_action_recorder"
+          ],
+          "cmd_vel_smoothed_subscribers": [
+            "collision_monitor",
+            "nav001_action_recorder"
+          ]
+        },
+        "online_slam_map": {
+          "ok": true,
+          "map_publishers": [
+            "slam_toolbox"
+          ]
+        },
+        "global_costmap": {
+          "ok": true
+        },
+        "ros_domain": {
+          "ok": true,
+          "ROS_DOMAIN_ID": "0",
+          "RMW_IMPLEMENTATION": ""
+        }
+      },
+      "selected_goal": {
+        "x": 0.5404260509145712,
+        "y": -0.8073469654671911,
+        "yaw_deg": -49.562036319778215,
+        "check": {
+          "segment_max_cost": 0,
+          "goal_cost": 0
+        },
+        "mode": "auto"
+      },
+      "summary": {
+        "index": 2,
+        "mode": "auto",
+        "goal_uuid": "5c4c81b1c6374c10afed6fa75a425786",
+        "start": {
+          "x": 0.1836826598729713,
+          "y": -0.38873717945145514,
+          "yaw_deg": -109.56203631977822
+        },
+        "goal": {
+          "x": 0.5404260509145712,
+          "y": -0.8073469654671911,
+          "yaw_deg": -49.562036319778215,
+          "distance_m": 0.5500000000000002,
+          "yaw_change_deg": 59.99999999999999
+        },
+        "goal_check": {
+          "segment_max_cost": 0,
+          "goal_cost": 0
+        },
+        "terminal_status": "SUCCEEDED",
+        "status_topic_final": "SUCCEEDED",
+        "cancel_reason": null,
+        "cancel_response": null,
+        "interrupted": false,
+        "final_pose": {
+          "x": 0.4531135093724527,
+          "y": -0.856072465789568,
+          "yaw_deg": -49.623450039607874,
+          "tf_stamp_s": 1646.733333333
+        },
+        "settle": {
+          "stationary": true,
+          "odom_vx": -5.1140784194526794e-05,
+          "odom_wz": -0.0004293576038496079,
+          "still_sim_s": 1.0
+        },
+        "active_goals_after": [],
+        "velocity_stats_during_goal": {
+          "/odom": {
+            "n": 1901,
+            "max_abs_vx": 0.047448675279602934,
+            "max_abs_wz": 0.30701217305319733,
+            "last_vx": -4.858374498480046e-05,
+            "last_wz": -0.00040788972365712753,
+            "last_phase": "settle"
+          },
+          "/cmd_vel_nav": {
+            "n": 3142,
+            "max_abs_vx": 0.04754966124892235,
+            "max_abs_wz": 0.31801196932792664,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "goal"
+          },
+          "/cmd_vel_smoothed": {
+            "n": 3143,
+            "max_abs_vx": 0.04754966124892235,
+            "max_abs_wz": 0.31801196932792664,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "settle"
+          },
+          "/diff_drive_controller/cmd_vel": {
+            "n": 2356,
+            "max_abs_vx": 0.04754966124892235,
+            "max_abs_wz": 0.3156384527683258,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "settle"
+          }
+        },
+        "scan_min_during_goal_m": 0.4000000059604645,
+        "collision_monitor_actions": [],
+        "commanded_stall_sim_s": 0.0,
+        "duration_wall_s": 157.170392774,
+        "duration_sim_s": 38.01666666699998,
+        "last_feedback": {
+          "distance_remaining": 0.1340337097644806,
+          "navigation_time_s": 38.0,
+          "recoveries": 1
+        },
+        "error_xy_m": 0.09998827077317676,
+        "error_yaw_rad": 0.001071871616924902,
+        "collision_suspected": false,
+        "acceptance": {
+          "succeeded": true,
+          "xy_ok": true,
+          "yaw_ok": true,
+          "no_collision": true,
+          "stationary": true,
+          "no_active_goals_after": true
+        },
+        "pass": true
+      }
+    },
+    {
+      "index": 3,
+      "preflight": {
+        "clock_advancing": {
+          "ok": true,
+          "sim_s": 1647.45,
+          "rtf": 0.242
+        },
+        "action_server": {
+          "ok": true
+        },
+        "no_active_goals": {
+          "ok": true,
+          "active": []
+        },
+        "tf_map_base_link": {
+          "ok": true,
+          "pose": [
+            0.45307781661740254,
+            -0.8560304724682253,
+            -0.8665552937770706
+          ],
+          "age_sim_s": -0.25
+        },
+        "tf_odom_base_link": {
+          "ok": true
+        },
+        "odom_fresh_stationary": {
+          "ok": true,
+          "vx": -5.7277678297870014e-05,
+          "wz": -0.0004808805163115608
+        },
+        "scan_fresh": {
+          "ok": true,
+          "min_range_m": 0.4000074565410614
+        },
+        "collision_protection": {
+          "ok": true,
+          "base_cmd_publishers": [
+            "collision_monitor"
+          ],
+          "base_cmd_subscribers": [
+            "diff_drive_controller",
+            "nav001_action_recorder"
+          ],
+          "cmd_vel_smoothed_subscribers": [
+            "collision_monitor",
+            "nav001_action_recorder"
+          ]
+        },
+        "online_slam_map": {
+          "ok": true,
+          "map_publishers": [
+            "slam_toolbox"
+          ]
+        },
+        "global_costmap": {
+          "ok": true
+        },
+        "ros_domain": {
+          "ok": true,
+          "ROS_DOMAIN_ID": "0",
+          "RMW_IMPLEMENTATION": ""
+        }
+      },
+      "selected_goal": {
+        "x": 0.9941284953623988,
+        "y": -0.7572166929150735,
+        "yaw_deg": 10.350038951854682,
+        "check": {
+          "segment_max_cost": 0,
+          "goal_cost": 0
+        },
+        "mode": "auto"
+      },
+      "summary": {
+        "index": 3,
+        "mode": "auto",
+        "goal_uuid": "4807f177e9654c6aa51a84fcabd0ddad",
+        "start": {
+          "x": 0.45307781661740254,
+          "y": -0.8560304724682253,
+          "yaw_deg": -49.649961048145315
+        },
+        "goal": {
+          "x": 0.9941284953623988,
+          "y": -0.7572166929150735,
+          "yaw_deg": 10.350038951854682,
+          "distance_m": 0.55,
+          "yaw_change_deg": 59.99999999999999
+        },
+        "goal_check": {
+          "segment_max_cost": 0,
+          "goal_cost": 0
+        },
+        "terminal_status": "SUCCEEDED",
+        "status_topic_final": "SUCCEEDED",
+        "cancel_reason": null,
+        "cancel_response": null,
+        "interrupted": false,
+        "final_pose": {
+          "x": 0.923203501415374,
+          "y": -0.8258593838371245,
+          "yaw_deg": 11.594387840950905,
+          "tf_stamp_s": 1664.433333333
+        },
+        "settle": {
+          "stationary": true,
+          "odom_vx": -7.492124884498175e-05,
+          "odom_wz": -0.0006290088896396755,
+          "still_sim_s": 1.0
+        },
+        "active_goals_after": [],
+        "velocity_stats_during_goal": {
+          "/odom": {
+            "n": 784,
+            "max_abs_vx": 0.06110837873796104,
+            "max_abs_wz": 0.23592287946627766,
+            "last_vx": -4.909515577242386e-05,
+            "last_wz": -0.000412183324426361,
+            "last_phase": "settle"
+          },
+          "/cmd_vel_nav": {
+            "n": 1283,
+            "max_abs_vx": 0.06171584874391556,
+            "max_abs_wz": 0.24176323413848877,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "goal"
+          },
+          "/cmd_vel_smoothed": {
+            "n": 1282,
+            "max_abs_vx": 0.06171584874391556,
+            "max_abs_wz": 0.24176323413848877,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "settle"
+          },
+          "/diff_drive_controller/cmd_vel": {
+            "n": 989,
+            "max_abs_vx": 0.0611613430082798,
+            "max_abs_wz": 0.24176323413848877,
+            "last_vx": 0.0,
+            "last_wz": 0.0,
+            "last_phase": "settle"
+          }
+        },
+        "scan_min_during_goal_m": 0.40000003576278687,
+        "collision_monitor_actions": [],
+        "commanded_stall_sim_s": 0.0,
+        "duration_wall_s": 64.14057172999856,
+        "duration_sim_s": 15.666666667000072,
+        "last_feedback": {
+          "distance_remaining": 0.08006401360034943,
+          "navigation_time_s": 15.666666667,
+          "recoveries": 0
+        },
+        "error_xy_m": 0.09870245074670499,
+        "error_yaw_rad": 0.02171798515826287,
+        "collision_suspected": false,
+        "acceptance": {
+          "succeeded": true,
+          "xy_ok": true,
+          "yaw_ok": true,
+          "no_collision": true,
+          "stationary": true,
+          "no_active_goals_after": true
+        },
+        "pass": true
+      }
+    }
+  ]
+}

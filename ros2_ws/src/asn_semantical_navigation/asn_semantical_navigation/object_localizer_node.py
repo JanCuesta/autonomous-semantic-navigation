@@ -6,11 +6,12 @@ This node NEVER commands navigation or /cmd_vel.
 import json
 import math
 import time
-from collections import deque
+from collections import Counter, deque
 import numpy as np
 import rclpy
 from cv_bridge import CvBridge
 from geometry_msgs.msg import PointStamped, PoseStamped
+from rclpy.clock import Clock, ClockType, JumpThreshold
 from rclpy.duration import Duration
 from rclpy.node import Node
 from action_msgs.msg import GoalStatus, GoalStatusArray
@@ -158,6 +159,9 @@ class ObjectLocalizer(Node):
             ('detections_topic', '/semantic/search/detections_json'),
             ('map_frame', 'map'),
             ('max_sync_difference_s', 0.10),
+            ('sync_wait_s', 0.75),
+            ('max_capture_age_s', 2.0),
+            ('max_future_stamp_s', 0.10),
             ('min_depth_m', 0.15),
             ('max_depth_m', 5.0),
             ('roi_fraction', 0.40),
@@ -179,6 +183,16 @@ class ObjectLocalizer(Node):
         # A bounded buffer is needed because CPU YOLO inference may be delayed.
         self.depth_buffer = deque(maxlen=60)
         self.pending_detections = deque(maxlen=8)
+        self.sync_counts = Counter({key: 0 for key in (
+            'depth_received', 'detections_received', 'exact_matches',
+            'matches_after_wait', 'timestamp_mismatches', 'expired_pending',
+            'out_of_order_depth', 'depth_evictions', 'pending_evictions',
+            'stale_or_future_depth', 'stale_or_future_detections', 'clock_resets',
+            'localization_validation_failures', 'tf_rejections',
+            'depth_quality_rejections', 'validated_poses')})
+        self.in_localization = False
+        self.max_depth_stamp_ns = None
+        self.last_sync_report = time.monotonic()
         self.position_history = deque(
             maxlen=max(1, int(self.get_parameter('confirmation_positions').value))
         )
@@ -202,8 +216,16 @@ class ObjectLocalizer(Node):
             Bool, '/semantic/perception/target_valid', 10)
         self.status_pub = self.create_publisher(
             String, '/semantic/perception/status', 10)
+        self.sync_status_pub = self.create_publisher(
+            String, '/semantic/perception/sync_diagnostics_json', 10)
         self.marker_pub = self.create_publisher(
             MarkerArray, '/semantic/perception/target_markers', 10)
+        self.last_known_marker_pub = self.create_publisher(
+            MarkerArray, '/semantic/perception/last_known_target_markers',
+            QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
+                       durability=DurabilityPolicy.TRANSIENT_LOCAL))
+        # Clear any marker retained by an RViz instance across node restarts.
+        self.clear_last_known_marker()
         self.depth_sub = self.create_subscription(
             Image, self.get_parameter('depth_topic').value,
             self.depth_callback, qos_profile_sensor_data)
@@ -225,7 +247,13 @@ class ObjectLocalizer(Node):
         self.create_subscription(
             GoalStatusArray, '/navigate_to_pose/_action/status',
             self.on_nav_status, mission_qos)
-        self.timer = self.create_timer(0.2, self.watchdog_callback)
+        self.watchdog_clock = Clock(clock_type=ClockType.STEADY_TIME)
+        self.timer = self.create_timer(0.2, self.watchdog_callback, clock=self.watchdog_clock)
+        # Clock notifications, not message order, define simulation epochs.
+        self.clock_jump_handle = self.get_clock().create_jump_callback(
+            JumpThreshold(min_forward=None, min_backward=Duration(nanoseconds=-1),
+                          on_clock_change=True),
+            post_callback=self.on_clock_jump)
         self.report('WAITING: depth, camera calibration, and YOLO detections')
 
 
@@ -249,8 +277,24 @@ class ObjectLocalizer(Node):
         self.marker_pub.publish(MarkerArray(markers=[marker]))
         self.last_marker_pose = None
 
+    def clear_last_known_marker(self):
+        marker = Marker()
+        marker.ns = 'last_known_target'
+        marker.id = 0
+        marker.action = Marker.DELETE
+        self.last_known_marker_pub.publish(MarkerArray(markers=[marker]))
+
 
     def invalidate(self, reason):
+        if self.in_localization:
+            self.sync_counts['localization_validation_failures'] += 1
+            if 'TF at camera timestamp' in reason:
+                self.sync_counts['tf_rejections'] += 1
+            elif any(word in reason for word in (
+                    'depth conversion', 'depth encoding', 'one-channel depth',
+                    'empty depth crop', 'valid depth pixels', 'mixed depth',
+                    'foreground itself')):
+                self.sync_counts['depth_quality_rejections'] += 1
         was_valid = self.valid
         self.valid = False
         self.position_history.clear()
@@ -318,20 +362,45 @@ class ObjectLocalizer(Node):
         self.camera_info = msg
 
 
+    def on_clock_jump(self, jump):
+        # A ROS time-source change or backward /clock jump starts a new epoch.
+        self.depth_buffer.clear()
+        self.pending_detections.clear()
+        self.max_depth_stamp_ns = None
+        self.last_detection_ns = -1
+        self.sync_counts['clock_resets'] += 1
+        self.clear_last_known_marker()
+        self.invalidate('WAITING: ROS clock epoch changed')
+
+    def _capture_now_ns(self):
+        return self.get_clock().now().nanoseconds
+
+    def _capture_fresh(self, stamp_ns):
+        age_ns = self._capture_now_ns() - stamp_ns
+        return (stamp_ns > 0 and
+                age_ns <= float(self.get_parameter('max_capture_age_s').value) * 1e9 and
+                age_ns >= -float(self.get_parameter('max_future_stamp_s').value) * 1e9)
+
     def depth_callback(self, msg):
+        # Resolve expired entries before admitting this arrival, even if the
+        # steady-clock timer callback was delayed by executor scheduling.
+        self.process_pending()
+        self.sync_counts['depth_received'] += 1
         stamp = self.timestamp_ns(msg.header.stamp)
-        if self.depth_buffer and stamp + 100_000_000 < self.timestamp_ns(
-                self.depth_buffer[-1].header.stamp):
-            # Handles resetting Isaac Sim's simulation clock.
-            self.depth_buffer.clear()
-            self.pending_detections.clear()
-            self.last_detection_ns = -1
-            self.invalidate('WAITING: simulation clock reset')
+        if not self._capture_fresh(stamp):
+            self.sync_counts['stale_or_future_depth'] += 1
+            return
+        if self.max_depth_stamp_ns is not None and stamp < self.max_depth_stamp_ns:
+            self.sync_counts['out_of_order_depth'] += 1
+        self.max_depth_stamp_ns = max(stamp, self.max_depth_stamp_ns or stamp)
+        if len(self.depth_buffer) == self.depth_buffer.maxlen:
+            self.sync_counts['depth_evictions'] += 1
         self.depth_buffer.append(msg)
         self.process_pending()
 
 
     def detection_callback(self, msg):
+        self.sync_counts['detections_received'] += 1
         try:
             data = json.loads(msg.data)
             target = str(data['target'])
@@ -343,7 +412,13 @@ class ObjectLocalizer(Node):
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
             self.invalidate(f'REJECTED: bad detection JSON: {exc}')
             return
+        if not self._capture_fresh(stamp_ns):
+            self.sync_counts['stale_or_future_detections'] += 1
+            self.invalidate('REJECTED: stale or future RGB capture timestamp')
+            return
         if target != self.current_target:
+            # The single historical position belongs to the previous class.
+            self.clear_last_known_marker()
             self.current_target = target
             self.last_detection_ns = -1
             self.pending_detections.clear()
@@ -366,29 +441,50 @@ class ObjectLocalizer(Node):
                 return
             self.invalidate('WAITING: no confirmed YOLO detection')
             return
+        if len(self.pending_detections) == self.pending_detections.maxlen:
+            self.sync_counts['pending_evictions'] += 1
+            self.pending_detections.popleft()
+            self.invalidate('REJECTED: pending detection buffer overflow')
         self.pending_detections.append((data, stamp_ns, time.monotonic()))
         self.process_pending()
 
 
     def process_pending(self):
-        if not self.depth_buffer:
-            return
+        # FIFO prevents later detections from publishing before earlier ones.
         while self.pending_detections:
             data, rgb_ns, received_at = self.pending_detections[0]
-            latest_depth_ns = self.timestamp_ns(self.depth_buffer[-1].header.stamp)
-            # If depth is behind RGB, wait briefly for the matching frame.
-            if latest_depth_ns < rgb_ns and time.monotonic() - received_at < 0.75:
+            if not self._capture_fresh(rgb_ns):
+                self.pending_detections.popleft()
+                self.sync_counts['stale_or_future_detections'] += 1
+                self.invalidate('REJECTED: stale or future RGB capture timestamp')
+                continue
+            candidates = [m for m in self.depth_buffer
+                          if self._capture_fresh(self.timestamp_ns(m.header.stamp))]
+            # Earlier timestamp wins an equal-distance tie; identical stamps use
+            # first arrival. Depth reuse is allowed for independent RGB frames.
+            best = min(candidates, key=lambda m: (
+                abs(self.timestamp_ns(m.header.stamp) - rgb_ns),
+                self.timestamp_ns(m.header.stamp)), default=None)
+            gap_ns = (abs(self.timestamp_ns(best.header.stamp) - rgb_ns)
+                      if best is not None else None)
+            exact = gap_ns == 0
+            if not exact and time.monotonic() - received_at < float(
+                    self.get_parameter('sync_wait_s').value):
                 return
             self.pending_detections.popleft()
-            depth_msg = min(
-                self.depth_buffer,
-                key=lambda m: abs(self.timestamp_ns(m.header.stamp) - rgb_ns)
-            )
-            dt = abs(self.timestamp_ns(depth_msg.header.stamp) - rgb_ns) / 1e9
-            if dt > float(self.get_parameter('max_sync_difference_s').value):
-                self.invalidate(f'REJECTED: RGB/depth timestamp gap {dt:.3f}s')
+            if best is None or gap_ns > round(
+                    float(self.get_parameter('max_sync_difference_s').value) * 1e9):
+                self.sync_counts['expired_pending'] += 1
+                if best is not None:
+                    self.sync_counts['timestamp_mismatches'] += 1
+                self.invalidate('REJECTED: timed out waiting for matching depth')
                 continue
-            self.localize(data, depth_msg, dt)
+            self.sync_counts['exact_matches' if exact else 'matches_after_wait'] += 1
+            self.in_localization = True
+            try:
+                self.localize(data, best, gap_ns / 1e9)
+            finally:
+                self.in_localization = False
 
 
     def localize(self, data, depth_msg, dt):
@@ -545,8 +641,10 @@ class ObjectLocalizer(Node):
         pose.pose.position.z = float(stable_xyz[2])
         pose.pose.orientation.w = 1.0  # orientation NOT estimated
         self.pose_pub.publish(pose)
+        self.sync_counts['validated_poses'] += 1
         self.valid_pub.publish(Bool(data=True))
         self.publish_marker(pose)
+        self.publish_last_known_marker(pose)
         self.valid = True
         self.last_valid_wall_time = time.monotonic()
         self.report(
@@ -580,12 +678,30 @@ class ObjectLocalizer(Node):
         self.marker_pub.publish(MarkerArray(markers=[marker]))
 
 
+    def publish_last_known_marker(self, pose):
+        """Publish visualization only; never refresh live localization state."""
+        marker = Marker()
+        marker.header = pose.header
+        marker.ns = 'last_known_target'
+        marker.id = 0
+        marker.type = Marker.SPHERE
+        marker.action = Marker.ADD
+        marker.pose = pose.pose
+        # A translucent, slightly larger shell leaves the green marker visible.
+        marker.scale.x = marker.scale.y = marker.scale.z = 0.19
+        marker.color.r = 1.0
+        marker.color.g = 0.5
+        marker.color.b = 0.0
+        marker.color.a = 0.5
+        marker.lifetime = Duration(seconds=0.0).to_msg()
+        self.last_known_marker_pub.publish(MarkerArray(markers=[marker]))
+
     def watchdog_callback(self):
         now = time.monotonic()
-        while (self.pending_detections and
-               now - self.pending_detections[0][2] > 1.5):
-            self.pending_detections.popleft()
-            self.invalidate('REJECTED: timed out waiting for matching depth')
+        self.process_pending()
+        if now - self.last_sync_report >= 5.0:
+            self.sync_status_pub.publish(String(data=json.dumps(dict(self.sync_counts))))
+            self.last_sync_report = now
         if self.valid and now - self.last_valid_wall_time > float(
                 self.get_parameter('target_timeout_s').value):
             self.invalidate('STALE: no recent valid target localization')

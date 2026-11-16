@@ -1,0 +1,92 @@
+{
+  "args": {
+    "output": "results/validation/NAV001/ordinary_current",
+    "goal": [
+      0.0,
+      0.6,
+      90.0
+    ],
+    "count": 1,
+    "dry_run": true,
+    "sim_timeout_s": 120.0,
+    "wall_guard_s": 600.0,
+    "clock_stale_s": 15.0,
+    "accept_timeout_s": 10.0,
+    "cancel_wait_s": 30.0,
+    "settle_wall_s": 30.0,
+    "stationary_s": 1.0,
+    "stationary_v": 0.01,
+    "stationary_w": 0.02,
+    "clearance_m": 0.3,
+    "max_occupancy": 0,
+    "max_segment_cost": 50,
+    "max_goal_cost": 20,
+    "min_yaw_change_deg": 20.0,
+    "extra_yaw_deg": 0.0,
+    "contact_range_m": 0.12
+  },
+  "runs": [
+    {
+      "index": 1,
+      "preflight": {
+        "clock_advancing": {
+          "ok": true,
+          "sim_s": 1566.766666666,
+          "rtf": 0.257
+        },
+        "action_server": {
+          "ok": true
+        },
+        "no_active_goals": {
+          "ok": true,
+          "active": []
+        },
+        "tf_map_base_link": {
+          "ok": true,
+          "pose": [
+            0.11079384479655556,
+            0.5394073252239506,
+            -0.8490372770106267
+          ],
+          "age_sim_s": -0.2333333340000081
+        },
+        "tf_odom_base_link": {
+          "ok": true
+        },
+        "odom_fresh_stationary": {
+          "ok": true,
+          "vx": -5.500031525170749e-05,
+          "wz": -0.000461760685515133
+        },
+        "scan_fresh": {
+          "ok": true,
+          "min_range_m": 0.4000006318092346
+        },
+        "collision_protection": {
+          "ok": true,
+          "base_cmd_publishers": [
+            "collision_monitor"
+          ],
+          "base_cmd_subscribers": [
+            "diff_drive_controller",
+            "nav001_action_recorder"
+          ],
+          "cmd_vel_smoothed_subscribers": [
+            "collision_monitor",
+            "nav001_action_recorder"
+          ]
+        },
+        "online_slam_map": {
+          "ok": true,
+          "map_publishers": [
+            "slam_toolbox"
+          ]
+        },
+        "global_costmap": {
+          "ok": true
+        }
+      },
+      "blocked": "no goal passed live-map safety checks"
+    }
+  ]
+}

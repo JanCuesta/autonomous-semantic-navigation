@@ -29,7 +29,7 @@ def generate_launch_description():
         bringup_share, "launch", "simulation.launch.py"
     )
     navigation_path = os.path.join(
-        bringup_share, "launch", "navigation.launch.py"
+        bringup_share, "launch", "slam_navigation.launch.py"
     )
 
     # Preserve the existing project-local RViz configuration.
@@ -188,10 +188,10 @@ def generate_launch_description():
         navigation_launcher,
         coverage_node,
         autonomous_node,
-        #semantic_mission_manager_node,
+        semantic_mission_manager_node,
+        search_command_node,
+        yolo_detector_node,
+        object_localization_node,
+        approach_goal_node,
         rviz_node,
-        #search_command_node,
-        #yolo_detector_node,
-        #object_localization_node,
-        #approach_goal_node,
     ])

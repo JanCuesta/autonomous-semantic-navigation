@@ -277,3 +277,28 @@ The map was loaded in RViz, and an initial pose was set using AMCL.
 **Current conclusion:** Normal navigation reached one supervised goal on the
 new laboratory map. Further testing is needed to improve map alignment and
 confirm repeatable navigation and safety behavior.
+
+## #15: RGB Camera and Depth
+
+- Confirmed that the live RGB camera image was visible and updating in RViz.
+- Checked depth measurements against an object measured approximately 1.12 m from the camera.
+- With a different object, depth readings were generally stable around 0.91–0.92 m.
+
+**STATUS: VALIDATED — Stationary camera and depth checks**
+
+## #16: Object Recognition
+
+- Confirmed that YOLO detections and labels were visible in RViz.
+- Tested mouse and backpack recognition. The operator confirmed backpack recognition.
+- Observed some incorrect labels and intermittent missed detections.
+- Updated the annotated view to show only the selected target class when a target is selected.
+
+**STATUS: PARTIALLY VALIDATED — Recognition works; repeatability needs further testing**
+
+## #17: Backpack Localization
+
+- Detected the backpack and produced map-frame object positions while the robot was stationary.
+- Found that the RViz object marker was suppressed while the mission was idle; the display logic was corrected.
+- Some localization updates were rejected because RGB and depth timestamps differed by more than the allowed limit.
+
+**STATUS: IN PROGRESS — Positions observed; marker fix and reliable localization require verification**

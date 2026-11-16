@@ -1,0 +1,17 @@
+{
+  "frame": "map",
+  "child": "base_link",
+  "stamp_sec": 1794359823,
+  "stamp_nanosec": 763748582,
+  "x": -0.9780484249881063,
+  "y": 0.0931506327870757,
+  "yaw_rad": 3.1378182961785717,
+  "yaw_deg": 179.7837452499631,
+  "quaternion_xyzw": [
+    0.0019411409510625987,
+    -0.0004926110837166755,
+    0.999996212140962,
+    0.0018881233689569952
+  ],
+  "warning": "AMCL/TF estimate only; independently verify actual pose and map alignment before reuse."
+}

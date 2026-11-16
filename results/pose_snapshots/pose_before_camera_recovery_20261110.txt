@@ -1,0 +1,154 @@
+[INFO] [1794359741.932080093] [tf2_echo]: Waiting for transform map ->  base_link: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[INFO] [1794359743.915798036] [tf2_echo]: Waiting for transform map ->  base_link: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[INFO] [1794359744.915857531] [tf2_echo]: Waiting for transform map ->  base_link: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+At time 1794359746.814700625
+- Translation: [-0.975, 0.090, 0.000]
+- Rotation: in Quaternion (xyzw) [-0.001, -0.000, 0.931, 0.365]
+- Rotation: in RPY (radian) [-0.002, 0.002, 2.395]
+- Rotation: in RPY (degree) [-0.099, 0.111, 137.214]
+- Matrix:
+ -0.734 -0.679 -0.003 -0.975
+  0.679 -0.734  0.000  0.090
+ -0.002 -0.002  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359747.806580119
+- Translation: [-0.975, 0.090, 0.000]
+- Rotation: in Quaternion (xyzw) [-0.001, -0.000, 0.931, 0.365]
+- Rotation: in RPY (radian) [-0.002, 0.002, 2.395]
+- Rotation: in RPY (degree) [-0.099, 0.111, 137.214]
+- Matrix:
+ -0.734 -0.679 -0.003 -0.975
+  0.679 -0.734  0.000  0.090
+ -0.002 -0.002  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359748.814722821
+- Translation: [-0.975, 0.090, 0.000]
+- Rotation: in Quaternion (xyzw) [-0.002, -0.001, 0.931, 0.365]
+- Rotation: in RPY (radian) [-0.002, 0.003, 2.395]
+- Rotation: in RPY (degree) [-0.121, 0.146, 137.216]
+- Matrix:
+ -0.734 -0.679 -0.003 -0.975
+  0.679 -0.734  0.000  0.090
+ -0.003 -0.002  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359749.806495751
+- Translation: [-0.975, 0.090, 0.000]
+- Rotation: in Quaternion (xyzw) [-0.002, -0.001, 0.931, 0.365]
+- Rotation: in RPY (radian) [-0.002, 0.003, 2.395]
+- Rotation: in RPY (degree) [-0.121, 0.146, 137.216]
+- Matrix:
+ -0.734 -0.679 -0.003 -0.975
+  0.679 -0.734  0.000  0.090
+ -0.003 -0.002  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359750.814752317
+- Translation: [-0.975, 0.090, 0.000]
+- Rotation: in Quaternion (xyzw) [-0.002, -0.001, 0.931, 0.365]
+- Rotation: in RPY (radian) [-0.002, 0.003, 2.395]
+- Rotation: in RPY (degree) [-0.121, 0.146, 137.216]
+- Matrix:
+ -0.734 -0.679 -0.003 -0.975
+  0.679 -0.734  0.000  0.090
+ -0.003 -0.002  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359751.806507816
+- Translation: [-0.975, 0.090, 0.000]
+- Rotation: in Quaternion (xyzw) [-0.002, -0.001, 0.931, 0.365]
+- Rotation: in RPY (radian) [-0.002, 0.003, 2.395]
+- Rotation: in RPY (degree) [-0.121, 0.146, 137.216]
+- Matrix:
+ -0.734 -0.679 -0.003 -0.975
+  0.679 -0.734  0.000  0.090
+ -0.003 -0.002  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359752.799504054
+- Translation: [-0.975, 0.090, 0.000]
+- Rotation: in Quaternion (xyzw) [-0.002, -0.000, 0.931, 0.364]
+- Rotation: in RPY (radian) [-0.002, 0.003, 2.396]
+- Rotation: in RPY (degree) [-0.113, 0.165, 137.308]
+- Matrix:
+ -0.735 -0.678 -0.003 -0.975
+  0.678 -0.735  0.000  0.090
+ -0.003 -0.002  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359753.806598176
+- Translation: [-0.978, 0.096, -0.000]
+- Rotation: in Quaternion (xyzw) [-0.001, 0.000, 0.970, 0.242]
+- Rotation: in RPY (radian) [0.000, 0.002, 2.652]
+- Rotation: in RPY (degree) [0.005, 0.140, 151.967]
+- Matrix:
+ -0.883 -0.470 -0.002 -0.978
+  0.470 -0.883  0.001  0.096
+ -0.002  0.000  1.000 -0.000
+  0.000  0.000  0.000  1.000
+At time 1794359754.798954537
+- Translation: [-0.989, 0.095, 0.000]
+- Rotation: in Quaternion (xyzw) [0.001, 0.001, 0.995, 0.104]
+- Rotation: in RPY (radian) [0.001, -0.002, 2.934]
+- Rotation: in RPY (degree) [0.083, -0.126, 168.089]
+- Matrix:
+ -0.978 -0.206  0.002 -0.989
+  0.206 -0.978  0.001  0.095
+  0.002  0.001  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359755.806713595
+- Translation: [-0.989, 0.091, 0.000]
+- Rotation: in Quaternion (xyzw) [0.001, 0.000, 1.000, -0.000]
+- Rotation: in RPY (radian) [0.001, -0.001, -3.141]
+- Rotation: in RPY (degree) [0.039, -0.077, -179.985]
+- Matrix:
+ -1.000  0.000  0.001 -0.989
+ -0.000 -1.000  0.001  0.091
+  0.001  0.001  1.000  0.000
+  0.000  0.000  0.000  1.000
+At time 1794359756.814673740
+- Translation: [-0.978, 0.093, -0.000]
+- Rotation: in Quaternion (xyzw) [0.000, 0.000, 1.000, 0.002]
+- Rotation: in RPY (radian) [0.000, -0.000, 3.138]
+- Rotation: in RPY (degree) [0.022, -0.017, 179.796]
+- Matrix:
+ -1.000 -0.004  0.000 -0.978
+  0.004 -1.000  0.000  0.093
+  0.000  0.000  1.000 -0.000
+  0.000  0.000  0.000  1.000
+At time 1794359757.806505479
+- Translation: [-0.978, 0.093, -0.000]
+- Rotation: in Quaternion (xyzw) [0.001, 0.000, 1.000, 0.002]
+- Rotation: in RPY (radian) [0.000, -0.002, 3.138]
+- Rotation: in RPY (degree) [0.002, -0.143, 179.786]
+- Matrix:
+ -1.000 -0.004  0.002 -0.978
+  0.004 -1.000  0.000  0.093
+  0.002  0.000  1.000 -0.000
+  0.000  0.000  0.000  1.000
+At time 1794359758.814426830
+- Translation: [-0.978, 0.093, -0.000]
+- Rotation: in Quaternion (xyzw) [0.002, -0.000, 1.000, 0.002]
+- Rotation: in RPY (radian) [-0.000, -0.003, 3.138]
+- Rotation: in RPY (degree) [-0.014, -0.181, 179.785]
+- Matrix:
+ -1.000 -0.004  0.003 -0.978
+  0.004 -1.000 -0.000  0.093
+  0.003 -0.000  1.000 -0.000
+  0.000  0.000  0.000  1.000
+At time 1794359759.806500436
+- Translation: [-0.978, 0.093, -0.000]
+- Rotation: in Quaternion (xyzw) [0.002, -0.000, 1.000, 0.002]
+- Rotation: in RPY (radian) [-0.000, -0.003, 3.138]
+- Rotation: in RPY (degree) [-0.014, -0.181, 179.785]
+- Matrix:
+ -1.000 -0.004  0.003 -0.978
+  0.004 -1.000 -0.000  0.093
+  0.003 -0.000  1.000 -0.000
+  0.000  0.000  0.000  1.000
+At time 1794359760.798755360
+- Translation: [-0.978, 0.093, -0.000]
+- Rotation: in Quaternion (xyzw) [0.002, -0.000, 1.000, 0.002]
+- Rotation: in RPY (radian) [-0.000, -0.003, 3.138]
+- Rotation: in RPY (degree) [-0.014, -0.181, 179.785]
+- Matrix:
+ -1.000 -0.004  0.003 -0.978
+  0.004 -1.000 -0.000  0.093
+  0.003 -0.000  1.000 -0.000
+  0.000  0.000  0.000  1.000
+[INFO] [1794359761.703440465] [rclcpp]: signal_handler(SIGINT/SIGTERM)

@@ -135,6 +135,10 @@ class NBVPreviewNode(Node):
         if (a.resolution != b.resolution or
                 a.origin.position.x != b.origin.position.x or
                 a.origin.position.y != b.origin.position.y or
+                a.origin.orientation.x != b.origin.orientation.x or
+                a.origin.orientation.y != b.origin.orientation.y or
+                a.origin.orientation.z != b.origin.orientation.z or
+                a.origin.orientation.w != b.origin.orientation.w or
                 self.map_msg.header.frame_id !=
                 self.coverage_msg.header.frame_id):
             self.publish_status('WAITING: map and coverage metadata differ')

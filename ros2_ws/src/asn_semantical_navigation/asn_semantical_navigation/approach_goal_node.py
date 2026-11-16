@@ -20,7 +20,9 @@ from std_msgs.msg import Bool, String
 from tf2_ros import Buffer, TransformException, TransformListener
 from visualization_msgs.msg import Marker, MarkerArray
 
-from .nbv_core import GridSpec, candidate_poses, safe_footprint
+from .nbv_core import (
+    GridSpec, candidate_poses, safe_footprint, safe_straight_segment,
+)
 from rclpy.action import ActionClient
 from nav2_msgs.action import NavigateToPose
 from std_srvs.srv import Trigger
@@ -278,8 +280,10 @@ class ApproachGoalNode(Node):
             free = safe_footprint(
                 self.map_grid, spec, x, y, clearance
             )
+            path_clear = safe_straight_segment(
+                self.map_grid, spec, (rx, ry), (x, y))
             standoff_ok = math.hypot(x - tx, y - ty) >= 0.35
-            valid = free and standoff_ok
+            valid = free and path_clear and standoff_ok
             heading = math.atan2(ty - y, tx - x)
             candidates.append((x, y, heading, name, valid))
 

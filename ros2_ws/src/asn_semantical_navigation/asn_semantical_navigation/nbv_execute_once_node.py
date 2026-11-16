@@ -9,7 +9,9 @@ Safety/validation scope:
 - Preserves the independent RGB-D coverage node and navigation stack.
 """
 
+import csv
 import math
+from pathlib import Path
 import time
 
 import numpy as np
@@ -20,6 +22,7 @@ from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
 from rclpy.clock import Clock, ClockType
 from rclpy.duration import Duration
+from rclpy.qos import DurabilityPolicy, QoSProfile
 from rclpy.time import Time
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
@@ -39,9 +42,19 @@ class NBVExecuteOnceNode(NBVPreviewNode):
         self.declare_parameters('', [
             ('nav_action_name', '/navigate_to_pose'),
             ('goal_timeout_s', 45.0),
+            # Use simulated navigation time in Isaac while retaining bounded
+            # wall-time protection if /clock pauses or the simulator stalls.
+            # At the measured Isaac RTF (~0.25), a 45 s simulated budget
+            # already consumes ~180 wall seconds. Leave explicit margin for
+            # callback/settling overhead while still detecting a frozen sim.
+            ('simulation_wall_guard_s', 300.0),
+            ('simulation_clock_stale_s', 15.0),
             ('result_settle_s', 2.0),
             ('goal_xy_tolerance_m', 0.15),
             ('goal_yaw_tolerance_deg', 15.0),
+            # A retained, append-only record makes terminal outcomes
+            # inspectable after the action callback has completed.
+            ('execution_log_path', '~/.ros/asn_nbv_execution.csv'),
         ])
         self.nav_client = ActionClient(
             self, NavigateToPose,
@@ -50,8 +63,11 @@ class NBVExecuteOnceNode(NBVPreviewNode):
             Trigger, '/semantic/nbv/execute_once', self.on_execute_once)
         self.cancel_service = self.create_service(
             Trigger, '/semantic/nbv/cancel', self.on_cancel)
+        self.last_result_service = self.create_service(
+            Trigger, '/semantic/nbv/last_result', self.on_last_result)
         self.execution_pub = self.create_publisher(
-            String, '/semantic/nbv/execution_status', 10)
+            String, '/semantic/nbv/execution_status',
+            QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
         # The watchdog uses steady wall time, even with paused /clock.
         self.watchdog = self.create_timer(
             0.25, self.check_action,
@@ -65,16 +81,62 @@ class NBVExecuteOnceNode(NBVPreviewNode):
         self.settle_until = None
         self.started_at = 0.0
         self.goal_started_at = 0.0
+        self.goal_started_clock_ns = None
+        self.last_clock_ns = None
+        self.last_clock_advanced_at = 0.0
         self.selected = None
         self.selected_from = None
         self.coverage_before = None
         self.final_outcome = None
+        self.goal_uuid = ''
+        self.last_terminal_result = 'NO_TERMINAL_RESULT_RECORDED'
+        self.log_path = Path(
+            self.get_parameter('execution_log_path').value).expanduser()
+        self.log_path.parent.mkdir(parents=True, exist_ok=True)
+        self._ensure_log_header()
         self.execution_status(
             'READY: call /semantic/nbv/execute_once to move once')
+
+    def _ensure_log_header(self):
+        if self.log_path.exists() and self.log_path.stat().st_size:
+            return
+        with self.log_path.open('w', newline='') as stream:
+            csv.writer(stream).writerow([
+                'event', 'wall_monotonic_s', 'sim_time_s', 'goal_uuid',
+                'detail', 'map_x', 'map_y', 'yaw_deg',
+                'distance_remaining_m', 'navigation_time_s',
+                'recoveries', 'wall_elapsed_s', 'sim_elapsed_s'])
+
+    def log_event(self, event, detail='', feedback=None):
+        """Append lifecycle evidence without relying on a transient topic."""
+        map_x = map_y = yaw_deg = distance = nav_time = recoveries = ''
+        if feedback is not None:
+            pose = feedback.current_pose.pose
+            map_x, map_y = pose.position.x, pose.position.y
+            yaw_deg = math.degrees(math.atan2(
+                2.0 * (pose.orientation.w * pose.orientation.z),
+                1.0 - 2.0 * pose.orientation.z ** 2))
+            distance = feedback.distance_remaining
+            nav_time = (feedback.navigation_time.sec +
+                        feedback.navigation_time.nanosec * 1e-9)
+            recoveries = feedback.number_of_recoveries
+        now_wall = time.monotonic()
+        now_sim = self.get_clock().now().nanoseconds / 1e9
+        wall_elapsed = (now_wall - self.goal_started_at
+                        if self.goal_started_at else '')
+        sim_elapsed = ((self.get_clock().now().nanoseconds -
+                        self.goal_started_clock_ns) / 1e9
+                       if self.goal_started_clock_ns is not None else '')
+        with self.log_path.open('a', newline='') as stream:
+            csv.writer(stream).writerow([
+                event, now_wall, now_sim, self.goal_uuid, detail,
+                map_x, map_y, yaw_deg, distance, nav_time, recoveries,
+                wall_elapsed, sim_elapsed])
 
     def execution_status(self, message):
         self.execution_pub.publish(String(data=message))
         self.get_logger().info(message)
+        self.log_event('STATUS', message)
 
     def robot_pose(self):
         frame = self.map_msg.header.frame_id
@@ -159,6 +221,9 @@ class NBVExecuteOnceNode(NBVPreviewNode):
         self.coverage_before = self.coverage.copy()
         self.started_at = time.monotonic()
         self.goal_started_at = 0.0
+        self.goal_started_clock_ns = None
+        self.last_clock_ns = None
+        self.last_clock_advanced_at = time.monotonic()
         self.response_pending = True
         self.cancel_requested = False
         self.cancel_sent = False
@@ -167,6 +232,7 @@ class NBVExecuteOnceNode(NBVPreviewNode):
         self.settle_until = None
         self.final_outcome = None
         self.goal_handle = None
+        self.goal_uuid = ''
 
         x, y, yaw = best['pose']
         stamped = PoseStamped()
@@ -182,7 +248,8 @@ class NBVExecuteOnceNode(NBVPreviewNode):
         action_goal = NavigateToPose.Goal()
         action_goal.pose = stamped
         try:
-            pending = self.nav_client.send_goal_async(action_goal)
+            pending = self.nav_client.send_goal_async(
+                action_goal, feedback_callback=self.on_navigation_feedback)
             pending.add_done_callback(self.on_goal_response)
         except Exception as exc:  # Log and allow a later manual retry.
             self.busy = False
@@ -200,6 +267,12 @@ class NBVExecuteOnceNode(NBVPreviewNode):
         self.execution_status(response.message)
         return response
 
+    def on_navigation_feedback(self, feedback_message):
+        feedback = feedback_message.feedback
+        self.goal_uuid = ''.join(
+            f'{value:02x}' for value in feedback_message.goal_id.uuid)
+        self.log_event('FEEDBACK', feedback=feedback)
+
     def on_goal_response(self, future):
         self.response_pending = False
         try:
@@ -211,7 +284,13 @@ class NBVExecuteOnceNode(NBVPreviewNode):
             self.finish('NAV2_REJECTED: NavigateToPose goal not accepted')
             return
         self.goal_handle = handle
+        if hasattr(handle, 'goal_id'):
+            self.goal_uuid = ''.join(
+                f'{value:02x}' for value in handle.goal_id.uuid)
         self.goal_started_at = time.monotonic()
+        self.goal_started_clock_ns = self.get_clock().now().nanoseconds
+        self.last_clock_ns = self.goal_started_clock_ns
+        self.last_clock_advanced_at = self.goal_started_at
         self.execution_status('NAV2_ACCEPTED: executing one selected viewpoint')
         try:
             result_future = handle.get_result_async()
@@ -221,6 +300,11 @@ class NBVExecuteOnceNode(NBVPreviewNode):
             return
         if self.cancel_requested:
             self.request_cancel('CANCEL: late goal acceptance')
+
+    def on_last_result(self, request, response):
+        response.success = self.last_terminal_result != 'NO_TERMINAL_RESULT_RECORDED'
+        response.message = self.last_terminal_result
+        return response
 
     def on_navigation_result(self, future):
         try:
@@ -285,8 +369,29 @@ class NBVExecuteOnceNode(NBVPreviewNode):
                     'if it eventually accepts')
             return
         limit = float(self.get_parameter('goal_timeout_s').value)
-        if (self.goal_handle is not None and not self.timeout_reported and
-                now - self.goal_started_at > max(1.0, limit)):
+        if self.goal_handle is None or self.timeout_reported:
+            return
+        if not self.get_parameter('use_sim_time').value:
+            expired = now - self.goal_started_at > max(1.0, limit)
+        else:
+            clock_ns = self.get_clock().now().nanoseconds
+            if clock_ns < self.last_clock_ns:
+                self.request_cancel('CLOCK_RESET: canceling active goal')
+                return
+            if clock_ns > self.last_clock_ns:
+                self.last_clock_ns = clock_ns
+                self.last_clock_advanced_at = now
+            if now - self.last_clock_advanced_at > float(
+                    self.get_parameter('simulation_clock_stale_s').value):
+                self.request_cancel('CLOCK_STALE: canceling active goal')
+                return
+            expired = ((clock_ns - self.goal_started_clock_ns) / 1e9 >
+                       max(1.0, limit))
+            if now - self.goal_started_at > float(
+                    self.get_parameter('simulation_wall_guard_s').value):
+                self.request_cancel('WALL_GUARD: canceling active goal')
+                return
+        if expired:
             self.timeout_reported = True
             self.request_cancel('NAV2_TIMEOUT: canceling this one goal')
 
@@ -324,6 +429,8 @@ class NBVExecuteOnceNode(NBVPreviewNode):
             'READY for another EXPLICIT manual trigger')
 
     def finish(self, message):
+        self.log_event('TERMINAL', message)
+        self.last_terminal_result = message
         self.busy = False
         self.response_pending = False
         self.goal_handle = None

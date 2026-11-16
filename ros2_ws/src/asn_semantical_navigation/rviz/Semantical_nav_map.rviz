@@ -285,6 +285,18 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /semantic/perception/target_markers
       Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Last Known Object
+      Namespaces:
+        {}
+      Topic:
+        Depth: 1
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /semantic/perception/last_known_target_markers
+      Value: true
     - Class: rviz_default_plugins/Image
       Enabled: false
       Max Value: 1

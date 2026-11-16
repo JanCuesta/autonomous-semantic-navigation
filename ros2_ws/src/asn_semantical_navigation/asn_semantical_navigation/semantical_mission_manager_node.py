@@ -797,27 +797,23 @@ class SemanticMissionManager(Node):
 
 
     def localized_target_snapshot(self):
-    # A recently confirmed RGB-D localization is allowed to survive
-    # temporary loss of detection during the Nav2 stop handshake. The
-        # sample must belong to THIS mission, have a map frame, and be recent.
-        if (self.pose_valid and valid_pose(self.pose) and
-                self.pose_at >= self.mission_started and
+        """Return only a currently valid, fresh measurement from this mission."""
+        if not (self.pose_valid and valid_pose(self.pose) and
+                self.pose_at >= self.mission_started and self.mission_started > 0 and
                 self.age_ok(self.pose_at, 'target_pose_stale_s')):
-            return self.pose
-        if (self.last_valid_pose is not None and
-                valid_pose(self.last_valid_pose) and
-                self.last_valid_pose_at >= self.mission_started and
-                self.age_ok(self.last_valid_pose_at,
-                            'target_snapshot_max_age_s')):
-            return self.last_valid_pose
-        return None
+            return None
+        stamp = self.pose.header.stamp
+        measured = stamp.sec + stamp.nanosec / 1e9
+        age = self.get_clock().now().nanoseconds / 1e9 - measured
+        if measured <= 0 or not math.isfinite(age) or age < 0 or age > self.param('target_pose_stale_s'):
+            return None
+        return self.pose
 
     def lock_target(self, target_pose):
         locked = PoseStamped()
         locked.header = target_pose.header
         locked.pose = target_pose.pose
         locked.header.frame_id = 'map'
-        locked.header.stamp = self.get_clock().now().to_msg()
         self.target_snapshot = locked
         # Use lock-publication time so approach preview MUST be recomputed.
         self.snapshot_at = time.monotonic()
@@ -1092,7 +1088,10 @@ class SemanticMissionManager(Node):
                     elapsed > self.param('prepare_timeout_s')):
                 self.abort(State.FAILED, 'Unable to resume NBV after inspection')
         elif self.state == State.WAITING_APPROACH:
-            if self.has_approach() and self.nav.server_is_ready() and self.nav_quiet():
+            if self.localized_target_snapshot() is None:
+                self.locked_valid_pub.publish(Bool(data=False))
+                self.set_state(State.FAILED, 'Live target localization lost before approach')
+            elif self.has_approach() and self.nav.server_is_ready() and self.nav_quiet():
                 self.send_approach()
             elif elapsed > self.param('approach_preview_timeout_s'):
                 self.set_state(State.FAILED, 'No fresh valid approach preview')
