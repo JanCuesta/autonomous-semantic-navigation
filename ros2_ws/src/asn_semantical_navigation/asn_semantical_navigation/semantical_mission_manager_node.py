@@ -11,6 +11,8 @@ Integration via setup.py and launch files is intentionally deferred.
 """
 import json
 import math
+
+from asn_semantical_navigation.core.target_freshness import measurement_is_fresh
 import time
 from enum import Enum
 import rclpy
@@ -804,8 +806,8 @@ class SemanticMissionManager(Node):
             return None
         stamp = self.pose.header.stamp
         measured = stamp.sec + stamp.nanosec / 1e9
-        age = self.get_clock().now().nanoseconds / 1e9 - measured
-        if measured <= 0 or not math.isfinite(age) or age < 0 or age > self.param('target_pose_stale_s'):
+        now = self.get_clock().now().nanoseconds / 1e9
+        if not measurement_is_fresh(measured, now, self.param('target_pose_stale_s')):
             return None
         return self.pose
 
