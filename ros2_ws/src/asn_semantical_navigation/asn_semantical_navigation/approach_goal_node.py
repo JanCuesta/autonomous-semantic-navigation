@@ -56,6 +56,7 @@ class ApproachGoalNode(Node):
         self.declare_parameters('', [
             ('stand_off_m', 0.60),
             ('clearance_m', 0.22),
+            ('target_path_clearance_m', 0.30),
             ('target_timeout_s', 2.5),
             ('locked_target_max_age_s', 15.0),
             ('allow_direct_nav_goal', False),
@@ -268,7 +269,9 @@ class ApproachGoalNode(Node):
             yaw_from_quaternion(origin.orientation))
         clearance = float(self.get_parameter('clearance_m').value)
         spacing = float(self.get_parameter('stand_off_m').value)
-        if min(clearance, spacing) <= 0:
+        path_clearance = float(self.get_parameter('target_path_clearance_m').value)
+        if (not all(math.isfinite(v) for v in (clearance, spacing, path_clearance))
+                or min(clearance, spacing, path_clearance) <= 0):
             self.no_goal('REJECTED: spacing and clearances must be positive')
             return
 
@@ -281,7 +284,8 @@ class ApproachGoalNode(Node):
                 self.map_grid, spec, x, y, clearance
             )
             path_clear = safe_straight_segment(
-                self.map_grid, spec, (rx, ry), (x, y))
+                self.map_grid, spec, (rx, ry), (x, y),
+                max(clearance, path_clearance))
             standoff_ok = math.hypot(x - tx, y - ty) >= 0.35
             valid = free and path_clear and standoff_ok
             heading = math.atan2(ty - y, tx - x)
