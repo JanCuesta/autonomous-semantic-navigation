@@ -9,10 +9,13 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
+from launch.actions import (DeclareLaunchArgument, ExecuteProcess, GroupAction,
+                            IncludeLaunchDescription, OpaqueFunction)
 from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, PythonExpression
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def _check_full_stack(context):
@@ -88,6 +91,36 @@ def generate_launch_description():
             'depth_topic': LaunchConfiguration('depth_topic'),
             'camera_info_topic': LaunchConfiguration('camera_info_topic'),
             'map_frame': LaunchConfiguration('map_frame'),
+            'odom_topic': LaunchConfiguration('odom_topic'),
+            'stationary_sync_tolerance_s': ParameterValue(
+                LaunchConfiguration('stationary_sync_tolerance_s'),
+                value_type=float),
+            'moving_sync_tolerance_s': ParameterValue(
+                LaunchConfiguration('moving_sync_tolerance_s'),
+                value_type=float),
+            'sync_wait_s': ParameterValue(
+                LaunchConfiguration('sync_wait_s'), value_type=float),
+            'max_capture_age_s': ParameterValue(
+                LaunchConfiguration('max_capture_age_s'), value_type=float),
+            'observation_window_s': ParameterValue(
+                LaunchConfiguration('observation_window_s'), value_type=float),
+            'confirmation_positions': ParameterValue(
+                LaunchConfiguration('confirmation_positions'), value_type=int),
+            'max_position_jitter_m': ParameterValue(
+                LaunchConfiguration('max_position_jitter_m'),
+                value_type=float),
+            'consecutive_outliers_to_reset': ParameterValue(
+                LaunchConfiguration('consecutive_outliers_to_reset'),
+                value_type=int),
+            'motion_state_freshness_s': ParameterValue(
+                LaunchConfiguration('motion_state_freshness_s'),
+                value_type=float),
+            'stationary_linear_speed_mps': ParameterValue(
+                LaunchConfiguration('stationary_linear_speed_mps'),
+                value_type=float),
+            'stationary_angular_speed_rps': ParameterValue(
+                LaunchConfiguration('stationary_angular_speed_rps'),
+                value_type=float),
         }])
 
     coverage = Node(
@@ -128,11 +161,37 @@ def generate_launch_description():
         output='screen', remappings=robot_remappings,
         parameters=[actual_time])
 
+    # The included sensor launch uses 'depth_topic' for compressed input;
+    # the parent uses it for the decoded depth that localization consumes.
+    # A scoped GroupAction prevents the child argument from leaking upward.
+    sensors = GroupAction(
+        scoped=True,
+        condition=IfCondition(PythonExpression([
+            "'", LaunchConfiguration('start_hardware_sensors'),
+            "'.lower() in ('true', '1', 'yes') and (",
+            "'", LaunchConfiguration('enable_full_stack'),
+            "'.lower() in ('true', '1', 'yes') or '",
+            LaunchConfiguration('enable_perception'),
+            "'.lower() in ('true', '1', 'yes'))",
+        ])),
+        actions=[IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(
+                get_package_share_directory('asn_bringup'),
+                'launch', 'hardware_sensors.launch.py')),
+            launch_arguments={
+                'depth_topic': LaunchConfiguration('hardware_depth_input_topic'),
+                'camera_info_topic': LaunchConfiguration('hardware_camera_info_input_topic'),
+            }.items(),
+        )],
+    )
+
     return LaunchDescription([
-        DeclareLaunchArgument('detector_model', default_value=(
-            os.path.expanduser('~/.cache/asn/models/yolo11s.pt')
-            if os.path.isfile(os.path.expanduser('~/.cache/asn/models/yolo11s.pt'))
-            else 'yolo11n.pt')),
+        DeclareLaunchArgument(
+            'detector_model',
+            default_value=os.path.expanduser(
+                '~/projects/autonomous-semantic-navigation/models/backpack_v2.pt'
+            )
+        ),
         DeclareLaunchArgument('detect_all_classes', default_value='true'),
         DeclareLaunchArgument('enable_full_stack', default_value='false'),
         DeclareLaunchArgument('use_rviz', default_value='true'),
@@ -151,7 +210,33 @@ def generate_launch_description():
             [robot, 'oakd', 'rgb', 'image_raw', 'compressed'])),
         DeclareLaunchArgument('depth_topic', default_value='/hardware_depth/image_raw'),
         DeclareLaunchArgument('camera_info_topic', default_value=PathJoinSubstitution([robot, 'oakd', 'stereo', 'camera_info'])),
+        DeclareLaunchArgument(
+            'start_hardware_sensors', default_value='true',
+            description='Start the hardware depth decoder with semantic perception; set false if already running'),
+        DeclareLaunchArgument('hardware_depth_input_topic',
+                              default_value=PathJoinSubstitution([robot, 'oakd', 'stereo', 'image_raw'])),
+        DeclareLaunchArgument('hardware_camera_info_input_topic',
+                              default_value=LaunchConfiguration('camera_info_topic')),
         DeclareLaunchArgument('pointcloud_topic', default_value='/depth_pcl'),
+        DeclareLaunchArgument('odom_topic', default_value=PathJoinSubstitution(
+            [robot, 'odom'])),
+        DeclareLaunchArgument(
+            'stationary_sync_tolerance_s', default_value='0.15'),
+        DeclareLaunchArgument(
+            'moving_sync_tolerance_s', default_value='0.10'),
+        DeclareLaunchArgument('sync_wait_s', default_value='1.0'),
+        DeclareLaunchArgument('max_capture_age_s', default_value='2.0'),
+        DeclareLaunchArgument('observation_window_s', default_value='4.0'),
+        DeclareLaunchArgument('confirmation_positions', default_value='3'),
+        DeclareLaunchArgument('max_position_jitter_m', default_value='0.45'),
+        DeclareLaunchArgument(
+            'consecutive_outliers_to_reset', default_value='2'),
+        DeclareLaunchArgument(
+            'motion_state_freshness_s', default_value='0.50'),
+        DeclareLaunchArgument(
+            'stationary_linear_speed_mps', default_value='0.02'),
+        DeclareLaunchArgument(
+            'stationary_angular_speed_rps', default_value='0.05'),
         DeclareLaunchArgument('tf_topic', default_value=PathJoinSubstitution(
             [robot, 'tf'])),
         DeclareLaunchArgument('tf_static_topic', default_value=PathJoinSubstitution(
@@ -162,5 +247,5 @@ def generate_launch_description():
         DeclareLaunchArgument('perception_python', default_value=os.path.expanduser(
             '~/projects/autonomous-semantic-navigation/.venv-perception/bin/python')),
         OpaqueFunction(function=_check_full_stack),
-        rgb_preview, search, yolo, localizer, coverage, approach, nbv, mission,
+        sensors, rgb_preview, search, yolo, localizer, coverage, approach, nbv, mission,
     ])
