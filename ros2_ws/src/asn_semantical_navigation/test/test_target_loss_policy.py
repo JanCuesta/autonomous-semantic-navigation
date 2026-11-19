@@ -21,6 +21,7 @@ def test_freshness_rejects_delayed_future_and_invalid_observations(module, frame
     pose.pose.orientation.w = 1.0
     pose.header.stamp.sec = 99
     m = SimpleNamespace(pose=pose, pose_at=11., mission_started=10., pose_valid=True,
+                        associated_observation=True,
                         age_ok=lambda *args: True, param=lambda name: 2.5,
                         get_clock=lambda: SimpleNamespace(now=lambda: SimpleNamespace(nanoseconds=100_000_000_000)))
     get = module.SemanticMissionManager.localized_target_snapshot
@@ -39,7 +40,7 @@ def test_freshness_rejects_delayed_future_and_invalid_observations(module, frame
 def test_lost_target_during_approach_requests_abort(module):
     calls = []
     m = SimpleNamespace(state=module.State.APPROACHING, since=time.monotonic(),
-                        localized_target_snapshot=lambda: None,
+                        live_target_matches_lock=lambda: False,
                         abort=lambda state, reason: calls.append((state, reason)))
     module.SemanticMissionManager.tick(m)
     assert calls and calls[0][0] == module.State.FAILED
@@ -67,7 +68,7 @@ def test_loss_while_goal_pending_cancels_after_acceptance(module):
         cancel_sent = False
         recovery_pending = False
         recovery_handle = None
-        localized_target_snapshot = lambda self: None
+        live_target_matches_lock = lambda self: False
         on_approach_result = lambda self, future: None
         on_cancel_ack = lambda self, future: None
         request_approach_cancel = module.SemanticMissionManager.request_approach_cancel
@@ -77,3 +78,28 @@ def test_loss_while_goal_pending_cancels_after_acceptance(module):
     module.SemanticMissionManager.on_approach_accepted(m, Future(handle))
     assert m.state == module.State.CANCELLING
     assert handle.cancelled
+
+
+@pytest.mark.parametrize('module,frame', CASES)
+def test_correspondence_rejects_moved_reordered_and_changed_class(module, frame):
+    from geometry_msgs.msg import PoseStamped
+    lock = PoseStamped()
+    lock.header.frame_id = frame
+    lock.header.stamp.sec = 99
+    live = PoseStamped()
+    live.header.frame_id = frame
+    live.header.stamp.sec = 100
+    mission = SimpleNamespace(target_snapshot=lock, target='chair',
+                              locked_target_class='chair',
+                              localized_target_snapshot=lambda: live,
+                              param=lambda name: 0.2)
+    check = module.SemanticMissionManager.live_target_matches_lock
+    assert check(mission)
+    live.pose.position.x = 0.21
+    assert not check(mission)
+    live.pose.position.x = 0.0
+    live.header.stamp.sec = 98
+    assert not check(mission)
+    live.header.stamp.sec = 100
+    mission.target = 'backpack'
+    assert not check(mission)

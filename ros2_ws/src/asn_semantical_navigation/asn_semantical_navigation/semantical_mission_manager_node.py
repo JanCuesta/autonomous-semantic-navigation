@@ -13,6 +13,7 @@ import json
 import math
 
 from asn_semantical_navigation.core.target_freshness import measurement_is_fresh
+from asn_semantical_navigation.core.target_correspondence import corresponds
 import time
 from enum import Enum
 import rclpy
@@ -81,6 +82,8 @@ class SemanticMissionManager(Node):
             ('inspection_goal_timeout_s', 120.0),
             ('inspection_max_cycles', 3),
             ('target_pose_stale_s', 2.5),
+            ('target_consistency_tolerance_m', 0.20),
+            ('require_associated_target_observation', True),
             ('target_snapshot_max_age_s', 12.0),
             ('approach_preview_timeout_s', 8.0),
             ('approach_goal_stale_s', 2.5),
@@ -105,12 +108,15 @@ class SemanticMissionManager(Node):
         self.pose = None
         self.pose_at = 0.0
         self.pose_valid = False
+        self.associated_observation = False
+        self.last_observation_sequence = -1
         self.last_valid_pose = None
         self.last_valid_pose_at = 0.0
         self.preview = None
         self.preview_at = 0.0
         self.preview_valid = False
         self.target_snapshot = None
+        self.locked_target_class = None
         self.snapshot_at = 0.0
         self.goal = None
         self.goal_pending = False
@@ -182,6 +188,9 @@ class SemanticMissionManager(Node):
                                  self.on_pose, 10)
         self.create_subscription(Bool, '/semantic/perception/target_valid',
                                  self.on_pose_valid, 10)
+        self.create_subscription(
+            String, '/semantic/perception/target_observation_json',
+            self.on_target_observation, 10)
         self.create_subscription(PoseStamped, '/semantic/approach/locked_goal',
                                  self.on_preview, 10)
         self.create_subscription(Bool, '/semantic/approach/goal_valid',
@@ -241,6 +250,7 @@ class SemanticMissionManager(Node):
         self.detected = False
         self.pose = self.preview = self.last_valid_pose = None
         self.pose_valid = self.preview_valid = False
+        self.associated_observation = False
         self.last_valid_pose_at = 0.0
         self.locked_valid_pub.publish(Bool(data=False))
         self.publish_state()
@@ -298,11 +308,15 @@ class SemanticMissionManager(Node):
         self.nav_active = active
 
     def on_pose(self, msg):
+        if self.param('require_associated_target_observation'):
+            return
         self.pose, self.pose_at = msg, time.monotonic()
         self.cache_valid_localization()
         self.stop_if_localized()
 
     def on_pose_valid(self, msg):
+        if self.param('require_associated_target_observation'):
+            return
         self.pose_valid = bool(msg.data)
         if self.pose_valid:
             self.cache_valid_localization()
@@ -313,6 +327,60 @@ class SemanticMissionManager(Node):
         else:
             # Preserve a previously validated pose for a bounded interval.
             self.pose = None
+
+    def on_target_observation(self, msg):
+        """Consume one atomically associated pose/validity record."""
+        try:
+            record = json.loads(msg.data)
+            sequence = int(record['sequence'])
+            valid = record['valid'] is True
+            target = str(record['target'])
+            if sequence <= self.last_observation_sequence:
+                return
+            self.last_observation_sequence = sequence
+            if not valid:
+                self.pose = None
+                self.pose_valid = False
+                self.associated_observation = True
+                return
+            if target != self.target:
+                raise ValueError('target class does not match active mission')
+            rgb_ns = int(record['rgb_timestamp_ns'])
+            depth_ns = int(record['depth_timestamp_ns'])
+            payload = record['pose']
+            if rgb_ns <= 0 or depth_ns <= 0:
+                raise ValueError('nonpositive capture timestamp')
+            pose = PoseStamped()
+            pose.header.frame_id = str(payload['frame_id'])
+            pose.header.stamp.sec = int(payload['timestamp_sec'])
+            pose.header.stamp.nanosec = int(payload['timestamp_nanosec'])
+            if (pose.header.stamp.sec * 1_000_000_000 +
+                    pose.header.stamp.nanosec != depth_ns):
+                raise ValueError('pose/depth timestamp association mismatch')
+            position = [float(value) for value in payload['position']]
+            orientation = [float(value) for value in payload['orientation']]
+            if len(position) != 3 or len(orientation) != 4:
+                raise ValueError('malformed associated pose')
+            (pose.pose.position.x, pose.pose.position.y,
+             pose.pose.position.z) = position
+            (pose.pose.orientation.x, pose.pose.orientation.y,
+             pose.pose.orientation.z, pose.pose.orientation.w) = orientation
+            if not valid_pose(pose):
+                raise ValueError('invalid associated target pose')
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            self.get_logger().warning(
+                f'ASSOCIATED_TARGET_REJECTED: {exc}')
+            return
+        self.pose = pose
+        self.pose_at = time.monotonic()
+        self.pose_valid = True
+        self.associated_observation = True
+        self.cache_valid_localization()
+        self.stop_if_localized()
+        if self.state == State.SCANNING_FOR_TARGET:
+            self.recovery_scan_detection = True
+            self.request_recovery_cancel(
+                'Associated RGB-D localization during inspection scan')
 
     def cache_valid_localization(self):
         if (self.state in (State.PREPARING, State.SEARCHING,
@@ -392,6 +460,7 @@ class SemanticMissionManager(Node):
         self.last_valid_pose_at = 0.0
         self.pose_at = self.preview_at = self.snapshot_at = 0.0
         self.pose_valid = self.preview_valid = False
+        self.associated_observation = False
         self.nbv_reset_done = False
         self.nbv_idle_verified = False
         self.nbv_busy = False
@@ -801,6 +870,7 @@ class SemanticMissionManager(Node):
     def localized_target_snapshot(self):
         """Return only a currently valid, fresh measurement from this mission."""
         if not (self.pose_valid and valid_pose(self.pose) and
+                self.associated_observation and
                 self.pose_at >= self.mission_started and self.mission_started > 0 and
                 self.age_ok(self.pose_at, 'target_pose_stale_s')):
             return None
@@ -817,10 +887,25 @@ class SemanticMissionManager(Node):
         locked.pose = target_pose.pose
         locked.header.frame_id = 'map'
         self.target_snapshot = locked
+        self.locked_target_class = self.target
         # Use lock-publication time so approach preview MUST be recomputed.
         self.snapshot_at = time.monotonic()
         self.locked_pose_pub.publish(locked)
         self.locked_valid_pub.publish(Bool(data=True))
+
+    def live_target_matches_lock(self):
+        """Check class and position; this cannot establish a unique object identity."""
+        live, locked = self.localized_target_snapshot(), self.target_snapshot
+        if live is None or locked is None:
+            return False
+        a, b = locked.pose.position, live.pose.position
+        la, lb = locked.header.stamp, live.header.stamp
+        return corresponds(
+            self.locked_target_class, self.target,
+            locked.header.frame_id, live.header.frame_id,
+            (a.x, a.y, a.z), (b.x, b.y, b.z),
+            la.sec + la.nanosec / 1e9, lb.sec + lb.nanosec / 1e9,
+            float(self.param('target_consistency_tolerance_m')))
 
     def has_approach(self):
         if (self.target_snapshot is None or not self.preview_valid or
@@ -833,8 +918,8 @@ class SemanticMissionManager(Node):
             'minimum_target_distance_m')
 
     def send_approach(self):
-        if self.localized_target_snapshot() is None:
-            self.abort(State.FAILED, 'Live target localization lost before submission')
+        if not self.live_target_matches_lock():
+            self.abort(State.FAILED, 'Live target inconsistent or lost before submission')
             return
         if not self.nav_quiet():
             return
@@ -879,8 +964,8 @@ class SemanticMissionManager(Node):
             return
         if self.state == State.CANCELLING or self.cancel_goal_on_accept:
             self.request_approach_cancel()
-        elif self.localized_target_snapshot() is None:
-            self.abort(State.FAILED, 'Live target localization lost before goal acceptance')
+        elif not self.live_target_matches_lock():
+            self.abort(State.FAILED, 'Live target inconsistent or lost before goal acceptance')
         else:
             self.set_state(State.APPROACHING, 'Nav2 accepted approach goal')
 
@@ -1095,16 +1180,16 @@ class SemanticMissionManager(Node):
                     elapsed > self.param('prepare_timeout_s')):
                 self.abort(State.FAILED, 'Unable to resume NBV after inspection')
         elif self.state == State.WAITING_APPROACH:
-            if self.localized_target_snapshot() is None:
+            if not self.live_target_matches_lock():
                 self.locked_valid_pub.publish(Bool(data=False))
-                self.set_state(State.FAILED, 'Live target localization lost before approach')
+                self.set_state(State.FAILED, 'Live target inconsistent or lost before approach')
             elif self.has_approach() and self.nav.server_is_ready() and self.nav_quiet():
                 self.send_approach()
             elif elapsed > self.param('approach_preview_timeout_s'):
                 self.set_state(State.FAILED, 'No fresh valid approach preview')
         elif self.state == State.APPROACHING:
-            if self.localized_target_snapshot() is None:
-                self.abort(State.FAILED, 'Live target localization lost during approach')
+            if not self.live_target_matches_lock():
+                self.abort(State.FAILED, 'Live target inconsistent or lost during approach')
             elif time.monotonic() - self.approach_at > self.param('approach_timeout_s'):
                 self.abort(State.FAILED, 'Approach action timed out')
         elif self.state == State.VERIFYING:

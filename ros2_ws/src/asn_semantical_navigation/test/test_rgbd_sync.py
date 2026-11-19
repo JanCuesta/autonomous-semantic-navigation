@@ -5,9 +5,11 @@ from types import SimpleNamespace
 import pytest
 import rclpy
 from sensor_msgs.msg import Image
+from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 
 import asn_semantical_navigation.object_localizer_node as module
+from asn_semantical_navigation.core.rgbd_observation import Observation3D
 
 
 @pytest.fixture
@@ -38,6 +40,14 @@ def detection(stamp_ns, target='chair'):
                                   'detections': [{'class': target}]}))
 
 
+def motion(stamp_ns, linear=0.0, angular=0.0):
+    msg = Odometry()
+    msg.header.stamp.sec, msg.header.stamp.nanosec = divmod(stamp_ns, 10**9)
+    msg.twist.twist.linear.x = linear
+    msg.twist.twist.angular.z = angular
+    return msg
+
+
 def test_delayed_out_of_order_depth_does_not_clear_pending(sync_node):
     node, clock, chosen = sync_node
     node.depth_callback(depth(10_300_000_000))
@@ -59,21 +69,21 @@ def test_watchdog_evaluates_buffered_candidate_at_deadline(sync_node):
     node, clock, chosen = sync_node
     node.depth_callback(depth(9_980_000_000))
     node.detection_callback(detection(10_000_000_000))
-    clock.now = 0.75
+    clock.now = 1.0
     node.watchdog_callback()
     assert len(chosen) == 1 and chosen[0][2] == pytest.approx(0.02)
 
 
-@pytest.mark.parametrize('offset,accepted', [(2_000_000, True), (100_000_000, True),
+@pytest.mark.parametrize('offset,accepted', [(2_000_001, True), (100_000_000, True),
                                               (101_000_000, False), (200_000_000, False)])
 def test_tolerance_and_deadline(sync_node, offset, accepted):
     node, clock, chosen = sync_node
     node.depth_callback(depth(10_000_000_000 + offset))
     node.detection_callback(detection(10_000_000_000))
-    clock.now = 0.749
+    clock.now = 0.999
     node.watchdog_callback()
     assert not chosen and len(node.pending_detections) == 1
-    clock.now = 0.75
+    clock.now = 1.0
     node.watchdog_callback()
     assert bool(chosen) is accepted
     assert not node.pending_detections
@@ -86,10 +96,43 @@ def test_tolerance_and_deadline(sync_node, offset, accepted):
 def test_no_depth_expires(sync_node):
     node, clock, chosen = sync_node
     node.detection_callback(detection(10_000_000_000))
-    clock.now = 0.75
+    clock.now = 1.0
     node.watchdog_callback()
     assert not chosen and not node.pending_detections
     assert node.sync_counts['expired_pending'] == 1
+
+
+@pytest.mark.parametrize('offset_ns,linear,stationary,accepted', [
+    (80_000_000, 0.0, True, True),
+    (120_000_000, 0.0, True, True),
+    (120_000_000, 0.10, False, False),
+    (120_000_000, None, None, False),
+    (151_000_000, 0.0, True, False),
+])
+def test_motion_dependent_tolerance(
+        sync_node, offset_ns, linear, stationary, accepted):
+    node, clock, chosen = sync_node
+    node.depth_callback(depth(10_000_000_000 + offset_ns))
+    node.detection_callback(detection(10_000_000_000))
+    clock.now = 1.0
+    if linear is not None:
+        node.odom_callback(motion(11_500_000_000, linear=linear))
+    assert node.motion_state() is stationary
+    node.watchdog_callback()
+    assert bool(chosen) is accepted
+
+
+def test_motion_state_is_evaluated_at_matching_deadline(sync_node):
+    node, clock, chosen = sync_node
+    node.depth_callback(depth(10_120_000_000))
+    node.detection_callback(detection(10_000_000_000))
+    node.odom_callback(motion(10_500_000_000, linear=0.0))
+    assert not chosen
+    clock.now = 1.0
+    node.odom_callback(motion(11_500_000_000, linear=0.1))
+    node.watchdog_callback()
+    assert not chosen
+    assert node.sync_counts['timestamp_mismatches'] == 1
 
 
 def test_exact_priority_and_fifo(sync_node):
@@ -110,12 +153,13 @@ def test_tie_prefers_earlier_stamp_and_depth_can_be_reused(sync_node):
     node.depth_callback(depth(10_050_000_000))
     node.depth_callback(depth(9_950_000_000))
     node.detection_callback(detection(10_000_000_000))
-    clock.now = 0.75
+    clock.now = 1.0
     node.watchdog_callback()
     assert node.timestamp_ns(chosen[0][1].header.stamp) == 9_950_000_000
+    node._capture_now_ns = lambda: 11_000_000_000
     node.detection_callback(detection(10_010_000_000))
     node.detection_callback(detection(10_020_000_000))
-    clock.now = 1.50
+    clock.now = 2.0
     node.watchdog_callback()
     assert node.timestamp_ns(chosen[1][1].header.stamp) == 10_050_000_000
     assert chosen[1][1] is chosen[2][1]
@@ -143,7 +187,8 @@ def test_duplicate_target_change_and_unconfirmed(sync_node):
     msg = json.loads(detection(10_000_000_002, 'bottle').data)
     msg['confirmed'] = False
     node.detection_callback(String(data=json.dumps(msg)))
-    assert not node.pending_detections
+    # An unrelated RGB-only miss must not discard an already pending match.
+    assert len(node.pending_detections) == 1
 
 
 def test_stale_inference_future_timestamps_and_recovery(sync_node):
@@ -186,7 +231,7 @@ def test_different_frequencies_missing_and_no_rewrite(sync_node):
         node.depth_callback(depth(stamp))
     for stamp in (9_800_000_000, 9_900_000_000, 10_000_000_000, 10_300_000_001):
         node.detection_callback(detection(stamp))
-    clock.now = 0.75
+    clock.now = 1.0
     node.watchdog_callback()
     assert len(chosen) == 3
     assert [d['timestamp_sec'] * 10**9 + d['timestamp_nanosec'] for d, _, _ in chosen] == [
@@ -216,7 +261,7 @@ def test_real_ros_clock_jump_callback(sync_node):
 def test_depth_arriving_at_deadline_cannot_rescue_expired_detection(sync_node):
     node, clock, chosen = sync_node
     node.detection_callback(detection(10_000_000_000))
-    clock.now = 0.75
+    clock.now = 1.0
     node.depth_callback(depth(10_000_000_000))
     assert not chosen and not node.pending_detections
     assert node.sync_counts['expired_pending'] == 1
@@ -226,3 +271,33 @@ def test_watchdog_uses_steady_clock(sync_node):
     from rclpy.clock import ClockType
     node, _, _ = sync_node
     assert node.watchdog_clock.clock_type == ClockType.STEADY_TIME
+
+
+def test_multiple_same_class_detections_are_ambiguous():
+    one = {'class': 'chair', 'confidence': 0.9}
+    chosen, count = module.select_unique_target(
+        [one, {'class': 'bottle'}], 'chair')
+    assert chosen is one and count == 1
+    chosen, count = module.select_unique_target(
+        [one, {'class': 'chair', 'confidence': 0.8}], 'chair')
+    assert chosen is None and count == 2
+
+
+def test_live_authorization_expires_without_clearing_history(sync_node):
+    node, clock, _ = sync_node
+    node.history.add(Observation3D(
+        'chair', '', 10_000_000_001, 10_000_000_002, (1.0, 2.0, 0.5)))
+    node.valid = True
+    node.last_valid_wall_time = 0.0
+    clock.now = 2.01
+    node.watchdog_callback()
+    assert not node.valid
+    assert len(node.history.observations) == 1
+
+
+def test_hardware_pair_processed_without_wait(sync_node):
+    node, clock, chosen = sync_node
+    node.detection_callback(detection(10_000_000_000))
+    node.depth_callback(depth(10_002_000_000))
+    assert len(chosen) == 1
+    assert chosen[0][2] == pytest.approx(0.002)

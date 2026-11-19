@@ -13,6 +13,7 @@ import json
 import math
 
 from asn_semantical_navigation.core.target_freshness import measurement_is_fresh
+from asn_semantical_navigation.core.target_correspondence import corresponds
 import time
 from enum import Enum
 import rclpy
@@ -81,6 +82,7 @@ class SemanticMissionManager(Node):
             ('inspection_goal_timeout_s', 120.0),
             ('inspection_max_cycles', 3),
             ('target_pose_stale_s', 2.5),
+            ('target_consistency_tolerance_m', 0.20),
             ('target_snapshot_max_age_s', 12.0),
             ('approach_preview_timeout_s', 8.0),
             ('approach_goal_stale_s', 2.5),
@@ -111,6 +113,7 @@ class SemanticMissionManager(Node):
         self.preview_at = 0.0
         self.preview_valid = False
         self.target_snapshot = None
+        self.locked_target_class = None
         self.snapshot_at = 0.0
         self.goal = None
         self.goal_pending = False
@@ -817,10 +820,25 @@ class SemanticMissionManager(Node):
         locked.pose = target_pose.pose
         locked.header.frame_id = 'odom'
         self.target_snapshot = locked
+        self.locked_target_class = self.target
         # Use lock-publication time so approach preview MUST be recomputed.
         self.snapshot_at = time.monotonic()
         self.locked_pose_pub.publish(locked)
         self.locked_valid_pub.publish(Bool(data=True))
+
+    def live_target_matches_lock(self):
+        """Check class and position; this cannot establish a unique object identity."""
+        live, locked = self.localized_target_snapshot(), self.target_snapshot
+        if live is None or locked is None:
+            return False
+        a, b = locked.pose.position, live.pose.position
+        la, lb = locked.header.stamp, live.header.stamp
+        return corresponds(
+            self.locked_target_class, self.target,
+            locked.header.frame_id, live.header.frame_id,
+            (a.x, a.y, a.z), (b.x, b.y, b.z),
+            la.sec + la.nanosec / 1e9, lb.sec + lb.nanosec / 1e9,
+            float(self.param('target_consistency_tolerance_m')))
 
     def has_approach(self):
         if (self.target_snapshot is None or not self.preview_valid or
@@ -833,8 +851,8 @@ class SemanticMissionManager(Node):
             'minimum_target_distance_m')
 
     def send_approach(self):
-        if self.localized_target_snapshot() is None:
-            self.abort(State.FAILED, 'Live target localization lost before submission')
+        if not self.live_target_matches_lock():
+            self.abort(State.FAILED, 'Live target inconsistent or lost before submission')
             return
         if not self.nav_quiet():
             return
@@ -879,8 +897,8 @@ class SemanticMissionManager(Node):
             return
         if self.state == State.CANCELLING or self.cancel_goal_on_accept:
             self.request_approach_cancel()
-        elif self.localized_target_snapshot() is None:
-            self.abort(State.FAILED, 'Live target localization lost before goal acceptance')
+        elif not self.live_target_matches_lock():
+            self.abort(State.FAILED, 'Live target inconsistent or lost before goal acceptance')
         else:
             self.set_state(State.APPROACHING, 'Nav2 accepted approach goal')
 
@@ -1095,16 +1113,16 @@ class SemanticMissionManager(Node):
                     elapsed > self.param('prepare_timeout_s')):
                 self.abort(State.FAILED, 'Unable to resume NBV after inspection')
         elif self.state == State.WAITING_APPROACH:
-            if self.localized_target_snapshot() is None:
+            if not self.live_target_matches_lock():
                 self.locked_valid_pub.publish(Bool(data=False))
-                self.set_state(State.FAILED, 'Live target localization lost before approach')
+                self.set_state(State.FAILED, 'Live target inconsistent or lost before approach')
             elif self.has_approach() and self.nav.server_is_ready() and self.nav_quiet():
                 self.send_approach()
             elif elapsed > self.param('approach_preview_timeout_s'):
                 self.set_state(State.FAILED, 'No fresh valid approach preview')
         elif self.state == State.APPROACHING:
-            if self.localized_target_snapshot() is None:
-                self.abort(State.FAILED, 'Live target localization lost during approach')
+            if not self.live_target_matches_lock():
+                self.abort(State.FAILED, 'Live target inconsistent or lost during approach')
             elif time.monotonic() - self.approach_at > self.param('approach_timeout_s'):
                 self.abort(State.FAILED, 'Approach action timed out')
         elif self.state == State.VERIFYING:

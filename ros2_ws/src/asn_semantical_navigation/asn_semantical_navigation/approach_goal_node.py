@@ -5,6 +5,7 @@ clearance and a straight-line path against /map, then publishes an RViz preview.
 Never publishes /cmd_vel. Direct Nav2 goal submission is disabled by default and may be enabled only for supervised standalone testing.
 """
 
+import json
 import math
 import time
 
@@ -61,6 +62,7 @@ class ApproachGoalNode(Node):
             ('locked_target_max_age_s', 15.0),
             ('allow_direct_nav_goal', False),
             ('robot_frame', 'base_link'),
+            ('require_associated_target_observation', True),
         ])
         map_qos = QoSProfile(
             depth=1, reliability=ReliabilityPolicy.RELIABLE,
@@ -70,6 +72,7 @@ class ApproachGoalNode(Node):
         self.target = None
         self.target_valid = False
         self.target_received_at = 0.0
+        self.last_target_observation_sequence = -1
         # The mission manager can freeze a validated target while NBV
         # cancels and live detections briefly disappear.
         self.locked_target = None
@@ -102,6 +105,9 @@ class ApproachGoalNode(Node):
                                  self.on_target, 10)
         self.create_subscription(Bool, '/semantic/perception/target_valid',
                                  self.on_valid, 10)
+        self.create_subscription(
+            String, '/semantic/perception/target_observation_json',
+            self.on_target_observation, 10)
         self.create_subscription(
             PoseStamped, '/semantic/mission/locked_target_pose',
             self.on_locked_target, map_qos)
@@ -183,13 +189,63 @@ class ApproachGoalNode(Node):
             msg.info.height, msg.info.width)
 
     def on_target(self, msg):
+        if self.get_parameter(
+                'require_associated_target_observation').value:
+            return
         self.target = msg
         self.target_received_at = time.monotonic()
 
     def on_valid(self, msg):
+        if self.get_parameter(
+                'require_associated_target_observation').value:
+            return
         self.target_valid = bool(msg.data)
         if not self.target_valid:
             self.target = None
+
+    def on_target_observation(self, msg):
+        """Atomically associate a live pose with its validity decision."""
+        try:
+            record = json.loads(msg.data)
+            sequence = int(record['sequence'])
+            if sequence <= self.last_target_observation_sequence:
+                return
+            self.last_target_observation_sequence = sequence
+            if record['valid'] is not True:
+                self.target = None
+                self.target_valid = False
+                return
+            payload = record['pose']
+            depth_ns = int(record['depth_timestamp_ns'])
+            pose = PoseStamped()
+            pose.header.frame_id = str(payload['frame_id'])
+            pose.header.stamp.sec = int(payload['timestamp_sec'])
+            pose.header.stamp.nanosec = int(payload['timestamp_nanosec'])
+            pose_ns = (pose.header.stamp.sec * 1_000_000_000 +
+                       pose.header.stamp.nanosec)
+            if depth_ns <= 0 or pose_ns != depth_ns:
+                raise ValueError('pose/depth timestamp association mismatch')
+            position = [float(value) for value in payload['position']]
+            orientation = [float(value) for value in payload['orientation']]
+            if len(position) != 3 or len(orientation) != 4:
+                raise ValueError('malformed associated pose')
+            values = position + orientation
+            if not all(math.isfinite(value) for value in values):
+                raise ValueError('non-finite associated pose')
+            (pose.pose.position.x, pose.pose.position.y,
+             pose.pose.position.z) = position
+            (pose.pose.orientation.x, pose.pose.orientation.y,
+             pose.pose.orientation.z, pose.pose.orientation.w) = orientation
+            if (pose.header.frame_id != 'map' or
+                    sum(value * value for value in orientation) < 1e-6):
+                raise ValueError('invalid associated map pose')
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            self.get_logger().warning(
+                f'ASSOCIATED_TARGET_REJECTED: {exc}')
+            return
+        self.target = pose
+        self.target_received_at = time.monotonic()
+        self.target_valid = True
 
     def on_locked_target(self, msg):
         # The lock is activated only by locked_target_valid=True.

@@ -25,7 +25,7 @@ class Recorder:
 def localizer(monkeypatch):
     rclpy.init()
     node = module.ObjectLocalizer()
-    for name in ('pose_pub', 'valid_pub', 'status_pub', 'marker_pub',
+    for name in ('pose_pub', 'valid_pub', 'observation_pub', 'status_pub', 'marker_pub',
                  'last_known_marker_pub'):
         setattr(node, name, Recorder())
     node.bridge = SimpleNamespace(
@@ -47,11 +47,17 @@ def localizer(monkeypatch):
 
 
 def sample(node):
+    node._test_sample_index = getattr(node, '_test_sample_index', 0) + 1
+    stamp_ns = 1_000_000_000 + node._test_sample_index * 10_000_000
     image = Image()
     image.width = image.height = 40
     image.encoding = '32FC1'
     image.header.frame_id = 'camera'
-    data = {'target': 'backpack', 'frame_id': 'camera', 'detections': [
+    image.header.stamp.sec, image.header.stamp.nanosec = divmod(
+        stamp_ns, 1_000_000_000)
+    data = {'target': 'backpack', 'frame_id': 'camera',
+            'timestamp_sec': image.header.stamp.sec,
+            'timestamp_nanosec': image.header.stamp.nanosec, 'detections': [
         {'class': 'backpack', 'confidence': 0.9, 'bbox_xyxy': [0, 0, 40, 40]}]}
     node.localize(data, image, 0.)
 
@@ -81,6 +87,7 @@ def test_confirm_and_update_marker_without_affecting_live_interfaces(localizer):
     assert node.last_valid_wall_time == timestamp
     point.point.x = 1.2
     confirm(node)
+    confirm(node)
     assert node.last_known_marker_pub.messages[-1].markers[0].pose.position.x == pytest.approx(1.2)
 
 
@@ -92,7 +99,7 @@ def test_dropout_timeout_idle_and_target_change(localizer, monkeypatch):
     detection = {'target': 'backpack', 'timestamp_sec': 1, 'timestamp_nanosec': 0,
                  'detections': [], 'confirmed': False}
     node.detection_callback(String(data=json.dumps(detection)))
-    assert not node.valid and node.valid_pub.messages[-1].data is False
+    assert node.valid
     assert node.last_known_marker_pub.messages[-1] is last
     confirm(node)
     last = node.last_known_marker_pub.messages[-1]
@@ -146,4 +153,4 @@ def test_localization_rejects_invalid_calibration_depth_and_tf(localizer):
         raise TransformException('missing historical transform')
     node.tf_buffer = SimpleNamespace(lookup_transform=missing_tf)
     sample(node)
-    assert not node.valid and 'TF at camera timestamp' in node.status_pub.messages[-1].data
+    assert not node.valid and 'TF_REJECTED' in node.status_pub.messages[-1].data

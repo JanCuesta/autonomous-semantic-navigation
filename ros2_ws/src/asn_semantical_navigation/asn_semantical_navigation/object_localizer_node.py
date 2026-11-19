@@ -18,11 +18,26 @@ from action_msgs.msg import GoalStatus, GoalStatusArray
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from rclpy.time import Time
+from nav_msgs.msg import Odometry
 from sensor_msgs.msg import CameraInfo, Image
 from std_msgs.msg import Bool, String
 from tf2_geometry_msgs import do_transform_point
 from tf2_ros import Buffer, TransformException, TransformListener
 from visualization_msgs.msg import Marker, MarkerArray
+
+from .core.rgbd_observation import (
+    Observation3D, ObservationHistory, stationary_from_twist)
+
+
+def select_unique_target(detections, target):
+    """Return one target detection; reject ambiguity without a tracker ID."""
+    matches = [
+        item for item in detections
+        if isinstance(item, dict) and item.get('class') == target
+    ]
+    if len(matches) != 1:
+        return None, len(matches)
+    return matches[0], 1
 
 
 def select_foreground_depth(region, *, min_depth_m=0.15, max_depth_m=5.0,
@@ -150,6 +165,7 @@ def select_foreground_depth(region, *, min_depth_m=0.15, max_depth_m=5.0,
 
 class ObjectLocalizer(Node):
 
+    default_map_frame = 'map'
 
     def __init__(self):
         super().__init__('object_localizer_node')
@@ -157,11 +173,17 @@ class ObjectLocalizer(Node):
             ('depth_topic', '/camera/depth/image_raw'),
             ('camera_info_topic', '/camera_info'),
             ('detections_topic', '/semantic/search/detections_json'),
-            ('map_frame', 'map'),
-            ('max_sync_difference_s', 0.10),
-            ('sync_wait_s', 0.75),
+            ('map_frame', self.default_map_frame),
+            ('odom_topic', '/odom'),
+            ('max_sync_difference_s', 0.10),  # Deprecated compatibility alias.
+            ('stationary_sync_tolerance_s', 0.15),
+            ('moving_sync_tolerance_s', 0.10),
+            ('sync_wait_s', 1.0),
             ('max_capture_age_s', 2.0),
             ('max_future_stamp_s', 0.10),
+            ('motion_state_freshness_s', 0.50),
+            ('stationary_linear_speed_mps', 0.02),
+            ('stationary_angular_speed_rps', 0.05),
             ('min_depth_m', 0.15),
             ('max_depth_m', 5.0),
             ('roi_fraction', 0.40),
@@ -175,7 +197,9 @@ class ObjectLocalizer(Node):
             ('foreground_min_fraction', 0.15),
             ('foreground_max_spread_m', 0.60),
             ('confirmation_positions', 3),
+            ('observation_window_s', 4.0),
             ('max_position_jitter_m', 0.45),
+            ('consecutive_outliers_to_reset', 2),
             ('target_timeout_s', 2.0),
         ])
         self.bridge = CvBridge()
@@ -185,21 +209,33 @@ class ObjectLocalizer(Node):
         self.pending_detections = deque(maxlen=8)
         self.sync_counts = Counter({key: 0 for key in (
             'depth_received', 'detections_received', 'exact_matches',
-            'matches_after_wait', 'timestamp_mismatches', 'expired_pending',
+            'close_matches', 'matches_after_wait', 'timestamp_mismatches', 'expired_pending',
             'out_of_order_depth', 'depth_evictions', 'pending_evictions',
             'stale_or_future_depth', 'stale_or_future_detections', 'clock_resets',
             'localization_validation_failures', 'tf_rejections',
-            'depth_quality_rejections', 'validated_poses')})
+            'depth_quality_rejections', 'validated_poses',
+            'rejected_observations', 'history_resets', 'expired_observations',
+            'duplicate_rgb_exclusions', 'duplicate_depth_exclusions',
+            'position_outliers', 'ambiguous_target_rejections',
+            'stationary_matches', 'moving_matches', 'unknown_motion_matches')})
         self.in_localization = False
         self.max_depth_stamp_ns = None
         self.last_sync_report = time.monotonic()
-        self.position_history = deque(
-            maxlen=max(1, int(self.get_parameter('confirmation_positions').value))
-        )
+        self.history = ObservationHistory(
+            required=int(self.get_parameter('confirmation_positions').value),
+            window_s=float(self.get_parameter('observation_window_s').value),
+            max_jitter_m=float(self.get_parameter('max_position_jitter_m').value),
+            outliers_to_reset=int(
+                self.get_parameter('consecutive_outliers_to_reset').value))
         self.current_target = None
         self.last_detection_ns = -1
         self.valid = False
         self.last_valid_wall_time = 0.0
+        self.last_valid_depth_ns = 0
+        self.observation_sequence = 0
+        self.last_odom = None
+        self.last_odom_received_at = None
+        self.last_match = None
         self.last_status = None
         self.last_status_log_time = 0.0
         # Visualization cache independent of perception validity.
@@ -214,6 +250,8 @@ class ObjectLocalizer(Node):
             PoseStamped, '/semantic/perception/target_pose', 10)
         self.valid_pub = self.create_publisher(
             Bool, '/semantic/perception/target_valid', 10)
+        self.observation_pub = self.create_publisher(
+            String, '/semantic/perception/target_observation_json', 10)
         self.status_pub = self.create_publisher(
             String, '/semantic/perception/status', 10)
         self.sync_status_pub = self.create_publisher(
@@ -232,6 +270,9 @@ class ObjectLocalizer(Node):
         self.info_sub = self.create_subscription(
             CameraInfo, self.get_parameter('camera_info_topic').value,
             self.camera_info_callback, qos_profile_sensor_data)
+        self.odom_sub = self.create_subscription(
+            Odometry, self.get_parameter('odom_topic').value,
+            self.odom_callback, qos_profile_sensor_data)
         self.detection_sub = self.create_subscription(
             String, self.get_parameter('detections_topic').value,
             self.detection_callback, 10)
@@ -266,9 +307,22 @@ class ObjectLocalizer(Node):
         self.status_pub.publish(String(data=message))
         now = time.monotonic()
         if message != self.last_status or now - self.last_status_log_time > 5.0:
-            self.get_logger().info(message)
+            warning_categories = (
+                'RGBD_TIMEOUT:', 'DEPTH_REJECTED:', 'TF_REJECTED:',
+                'POSITION_OUTLIER:', 'HISTORY_RESET:',
+                'LIVE_POSE_INVALIDATED:', 'OBSERVATION_REJECTED:')
+            if message.startswith(warning_categories):
+                self._log_warning(message)
+            else:
+                self._log_info(message)
             self.last_status = message
             self.last_status_log_time = now
+
+    def _log_info(self, message):
+        self.get_logger().info(message)
+
+    def _log_warning(self, message):
+        self.get_logger().warning(message)
 
 
     def clear_marker(self):
@@ -285,23 +339,75 @@ class ObjectLocalizer(Node):
         self.last_known_marker_pub.publish(MarkerArray(markers=[marker]))
 
 
-    def invalidate(self, reason):
+    def history_count(self):
+        return len(self.history.observations)
+
+    def reject_observation(self, category, reason):
+        """Reject one candidate without destroying independent prior evidence."""
+        self.sync_counts['rejected_observations'] += 1
         if self.in_localization:
             self.sync_counts['localization_validation_failures'] += 1
-            if 'TF at camera timestamp' in reason:
-                self.sync_counts['tf_rejections'] += 1
-            elif any(word in reason for word in (
-                    'depth conversion', 'depth encoding', 'one-channel depth',
-                    'empty depth crop', 'valid depth pixels', 'mixed depth',
-                    'foreground itself')):
-                self.sync_counts['depth_quality_rejections'] += 1
+        if category == 'TF_REJECTED':
+            self.sync_counts['tf_rejections'] += 1
+        elif category == 'DEPTH_REJECTED':
+            self.sync_counts['depth_quality_rejections'] += 1
+        self.report(
+            f'{category}: {reason}; history retained '
+            f'{self.history_count()}/{self.history.required}')
+
+    def publish_associated_observation(self, valid, pose=None, *,
+                                       rgb_ns=0, depth_ns=0, reason=''):
+        """Publish one atomic authorization record alongside legacy topics."""
+        self.observation_sequence += 1
+        record = {
+            'sequence': self.observation_sequence,
+            'valid': bool(valid),
+            'target': self.current_target or '',
+            'rgb_timestamp_ns': int(rgb_ns),
+            'depth_timestamp_ns': int(depth_ns),
+            'reason': reason,
+        }
+        if pose is not None:
+            record['pose'] = {
+                'frame_id': pose.header.frame_id,
+                'timestamp_sec': int(pose.header.stamp.sec),
+                'timestamp_nanosec': int(pose.header.stamp.nanosec),
+                'position': [
+                    pose.pose.position.x, pose.pose.position.y,
+                    pose.pose.position.z],
+                'orientation': [
+                    pose.pose.orientation.x, pose.pose.orientation.y,
+                    pose.pose.orientation.z, pose.pose.orientation.w],
+            }
+        self.observation_pub.publish(String(data=json.dumps(record)))
+
+    def invalidate_live(self, reason):
+        """Withdraw navigation authorization while retaining history."""
         was_valid = self.valid
         self.valid = False
-        self.position_history.clear()
         self.valid_pub.publish(Bool(data=False))
+        self.publish_associated_observation(False, reason=reason)
         if was_valid and not self._hold_marker():
             self.clear_marker()
-        self.report(reason)
+        self.report(
+            f'LIVE_POSE_INVALIDATED: reason={reason}; history retained '
+            f'{self.history_count()}/{self.history.required}')
+
+    def reset_history(self, reason):
+        """Discard accumulated evidence only for an explicit reset event."""
+        previous = self.history.clear()
+        self.sync_counts['history_resets'] += 1
+        self.valid = False
+        self.valid_pub.publish(Bool(data=False))
+        self.publish_associated_observation(False, reason=reason)
+        if previous and not self._hold_marker():
+            self.clear_marker()
+        self.report(
+            f'HISTORY_RESET: reason={reason} old_count={previous} new_count=0')
+
+    # Compatibility for older callers; new code should choose reject/reset/live.
+    def invalidate(self, reason):
+        self.invalidate_live(reason)
 
 
     def _hold_marker(self):
@@ -368,9 +474,11 @@ class ObjectLocalizer(Node):
         self.pending_detections.clear()
         self.max_depth_stamp_ns = None
         self.last_detection_ns = -1
+        self.last_odom = None
+        self.last_odom_received_at = None
         self.sync_counts['clock_resets'] += 1
         self.clear_last_known_marker()
-        self.invalidate('WAITING: ROS clock epoch changed')
+        self.reset_history('CLOCK_EPOCH_CHANGED')
 
     def _capture_now_ns(self):
         return self.get_clock().now().nanoseconds
@@ -380,6 +488,45 @@ class ObjectLocalizer(Node):
         return (stamp_ns > 0 and
                 age_ns <= float(self.get_parameter('max_capture_age_s').value) * 1e9 and
                 age_ns >= -float(self.get_parameter('max_future_stamp_s').value) * 1e9)
+
+    def odom_callback(self, msg):
+        self.last_odom = msg
+        self.last_odom_received_at = time.monotonic()
+
+    def motion_state(self):
+        """Return True stationary, False moving, or None when uncertain."""
+        freshness = float(
+            self.get_parameter('motion_state_freshness_s').value)
+        if (self.last_odom is None or self.last_odom_received_at is None or
+                time.monotonic() - self.last_odom_received_at > freshness):
+            return None
+        stamp_ns = self.timestamp_ns(self.last_odom.header.stamp)
+        if not self._capture_fresh(stamp_ns):
+            return None
+        twist = self.last_odom.twist.twist
+        return stationary_from_twist(
+            (twist.linear.x, twist.linear.y, twist.linear.z),
+            (twist.angular.x, twist.angular.y, twist.angular.z),
+            float(self.get_parameter('stationary_linear_speed_mps').value),
+            float(self.get_parameter('stationary_angular_speed_rps').value))
+
+    def current_sync_tolerance(self):
+        stationary = self.motion_state()
+        parameter = ('stationary_sync_tolerance_s' if stationary is True
+                     else 'moving_sync_tolerance_s')
+        return float(self.get_parameter(parameter).value), stationary
+
+    def expire_history(self):
+        expired = self.history.expire(self._capture_now_ns())
+        for observation in expired:
+            self.sync_counts['expired_observations'] += 1
+            age = (self._capture_now_ns() - observation.depth_stamp_ns) / 1e9
+            self.report(
+                f'POSITION_EXPIRED: age={age:.1f}s remaining_count='
+                f'{self.history_count()}/{self.history.required}')
+        if expired and self.valid and not self.history.confirmed:
+            self.invalidate_live('INSUFFICIENT_UNEXPIRED_CONFIRMATIONS')
+        return expired
 
     def depth_callback(self, msg):
         # Resolve expired entries before admitting this arrival, even if the
@@ -410,26 +557,29 @@ class ObjectLocalizer(Node):
             if not isinstance(detections, list):
                 raise ValueError('detections must be a list')
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
-            self.invalidate(f'REJECTED: bad detection JSON: {exc}')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', f'bad detection JSON: {exc}')
             return
         if not self._capture_fresh(stamp_ns):
             self.sync_counts['stale_or_future_detections'] += 1
-            self.invalidate('REJECTED: stale or future RGB capture timestamp')
+            self.reject_observation(
+                'OBSERVATION_REJECTED',
+                'stale or future RGB capture timestamp')
             return
         if target != self.current_target:
-            # The single historical position belongs to the previous class.
             self.clear_last_known_marker()
+            old_target = self.current_target
             self.current_target = target
             self.last_detection_ns = -1
             self.pending_detections.clear()
-            self.invalidate(f'TARGET_SELECTED: {target}')
+            self.reset_history(
+                f'TARGET_CHANGED({old_target or "none"}->{target})')
         if stamp_ns <= self.last_detection_ns:
             return  # Ignore duplicate or out-of-order detections.
         self.last_detection_ns = stamp_ns
         matches = [d for d in detections
                    if isinstance(d, dict) and d.get('class') == target]
         if not data.get('confirmed') or not matches:
-            self.pending_detections.clear()
             # One missed YOLO frame must not immediately destroy a
             # previously confirmed 3D map position during NBV braking.
             # This is a bounded hold, NOT a new object observation.
@@ -439,12 +589,14 @@ class ObjectLocalizer(Node):
                 self.report('HOLDING: last validated target; waiting '
                             'for fresh RGB-D confirmation')
                 return
-            self.invalidate('WAITING: no confirmed YOLO detection')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', 'no confirmed YOLO detection')
             return
         if len(self.pending_detections) == self.pending_detections.maxlen:
             self.sync_counts['pending_evictions'] += 1
             self.pending_detections.popleft()
-            self.invalidate('REJECTED: pending detection buffer overflow')
+            self.reject_observation(
+                'RGBD_TIMEOUT', 'pending detection buffer overflow')
         self.pending_detections.append((data, stamp_ns, time.monotonic()))
         self.process_pending()
 
@@ -456,30 +608,60 @@ class ObjectLocalizer(Node):
             if not self._capture_fresh(rgb_ns):
                 self.pending_detections.popleft()
                 self.sync_counts['stale_or_future_detections'] += 1
-                self.invalidate('REJECTED: stale or future RGB capture timestamp')
+                self.reject_observation(
+                    'OBSERVATION_REJECTED',
+                    'stale or future RGB capture timestamp')
                 continue
             candidates = [m for m in self.depth_buffer
                           if self._capture_fresh(self.timestamp_ns(m.header.stamp))]
             # Earlier timestamp wins an equal-distance tie; identical stamps use
-            # first arrival. Depth reuse is allowed for independent RGB frames.
+            # first arrival. Independence is enforced by ObservationHistory.
             best = min(candidates, key=lambda m: (
                 abs(self.timestamp_ns(m.header.stamp) - rgb_ns),
                 self.timestamp_ns(m.header.stamp)), default=None)
             gap_ns = (abs(self.timestamp_ns(best.header.stamp) - rgb_ns)
                       if best is not None else None)
             exact = gap_ns == 0
-            if not exact and time.monotonic() - received_at < float(
+            # The hardware produces same-cycle stamps 1–2 ms apart.
+            # Keep the full reordering window for ambiguous/missing pairs.
+            close_pair = gap_ns is not None and gap_ns <= 2_000_000
+            if not close_pair and time.monotonic() - received_at < float(
                     self.get_parameter('sync_wait_s').value):
                 return
             self.pending_detections.popleft()
-            if best is None or gap_ns > round(
-                    float(self.get_parameter('max_sync_difference_s').value) * 1e9):
+            tolerance_s, stationary = self.current_sync_tolerance()
+            if best is None or gap_ns > round(tolerance_s * 1e9):
                 self.sync_counts['expired_pending'] += 1
                 if best is not None:
                     self.sync_counts['timestamp_mismatches'] += 1
-                self.invalidate('REJECTED: timed out waiting for matching depth')
+                detail = ('no eligible depth'
+                          if best is None else
+                          f'nearest dt={gap_ns / 1e6:.0f}ms exceeds '
+                          f'{tolerance_s * 1e3:.0f}ms')
+                self.reject_observation(
+                    'RGBD_TIMEOUT',
+                    f'{detail} after '
+                    f'{float(self.get_parameter("sync_wait_s").value) * 1e3:.0f}ms')
                 continue
-            self.sync_counts['exact_matches' if exact else 'matches_after_wait'] += 1
+            depth_ns = self.timestamp_ns(best.header.stamp)
+            match_kind = 'close_matches' if close_pair else 'matches_after_wait'
+            self.sync_counts['exact_matches' if exact else match_kind] += 1
+            motion_label = ('stationary' if stationary is True else
+                            'moving' if stationary is False else 'unknown')
+            self.sync_counts[f'{motion_label}_matches'] += 1
+            self.last_match = {
+                'rgb_timestamp_ns': rgb_ns,
+                'depth_timestamp_ns': depth_ns,
+                'difference_ms': gap_ns / 1e6,
+                'tolerance_ms': tolerance_s * 1e3,
+                'motion_state': motion_label,
+                'decision': 'accepted',
+            }
+            self.report(
+                f'RGBD_MATCH: rgb={rgb_ns / 1e9:.3f}s '
+                f'depth={depth_ns / 1e9:.3f}s dt={gap_ns / 1e6:.0f}ms '
+                f'tolerance={tolerance_s * 1e3:.0f}ms '
+                f'stationary={str(stationary).lower()}')
             self.in_localization = True
             try:
                 self.localize(data, best, gap_ns / 1e9)
@@ -490,31 +672,45 @@ class ObjectLocalizer(Node):
     def localize(self, data, depth_msg, dt):
         info = self.camera_info
         if info is None:
-            self.invalidate('WAITING: /camera_info not received')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', '/camera_info not received')
             return
         if not data.get('frame_id') or data['frame_id'] != depth_msg.header.frame_id:
-            self.invalidate('REJECTED: RGB/depth optical frames differ')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', 'RGB/depth optical frames differ')
             return
         if info.header.frame_id and info.header.frame_id != depth_msg.header.frame_id:
-            self.invalidate('REJECTED: CameraInfo/depth optical frames differ')
+            self.reject_observation(
+                'OBSERVATION_REJECTED',
+                'CameraInfo/depth optical frames differ')
             return
         if info.width != depth_msg.width or info.height != depth_msg.height:
-            self.invalidate('REJECTED: CameraInfo/depth resolutions differ')
+            self.reject_observation(
+                'OBSERVATION_REJECTED',
+                'CameraInfo/depth resolutions differ')
             return
         if (data.get('image_width', depth_msg.width) != depth_msg.width or
                 data.get('image_height', depth_msg.height) != depth_msg.height):
-            self.invalidate('REJECTED: RGB/depth image resolutions differ')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', 'RGB/depth image resolutions differ')
             return
-        matches = [d for d in data['detections'] if d.get('class') == data['target']]
+        best, match_count = select_unique_target(
+            data['detections'], data['target'])
+        if best is None:
+            self.sync_counts['ambiguous_target_rejections'] += 1
+            self.reject_observation(
+                'OBSERVATION_REJECTED',
+                f'ambiguous same-class detections count={match_count}')
+            return
         try:
-            best = max(matches, key=lambda d: float(d['confidence']))
             x1, y1, x2, y2 = (float(v) for v in best['bbox_xyxy'])
             if not all(math.isfinite(v) for v in (x1, y1, x2, y2)):
                 raise ValueError('non-finite box coordinates')
             if x2 <= x1 or y2 <= y1:
                 raise ValueError('empty or inverted box')
         except (KeyError, TypeError, ValueError) as exc:
-            self.invalidate(f'REJECTED: invalid bounding box: {exc}')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', f'invalid bounding box: {exc}')
             return
         try:
             depth = self.bridge.imgmsg_to_cv2(
@@ -524,18 +720,24 @@ class ObjectLocalizer(Node):
             elif depth_msg.encoding == '16UC1':
                 depth = np.asarray(depth, dtype=np.float32) * 0.001  # mm -> m
             else:
-                self.invalidate(f'REJECTED: unsupported depth encoding {depth_msg.encoding}')
+                self.reject_observation(
+                    'DEPTH_REJECTED',
+                    f'unsupported depth encoding {depth_msg.encoding}')
                 return
         except Exception as exc:
-            self.invalidate(f'REJECTED: depth conversion failed: {exc}')
+            self.reject_observation(
+                'DEPTH_REJECTED', f'depth conversion failed: {exc}')
             return
         if depth.ndim != 2:
-            self.invalidate('REJECTED: expected one-channel depth image')
+            self.reject_observation(
+                'DEPTH_REJECTED', 'expected one-channel depth image')
             return
         height, width = depth.shape
         u, v = (x1 + x2) / 2.0, (y1 + y2) / 2.0
         if not (0 <= u < width and 0 <= v < height):
-            self.invalidate('REJECTED: bounding-box center outside depth image')
+            self.reject_observation(
+                'OBSERVATION_REJECTED',
+                'bounding-box center outside depth image')
             return
         # Sample a central crop; exclude box edges that commonly include background.
         fraction = float(self.get_parameter('roi_fraction').value)
@@ -548,7 +750,7 @@ class ObjectLocalizer(Node):
         bottom = min(height, int(math.ceil(v + half_h)))
         region = depth[top:bottom, left:right]
         if region.size == 0:
-            self.invalidate('REJECTED: empty depth crop')
+            self.reject_observation('DEPTH_REJECTED', 'empty depth crop')
             return
         min_depth = float(self.get_parameter('min_depth_m').value)
         max_depth = float(self.get_parameter('max_depth_m').value)
@@ -557,7 +759,8 @@ class ObjectLocalizer(Node):
         if (values.size < int(self.get_parameter('min_valid_pixels').value) or
                 values.size / region.size < float(
                     self.get_parameter('min_valid_fraction').value)):
-            self.invalidate('REJECTED: insufficient valid depth pixels')
+            self.reject_observation(
+                'DEPTH_REJECTED', 'insufficient valid depth pixels')
             return
         selection, error = select_foreground_depth(
             region,
@@ -577,7 +780,7 @@ class ObjectLocalizer(Node):
                 self.get_parameter('foreground_max_spread_m').value),
         )
         if selection is None:
-            self.invalidate('REJECTED: ' + error)
+            self.reject_observation('DEPTH_REJECTED', error)
             return
         z = selection['depth_m']
         # The median foreground pixel may lie away from the box center,
@@ -591,7 +794,8 @@ class ObjectLocalizer(Node):
         k = info.k
         fx, fy, cx, cy = float(k[0]), float(k[4]), float(k[2]), float(k[5])
         if not all(math.isfinite(val) for val in (fx, fy, cx, cy)) or fx <= 0 or fy <= 0:
-            self.invalidate('REJECTED: invalid camera intrinsic matrix')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', 'invalid camera intrinsic matrix')
             return
         point = PointStamped()
         point.header = depth_msg.header
@@ -607,32 +811,77 @@ class ObjectLocalizer(Node):
             )
             map_point = do_transform_point(point, tf)
         except TransformException as exc:
-            self.invalidate(f'WAITING: target-frame TF at camera timestamp: {exc}')
+            self.reject_observation(
+                'TF_REJECTED',
+                f'transform unavailable at capture timestamp: {exc}')
             return
         xyz = np.array([map_point.point.x, map_point.point.y, map_point.point.z])
         if not np.all(np.isfinite(xyz)):
-            self.invalidate('REJECTED: invalid map coordinates')
+            self.reject_observation(
+                'OBSERVATION_REJECTED', 'invalid map coordinates')
             return
-        tolerance = float(self.get_parameter('max_position_jitter_m').value)
-        if self.position_history and any(
-            np.linalg.norm(xyz - previous) > tolerance
-            for previous in self.position_history
-        ):
-            if self.valid and not self._hold_marker():
-                self.clear_marker()
-            self.valid = False
-            self.position_history.clear()
-        self.position_history.append(xyz)
-        required = self.position_history.maxlen
-        if len(self.position_history) < required:
+        self.expire_history()
+        rgb_ns = (int(data['timestamp_sec']) * 1_000_000_000
+                  + int(data['timestamp_nanosec']))
+        depth_ns = self.timestamp_ns(depth_msg.header.stamp)
+        identity = str(best.get('track_id', data.get('target_identity', '')))
+        observation = Observation3D(
+            target=str(data['target']), identity=identity,
+            rgb_stamp_ns=rgb_ns, depth_stamp_ns=depth_ns,
+            xyz=tuple(float(value) for value in xyz))
+        decision, details = self.history.add(observation)
+        if decision == 'duplicate_rgb':
+            self.sync_counts['duplicate_rgb_exclusions'] += 1
+            self.reject_observation(
+                'OBSERVATION_REJECTED',
+                'duplicate RGB capture timestamp is not independent evidence')
+            return
+        if decision == 'duplicate_depth':
+            self.sync_counts['duplicate_depth_exclusions'] += 1
+            self.reject_observation(
+                'OBSERVATION_REJECTED',
+                'reused depth capture timestamp is not independent evidence')
+            return
+        if decision == 'outlier':
+            self.sync_counts['position_outliers'] += 1
+            self.reject_observation(
+                'POSITION_OUTLIER',
+                f'distance={details["distance_m"]:.2f}m '
+                f'limit={self.history.max_jitter_m:.2f}m '
+                f'consecutive={details["consecutive"]}')
+            return
+        if decision == 'cluster_reset':
+            self.sync_counts['position_outliers'] += 1
+            self.sync_counts['history_resets'] += 1
             self.valid = False
             self.valid_pub.publish(Bool(data=False))
+            self.publish_associated_observation(
+                False, reason='CONTRADICTORY_SPATIAL_CLUSTER')
             self.report(
-                f'OBSERVING: {len(self.position_history)}/{required} target poses; '
-                f'camera depth={z:.2f}m, dt={dt:.3f}s; {depth_note}'
-            )
+                'HISTORY_RESET: reason=CONTRADICTORY_SPATIAL_CLUSTER '
+                f'old_count={details["previous_count"]} new_count=1 '
+                f'distance={details["distance_m"]:.2f}m')
+        elif decision in ('target_changed', 'identity_changed'):
+            reason = ('TARGET_CHANGED' if decision == 'target_changed'
+                      else 'TARGET_IDENTITY_CHANGED')
+            self.reset_history(reason)
+            self.history.add(observation)
+        elif decision != 'accepted':
+            self.reject_observation(
+                'OBSERVATION_REJECTED', f'invalid 3D candidate ({decision})')
             return
-        stable_xyz = np.median(np.stack(self.position_history), axis=0)
+        required = self.history.required
+        count = self.history_count()
+        self.report(
+            f'POSITION_ACCEPTED: target={data["target"]} count={count}/{required} '
+            f'window={float(self.get_parameter("observation_window_s").value):.1f}s')
+        if count < required:
+            if self.valid:
+                self.invalidate_live('INSUFFICIENT_CONFIRMATIONS')
+            else:
+                self.valid_pub.publish(Bool(data=False))
+            return
+        stable_xyz = self.history.stable_xyz()
         pose = PoseStamped()
         pose.header.frame_id = self.get_parameter('map_frame').value
         pose.header.stamp = depth_msg.header.stamp
@@ -643,13 +892,19 @@ class ObjectLocalizer(Node):
         self.pose_pub.publish(pose)
         self.sync_counts['validated_poses'] += 1
         self.valid_pub.publish(Bool(data=True))
+        self.publish_associated_observation(
+            True, pose, rgb_ns=rgb_ns, depth_ns=depth_ns)
         self.publish_marker(pose)
         self.publish_last_known_marker(pose)
         self.valid = True
         self.last_valid_wall_time = time.monotonic()
+        self.last_valid_depth_ns = depth_ns
         self.report(
-            f'LOCALIZED {data["target"]}: {pose.header.frame_id}=({pose.pose.position.x:.2f}, '
+            f'TARGET_LOCALIZED: {data["target"]} '
+            f'{pose.header.frame_id}=({pose.pose.position.x:.2f}, '
             f'{pose.pose.position.y:.2f}, {pose.pose.position.z:.2f})m; '
+            f'confirmations={count}/{required} latest_age='
+            f'{max(0.0, (self._capture_now_ns() - depth_ns) / 1e9):.3f}s; '
             f'depth={z:.2f}m; dt={dt:.3f}s; {depth_note}'
         )
 
@@ -699,12 +954,27 @@ class ObjectLocalizer(Node):
     def watchdog_callback(self):
         now = time.monotonic()
         self.process_pending()
+        self.expire_history()
         if now - self.last_sync_report >= 5.0:
-            self.sync_status_pub.publish(String(data=json.dumps(dict(self.sync_counts))))
+            report = dict(self.sync_counts)
+            matched = report['exact_matches'] + report['close_matches'] + report['matches_after_wait']
+            completed = matched + report['expired_pending']
+            report.update({
+                'eligible_match_rate': (
+                    matched / completed if completed else 0.0),
+                'history_count': self.history_count(),
+                'history_required': self.history.required,
+                'live_valid': self.valid,
+                'pending_count': len(self.pending_detections),
+                'depth_buffer_count': len(self.depth_buffer),
+                'last_match': self.last_match,
+            })
+            self.sync_status_pub.publish(
+                String(data=json.dumps(report, sort_keys=True)))
             self.last_sync_report = now
         if self.valid and now - self.last_valid_wall_time > float(
                 self.get_parameter('target_timeout_s').value):
-            self.invalidate('STALE: no recent valid target localization')
+            self.invalidate_live('NO_RECENT_VALID_3D_OBSERVATION')
 
 
 def main(args=None):

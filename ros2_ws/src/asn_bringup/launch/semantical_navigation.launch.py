@@ -86,15 +86,42 @@ def generate_launch_description():
             'camera_info_topic': '/camera_info',
             'detections_topic': '/semantic/search/detections_json',
             'map_frame': 'map',
-            'max_sync_difference_s': 0.10,
+            'odom_topic': '/odom',
+            'stationary_sync_tolerance_s': ParameterValue(
+                LaunchConfiguration('stationary_sync_tolerance_s'),
+                value_type=float),
+            'moving_sync_tolerance_s': ParameterValue(
+                LaunchConfiguration('moving_sync_tolerance_s'),
+                value_type=float),
+            'sync_wait_s': ParameterValue(
+                LaunchConfiguration('sync_wait_s'), value_type=float),
+            'max_capture_age_s': ParameterValue(
+                LaunchConfiguration('max_capture_age_s'), value_type=float),
+            'observation_window_s': ParameterValue(
+                LaunchConfiguration('observation_window_s'), value_type=float),
+            'confirmation_positions': ParameterValue(
+                LaunchConfiguration('confirmation_positions'), value_type=int),
+            'consecutive_outliers_to_reset': ParameterValue(
+                LaunchConfiguration('consecutive_outliers_to_reset'),
+                value_type=int),
+            'motion_state_freshness_s': ParameterValue(
+                LaunchConfiguration('motion_state_freshness_s'),
+                value_type=float),
+            'stationary_linear_speed_mps': ParameterValue(
+                LaunchConfiguration('stationary_linear_speed_mps'),
+                value_type=float),
+            'stationary_angular_speed_rps': ParameterValue(
+                LaunchConfiguration('stationary_angular_speed_rps'),
+                value_type=float),
             'min_depth_m': 0.15,
             'max_depth_m': 5.0,
             'roi_fraction': 0.40,
             'min_valid_pixels': 20,
             'min_valid_fraction': 0.30,
             'max_depth_spread_m': 1.0,
-            'confirmation_positions': 3,
-            'max_position_jitter_m': 0.45,
+            'max_position_jitter_m': ParameterValue(
+                LaunchConfiguration('max_position_jitter_m'),
+                value_type=float),
             'target_timeout_s': 2.0,
         }]
     )
@@ -180,6 +207,23 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument('auto_max_goals', default_value='5'),
+        DeclareLaunchArgument(
+            'stationary_sync_tolerance_s', default_value='0.15'),
+        DeclareLaunchArgument(
+            'moving_sync_tolerance_s', default_value='0.10'),
+        DeclareLaunchArgument('sync_wait_s', default_value='1.0'),
+        DeclareLaunchArgument('max_capture_age_s', default_value='2.0'),
+        DeclareLaunchArgument('observation_window_s', default_value='4.0'),
+        DeclareLaunchArgument('confirmation_positions', default_value='3'),
+        DeclareLaunchArgument('max_position_jitter_m', default_value='0.45'),
+        DeclareLaunchArgument(
+            'consecutive_outliers_to_reset', default_value='2'),
+        DeclareLaunchArgument(
+            'motion_state_freshness_s', default_value='0.50'),
+        DeclareLaunchArgument(
+            'stationary_linear_speed_mps', default_value='0.02'),
+        DeclareLaunchArgument(
+            'stationary_angular_speed_rps', default_value='0.05'),
         DeclareLaunchArgument(
                 'start_mission_manager',
                 default_value='true'
