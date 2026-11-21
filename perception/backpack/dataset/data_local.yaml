@@ -1,0 +1,6 @@
+path: /home/master-jan/datasets/backpack/yolo
+train: train/images
+val: valid/images
+test: test/images
+names:
+  0: backpack
